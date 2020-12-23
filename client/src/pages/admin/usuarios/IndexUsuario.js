@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { withStyles, makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
-import Accordion from '@material-ui/core/Accordion';
-import AccordionDetails from '@material-ui/core/AccordionDetails';
-import AccordionActions from '@material-ui/core/AccordionActions';
+import Typography from '@material-ui/core/Typography';
+import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import Divider from '@material-ui/core/Divider';
 import Table from '@material-ui/core/Table';
@@ -19,13 +18,12 @@ import EditIcon from '@material-ui/icons/Edit';
 import Tooltip from '@material-ui/core/Tooltip';
 import Chip from '@material-ui/core/Chip';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import FilterListIcon from '@material-ui/icons/FilterList';
+import Button from '@material-ui/core/Button';
 
 import MenuAdmin from '../../../components/menu-admin';
 import api from '../../../services/api';
 import { getTypeUser, getTypeUserLabel } from '../../../functions/static_data';
-
-
-
 
 const StyledTableRow = withStyles((theme) => ({
   root: {
@@ -119,18 +117,28 @@ export default function IndexUsuario() {
 
         
         <Container maxWidth="lg" className={classes.container}>
-          <Accordion defaultExpanded>
-            <AccordionActions>
-              <h2>
-                Lista de usuários
-                    </h2>
-
-            </AccordionActions>
             
-            <Divider variant="middle" />
+        <Paper className={classes.paper}>
+        
+        <Grid container spacing={3}>
+        <Grid item sm={12}>
+            <Grid item xs={3}>
+              <Typography variant="h6" color="primary" gutterBottom>
+                Usuários
+              </Typography>
+            </Grid>
+            <Grid item xs={3}>
+              <Button style={{ marginBottom: 10, marginRight: 5 }} variant="contained" color="secondary" href={'/admin/usuarios/create'} startIcon={<DeleteIcon />}>Cadastrar</Button>
+            </Grid>
+            </Grid>
+            </Grid>
+            
+       
+
+            <Divider variant="fullWidth" />
 
             {loading ? (<FacebookCircularProgress style={{  margin: '20 auto'}} />) : (
-            <AccordionDetails className={classes.details}>
+            
               <Grid container spacing={3}>
                 <Grid item xs={12} sm={12}>
                   <TableContainer>
@@ -183,14 +191,9 @@ export default function IndexUsuario() {
                   </TableContainer>
                 </Grid>
               </Grid>
-            </AccordionDetails> )}
+             )}
 
-            <Divider />
-
-            <AccordionActions>
-
-            </AccordionActions>
-          </Accordion>
+          </Paper>
         </Container>       
       </main>
     </div>
@@ -201,8 +204,14 @@ const useStyles = makeStyles((theme) => ({
   root: {
     display: 'flex',
   },
+  paper: {
+    padding: theme.spacing(2),
+    display: 'flex',
+    overflow: 'auto',
+    flexDirection: 'column',
+  },
   table: {
-    minWidth: 650,
+    minWidth: 750,
   },
   title: {
     flexGrow: 1,
@@ -217,10 +226,5 @@ const useStyles = makeStyles((theme) => ({
     paddingTop: theme.spacing(4),
     paddingBottom: theme.spacing(4),
   },
-  paper: {
-    padding: theme.spacing(2),
-    display: 'flex',
-    overflow: 'auto',
-    flexDirection: 'column',
-  },
+  
 }));

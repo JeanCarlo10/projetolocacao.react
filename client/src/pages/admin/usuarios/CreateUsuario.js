@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-
-
+import Divider from '@material-ui/core/Divider';
+import Button from '@material-ui/core/Button';
+import AddCircleIcon from '@material-ui/icons/AddCircle';
 
 import MenuAdmin from '../../../components/menu-admin';
 import api from '../../../services/api';
@@ -116,7 +117,12 @@ export default function CreateUsuario() {
 
             </Grid>
           </form>
-
+          <Divider variant="fullWidth" />
+          <Grid container className={classes.button} style={{ paddingTop: 2}}>
+            <Button variant="contained" size="small" color='default' href={'/admin/usuarios'} startIcon={<AddCircleIcon />}>Voltar</Button>
+            <Button variant="contained" size="small" color='primary' href={'/admin/usuarios/create'} startIcon={<AddCircleIcon />}>Limpar</Button>
+            <Button variant="contained" size="small" href={'/admin/usuarios/create'} className={classes.btnSalvar} startIcon={<AddCircleIcon />}>Salvar</Button>
+          </Grid>
           {/* <Divider />
 
         <AccordionActions>
@@ -172,6 +178,11 @@ const useStyles = makeStyles((theme) => ({
   title: {
     flexGrow: 1,
   },
+  btnSalvar: {
+    backgroundColor: "green",
+    color: "#FFF",
+    "&:hover": {backgroundColor: "#12b912"}
+  },
   appBarSpacer: theme.mixins.toolbar,
   content: {
     flexGrow: 1,
@@ -186,7 +197,7 @@ const useStyles = makeStyles((theme) => ({
   button: {
     margin: theme.spacing(1),
   },
-
+  
   //coloquei agora
 
   heading: {

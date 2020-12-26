@@ -20,7 +20,8 @@ import Chip from '@material-ui/core/Chip';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import FilterListIcon from '@material-ui/icons/FilterList';
 import Button from '@material-ui/core/Button';
-
+import AddIcon from '@material-ui/icons/Add';
+import AddCircleIcon from '@material-ui/icons/AddCircle';
 import MenuAdmin from '../../../components/menu-admin';
 import api from '../../../services/api';
 import { getTypeUser, getTypeUserLabel } from '../../../functions/static_data';
@@ -46,7 +47,7 @@ export default function IndexUsuario() {
       setUsers(response.data);
       setLoading(false);
     }
-    setTimeout(() => loadUsers(), 1000);
+    loadUsers();
   }, []);
 
   async function handleDelete(id) {
@@ -120,78 +121,71 @@ export default function IndexUsuario() {
             
         <Paper className={classes.paper}>
         
-        <Grid container spacing={3}>
-        <Grid item sm={12}>
-            <Grid item xs={3}>
-              <Typography variant="h6" color="primary" gutterBottom>
-                Usuários
-              </Typography>
-            </Grid>
-            <Grid item xs={3}>
-              <Button style={{ marginBottom: 10, marginRight: 5 }} variant="contained" color="secondary" href={'/admin/usuarios/create'} startIcon={<DeleteIcon />}>Cadastrar</Button>
-            </Grid>
-            </Grid>
-            </Grid>
-            
-       
+        <Grid container style={{ justifyContent: 'space-between', marginBottom: 10, marginRight: 5  }}>
+          <Button variant="contained" size="small" color='primary' href={'/admin/usuarios/create'} startIcon={<AddCircleIcon />}>Cadastrar</Button>
+        
+          <Tooltip title="Filtros">
+            <IconButton>
+              <FilterListIcon />
+            </IconButton>
+          </Tooltip>
+        </Grid>
 
-            <Divider variant="fullWidth" />
+        <Divider variant="fullWidth" />
 
-            {loading ? (<FacebookCircularProgress style={{  margin: '20 auto'}} />) : (
-            
-              <Grid container spacing={3}>
-                <Grid item xs={12} sm={12}>
-                  <TableContainer>
-                    <Table className={classes.table} aria-label="simple table">
-                      <TableHead>
-                        <TableRow>
-                          <TableCell align="left"></TableCell>
-                          <TableCell>Data de cadastro</TableCell>
-                          <TableCell>Nome</TableCell>
-                          <TableCell>Email</TableCell>
-                          <TableCell align="center">Tipo</TableCell>
-                        </TableRow>
-                      </TableHead>
+        {loading ? (<FacebookCircularProgress style={{  margin: '20 auto'}} />) : (
+        
+          <Grid container spacing={3}>
+            <Grid item xs={12} sm={12}>
+              <TableContainer>
+                <Table className={classes.table} aria-label="simple table">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell align="left"></TableCell>
+                      <TableCell>Data de cadastro</TableCell>
+                      <TableCell>Nome</TableCell>
+                      <TableCell>Email</TableCell>
+                      <TableCell align="center">Tipo</TableCell>
+                    </TableRow>
+                  </TableHead>
 
-                      <TableBody>
-                        {users.map((row) => (
-                          <StyledTableRow key={row._id}>
-                            <TableCell>
-                              <Tooltip title="Visualizar">
-                                <IconButton>
-                                  <VisibilityIcon />
-                                </IconButton>
-                              </Tooltip>
-                              <Tooltip title="Editar">
-                                <IconButton href={'/admin/usuarios/edit/' + row._id}>
-                                  <EditIcon
-                                    color="primary"
-                                  />
-                                </IconButton>
-                              </Tooltip>
-                              <Tooltip title="Excluir">
-                                <IconButton onClick={() => handleDelete(row._id)}>
-                                  <DeleteIcon
-                                    color="error"
-                                  />
-                                </IconButton>
-                              </Tooltip>
-                            </TableCell>
+                  <TableBody>
+                    {users.map((row) => (
+                      <StyledTableRow key={row._id}>
+                        <TableCell>
+                          <Tooltip title="Visualizar">
+                            <IconButton>
+                              <VisibilityIcon />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title="Editar">
+                            <IconButton href={'/admin/usuarios/edit/' + row._id}>
+                              <EditIcon
+                                color="primary"
+                              />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title="Excluir">
+                            <IconButton onClick={() => handleDelete(row._id)}>
+                              <DeleteIcon
+                                color="error"
+                              />
+                            </IconButton>
+                          </Tooltip>
+                        </TableCell>
 
-                            <TableCell>{new Date(row.createdAt).toLocaleDateString('pt-br')}</TableCell>
-                            <TableCell component="th" scope="row">
-                              {row.nmUsuario}
-                            </TableCell>
-                            <TableCell>{row.dsEmail}</TableCell>
-                            <TableCell align="center"><Chip label={getTypeUser(row.flUsuario)} color={getTypeUserLabel(row.flUsuario)} /></TableCell>
-                          </StyledTableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-                </Grid>
-              </Grid>
-             )}
+                        <TableCell>{new Date(row.createdAt).toLocaleDateString('pt-br')}</TableCell>
+                        <TableCell component="th" scope="row">{row.nmUsuario}</TableCell>
+                        <TableCell>{row.dsEmail}</TableCell>
+                        <TableCell align="center"><Chip label={getTypeUser(row.flUsuario)} color={getTypeUserLabel(row.flUsuario)} /></TableCell>
+                      </StyledTableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Grid>
+          </Grid>
+          )}         
 
           </Paper>
         </Container>       
@@ -209,6 +203,9 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
     overflow: 'auto',
     flexDirection: 'column',
+  },
+  bottom: {
+    color: theme.palette.grey[theme.palette.type === 'light' ? 200 : 700],
   },
   table: {
     minWidth: 750,

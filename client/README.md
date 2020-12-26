@@ -70,6 +70,9 @@ This section has moved here: https://facebook.github.io/create-react-app/docs/tr
 <!-- Para dá um COMMIT -->
 <!-- git commit -m "Texto" -->
 
+<!-- Para dá um PUSH  -->
+<!-- git push origin master -->
+
 <!-- Para dá um PULL  -->
 <!-- git pull origin master -->
 

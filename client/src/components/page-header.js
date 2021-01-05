@@ -1,12 +1,13 @@
 import React from 'react';
 import { Paper, Card, Typography, makeStyles } from '@material-ui/core';
+import Divider from '@material-ui/core/Divider';
 
 const useStyles = makeStyles(theme => ({
     root: {
         backgroundColor: "#fdfdff"
     },
     pageHeader: {
-        padding: theme.spacing(10),
+        padding: theme.spacing(4),
         display: 'flex',
         marginBottom: theme.spacing(2),
     },
@@ -16,7 +17,7 @@ const useStyles = makeStyles(theme => ({
         color: '#3c44b1'
     },
     pageTitle: {
-        paddingLeft: theme.spacing(4),
+        // paddingLeft: theme.spacing(4),
         '& .MuiTypography-subtitle2': {
             opacity: '0.6'
         },
@@ -25,16 +26,14 @@ const useStyles = makeStyles(theme => ({
 
 export default function PageHeader(props) {
     const classes = useStyles();
-    const { title, subTitle, icon } = props;
-
-    
+    const { title, subTitle } = props;
 
     return (
         <Paper elevation={0} square className={classes.root}>
             <div className={classes.pageHeader} >
-                <Card className={classes.pageIcon}>
+                {/* <Card className={classes.pageIcon}>
                     {icon}
-                </Card>
+                </Card> */}
 
                 <div className={classes.pageTitle}>
                     <Typography
@@ -49,6 +48,9 @@ export default function PageHeader(props) {
                         {subTitle}
                     </Typography>
                 </div>
+
+                <Divider variant="fullWidth" />
+
             </div>
         </Paper>
     )

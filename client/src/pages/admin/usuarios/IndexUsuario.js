@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { withStyles, makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
-import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import Divider from '@material-ui/core/Divider';
@@ -20,7 +19,6 @@ import Chip from '@material-ui/core/Chip';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import FilterListIcon from '@material-ui/icons/FilterList';
 import Button from '@material-ui/core/Button';
-import AddIcon from '@material-ui/icons/Add';
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 import MenuAdmin from '../../../components/menu-admin';
 import api from '../../../services/api';
@@ -134,57 +132,54 @@ export default function IndexUsuario() {
         <Divider variant="fullWidth" />
 
         {loading ? (<FacebookCircularProgress style={{  margin: '20 auto'}} />) : (
-        
-          <Grid container spacing={3}>
-            <Grid item xs={12} sm={12}>
-              <TableContainer>
-                <Table className={classes.table} aria-label="simple table">
-                  <TableHead>
-                    <TableRow>
-                      <TableCell align="left"></TableCell>
-                      <TableCell>Data de cadastro</TableCell>
-                      <TableCell>Nome</TableCell>
-                      <TableCell>Email</TableCell>
-                      <TableCell align="center">Tipo</TableCell>
-                    </TableRow>
-                  </TableHead>
+        <Paper style={{ marginTop: 15}}>
+          <TableContainer>
+            <Table className={classes.table}>
+              <TableHead>
+                <TableRow>
+                  <TableCell align="left"></TableCell>
+                  <TableCell>Data de cadastro</TableCell>
+                  <TableCell>Nome</TableCell>
+                  <TableCell>Email</TableCell>
+                  <TableCell align="center">Tipo</TableCell>
+                </TableRow>
+              </TableHead>
 
-                  <TableBody>
-                    {users.map((row) => (
-                      <StyledTableRow key={row._id}>
-                        <TableCell>
-                          <Tooltip title="Visualizar">
-                            <IconButton>
-                              <VisibilityIcon />
-                            </IconButton>
-                          </Tooltip>
-                          <Tooltip title="Editar">
-                            <IconButton href={'/admin/usuarios/edit/' + row._id}>
-                              <EditIcon
-                                color="primary"
-                              />
-                            </IconButton>
-                          </Tooltip>
-                          <Tooltip title="Excluir">
-                            <IconButton onClick={() => handleDelete(row._id)}>
-                              <DeleteIcon
-                                color="error"
-                              />
-                            </IconButton>
-                          </Tooltip>
-                        </TableCell>
+            <TableBody>
+              {users.map((row) => (
+                <TableRow hover key={row._id}>
+                  <TableCell>
+                    <Tooltip title="Visualizar">
+                      <IconButton>
+                        <VisibilityIcon />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Editar">
+                      <IconButton href={'/admin/usuarios/edit/' + row._id}>
+                        <EditIcon
+                          color="primary"
+                        />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Excluir">
+                      <IconButton onClick={() => handleDelete(row._id)}>
+                        <DeleteIcon
+                          color="error"
+                        />
+                      </IconButton>
+                    </Tooltip>
+                  </TableCell>
 
-                        <TableCell>{new Date(row.createdAt).toLocaleDateString('pt-br')}</TableCell>
-                        <TableCell component="th" scope="row">{row.nmUsuario}</TableCell>
-                        <TableCell>{row.dsEmail}</TableCell>
-                        <TableCell align="center"><Chip label={getTypeUser(row.flUsuario)} color={getTypeUserLabel(row.flUsuario)} /></TableCell>
-                      </StyledTableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </Grid>
-          </Grid>
+                  <TableCell>{new Date(row.createdAt).toLocaleDateString('pt-br')}</TableCell>
+                  <TableCell>{row.nmUsuario}</TableCell>
+                  <TableCell>{row.dsEmail}</TableCell>
+                  <TableCell align="center"><Chip label={getTypeUser(row.flUsuario)} color={getTypeUserLabel(row.flUsuario)} /></TableCell>
+                </TableRow>
+              ))}
+              </TableBody>
+              </Table>
+            </TableContainer>
+          </Paper>
           )}         
 
           </Paper>
@@ -198,22 +193,6 @@ const useStyles = makeStyles((theme) => ({
   root: {
     display: 'flex',
   },
-  paper: {
-    padding: theme.spacing(2),
-    display: 'flex',
-    overflow: 'auto',
-    flexDirection: 'column',
-  },
-  bottom: {
-    color: theme.palette.grey[theme.palette.type === 'light' ? 200 : 700],
-  },
-  table: {
-    minWidth: 750,
-  },
-  title: {
-    flexGrow: 1,
-  },
-  appBarSpacer: theme.mixins.toolbar,
   content: {
     flexGrow: 1,
     height: '100vh',
@@ -223,5 +202,14 @@ const useStyles = makeStyles((theme) => ({
     paddingTop: theme.spacing(4),
     paddingBottom: theme.spacing(4),
   },
-  
+  paper: {
+    padding: theme.spacing(2),
+    display: 'flex',
+    overflow: 'auto',
+    flexDirection: 'column',
+  },
+  table: {
+    minWidth: 750,
+  },
+  appBarSpacer: theme.mixins.toolbar,
 }));

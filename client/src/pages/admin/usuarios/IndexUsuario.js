@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { withStyles, makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import Paper from '@material-ui/core/Paper';
-import Grid from '@material-ui/core/Grid';
-import Divider from '@material-ui/core/Divider';
+import Drawer from '@material-ui/core/Drawer';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -16,27 +15,48 @@ import VisibilityIcon from '@material-ui/icons/Visibility';
 import EditIcon from '@material-ui/icons/Edit';
 import Tooltip from '@material-ui/core/Tooltip';
 import Chip from '@material-ui/core/Chip';
-import CircularProgress from '@material-ui/core/CircularProgress';
-import FilterListIcon from '@material-ui/icons/FilterList';
+import FilterListRoundedIcon from '@material-ui/icons/FilterListRounded';
 import Button from '@material-ui/core/Button';
-import AddCircleIcon from '@material-ui/icons/AddCircle';
+import AddCircleRoundedIcon from '@material-ui/icons/AddCircleRounded';
 import MenuAdmin from '../../../components/menu-admin';
 import api from '../../../services/api';
 import { getTypeUser, getTypeUserLabel } from '../../../functions/static_data';
+import lottie from 'lottie-web';
+import Card from '@material-ui/core/Card';
+import CardContent from '@material-ui/core/CardContent';
+import Breadcrumbs from '@material-ui/core/Breadcrumbs';
+import Link from '@material-ui/core/Link';
+import Typography from '@material-ui/core/Typography';
+import CardHeader from '@material-ui/core/CardHeader';
+import clsx from 'clsx';
 
 const StyledTableRow = withStyles((theme) => ({
   root: {
     '&:nth-of-type(odd)': {
       backgroundColor: theme.palette.action.hover,
     },
+    
   },
 }))(TableRow);
 
+
 export default function IndexUsuario() {
   const classes = useStyles();
-
+  
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const container = useRef(null);
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    lottie.loadAnimation({
+      container: container.current,
+      renderer: 'svg',
+      loop: true,
+      autoplay: true,
+      animationData: require('../../../assets/search.json'),
+    })
+  }, []);
 
   useEffect(() => {
     async function loadUsers() {
@@ -45,7 +65,7 @@ export default function IndexUsuario() {
       setUsers(response.data);
       setLoading(false);
     }
-    loadUsers();
+    setTimeout(() => loadUsers(), 2000);
   }, []);
 
   async function handleDelete(id) {
@@ -60,103 +80,90 @@ export default function IndexUsuario() {
     }
   }
 
-  const useStylesFacebook = makeStyles((theme) => ({
-    root: {
-      position: 'relative',
-    },
-    bottom: {
-      color: theme.palette.grey[theme.palette.type === 'light' ? 200 : 700],
-    },
-    top: {
-      color: '#1a90ff',
-      animationDuration: '550ms',
-      position: 'absolute',
-      left: 0,
-    },
-    circle: {
-      strokeLinecap: 'round',
-    },
-  }));
-  
-  function FacebookCircularProgress(props) {
-    const classes = useStylesFacebook();
-  
-    return (
-      <div className={classes.root}>
-        <CircularProgress
-          variant="determinate"
-          className={classes.bottom}
-          size={40}
-          thickness={4}
-          {...props}
-          value={100}
-        />
-        <CircularProgress
-          variant="indeterminate"
-          disableShrink
-          className={classes.top}
-          classes={{
-            circle: classes.circle,
-          }}
-          size={40}
-          thickness={4}
-          {...props}
-        />
-      </div>
-    );
-  }
+  const handleDrawerFilter = () => {
+    setOpen(true);
+  };
 
   return (
     <div className={classes.root}>
-      <MenuAdmin title={'Lista de usuários'} />
-
+      <MenuAdmin/>
 
       <main className={classes.content}>
         <div className={classes.appBarSpacer} />
 
-        
         <Container maxWidth="lg" className={classes.container}>
-            
-        <Paper className={classes.paper}>
-        
-        <Grid container style={{ justifyContent: 'space-between', marginBottom: 10, marginRight: 5  }}>
-          <Button variant="contained" size="small" color='primary' href={'/admin/usuarios/create'} startIcon={<AddCircleIcon />}>Cadastrar</Button>
-        
-          <Tooltip title="Filtros">
-            <IconButton>
-              <FilterListIcon />
-            </IconButton>
-          </Tooltip>
-        </Grid>
+        <Card>
+          <CardHeader className={classes.cardHeader}
+            title="Usuários"
+            subheader={
+            <Breadcrumbs aria-label="breadcrumb">
+              <Link color="inherit" href={'/admin'} >
+                Painel
+              </Link>
+              <Typography color="textPrimary">Lista de usuário</Typography>
+            </Breadcrumbs>
+            }
+            action={
+              <div style={{ paddingTop: 10}}>
+                <Button 
+                  variant="contained" 
+                  size="medium"
+                  color='primary' 
+                  href={'/admin/usuarios/create'} 
+                  startIcon={<AddCircleRoundedIcon/>}>
+                    Cadastrar
+                </Button>
+                
+                <Tooltip title="Filtros">
+                  <IconButton size="large" onClick={handleDrawerFilter}>
+                    <FilterListRoundedIcon />
+                  </IconButton>
+                  
+                </Tooltip>
 
-        <Divider variant="fullWidth" />
-
-        {loading ? (<FacebookCircularProgress style={{  margin: '20 auto'}} />) : (
-        <Paper style={{ marginTop: 15}}>
-          <TableContainer>
+                <Drawer 
+                anchor='right'
+                open={open}
+                onClose={() => setOpen(false)}
+                >
+                  <h3>Filtros aqui!!</h3>
+                    {/* <List>{secondaryListItems}</List> */}
+                  </Drawer>
+              </div>
+            }
+          />
+          
+          {loading ? (<div style={{width: 400, margin: '0 auto'}} ref={container} />) : (
+          <CardContent>
+          <TableContainer component={Paper}>
             <Table className={classes.table}>
               <TableHead>
                 <TableRow>
-                  <TableCell align="left"></TableCell>
                   <TableCell>Data de cadastro</TableCell>
                   <TableCell>Nome</TableCell>
                   <TableCell>Email</TableCell>
                   <TableCell align="center">Tipo</TableCell>
+                  <TableCell align="right">Ações</TableCell>
                 </TableRow>
               </TableHead>
 
             <TableBody>
               {users.map((row) => (
                 <TableRow hover key={row._id}>
-                  <TableCell>
+                  <TableCell>{new Date(row.createdAt).toLocaleDateString('pt-br')}</TableCell>
+                  <TableCell>{row.nmUsuario}</TableCell>
+                  <TableCell>{row.dsEmail}</TableCell>
+                  <TableCell align="center"><Chip label={getTypeUser(row.flUsuario)} color={getTypeUserLabel(row.flUsuario)} /></TableCell>
+                  <TableCell component="th" scope="row" align="right">
                     <Tooltip title="Visualizar">
-                      <IconButton>
-                        <VisibilityIcon />
+                      <IconButton >
+                        <VisibilityIcon className={classes.buttonTable}/>
                       </IconButton>
                     </Tooltip>
                     <Tooltip title="Editar">
-                      <IconButton href={'/admin/usuarios/edit/' + row._id}>
+                      <IconButton  href={'/admin/usuarios/edit/' + row._id}>
                         <EditIcon
+                          className={classes.buttonTable}
                           color="primary"
                         />
                       </IconButton>
@@ -164,35 +171,46 @@ export default function IndexUsuario() {
                     <Tooltip title="Excluir">
                       <IconButton onClick={() => handleDelete(row._id)}>
                         <DeleteIcon
+                          className={classes.buttonTable}
                           color="error"
                         />
                       </IconButton>
                     </Tooltip>
                   </TableCell>
-
-                  <TableCell>{new Date(row.createdAt).toLocaleDateString('pt-br')}</TableCell>
-                  <TableCell>{row.nmUsuario}</TableCell>
-                  <TableCell>{row.dsEmail}</TableCell>
-                  <TableCell align="center"><Chip label={getTypeUser(row.flUsuario)} color={getTypeUserLabel(row.flUsuario)} /></TableCell>
                 </TableRow>
               ))}
               </TableBody>
               </Table>
             </TableContainer>
-          </Paper>
-          )}         
-
-          </Paper>
-        </Container>       
+          </CardContent>
+          )}
+        </Card>
+        </Container>     
       </main>
     </div>
   );
 }
 
+const drawerWidth = 240;
+
 const useStyles = makeStyles((theme) => ({
   root: {
     display: 'flex',
   },
+  drawerPaper: {
+    position: 'relative',
+    whiteSpace: 'nowrap',
+    backgroundColor: "#222C3C",
+
+    "& .MuiListItem-button:hover": {
+      backgroundColor: "#1D2531",
+    },
+    width: drawerWidth,
+    transition: theme.transitions.create('width', {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+  }, 
   content: {
     flexGrow: 1,
     height: '100vh',
@@ -202,14 +220,25 @@ const useStyles = makeStyles((theme) => ({
     paddingTop: theme.spacing(4),
     paddingBottom: theme.spacing(4),
   },
-  paper: {
-    padding: theme.spacing(2),
-    display: 'flex',
-    overflow: 'auto',
-    flexDirection: 'column',
-  },
+  
   table: {
     minWidth: 750,
+    '& .MuiTableCell-head': {
+      fontWeight: 'bold',
+      fontSize: 15
+    }
+  },
+  buttonTable: {
+    margin: theme.spacing(0.5)
+  },
+  cardHeader: {
+    backgroundColor:
+      theme.palette.type === 'light' ? theme.palette.grey[200] : theme.palette.grey[700],
+      "& .MuiCardHeader-title": {
+        textTransform: 'uppercase',
+        fontWeight: 700,
+        color: '#7F8F97'
+      },
   },
   appBarSpacer: theme.mixins.toolbar,
 }));

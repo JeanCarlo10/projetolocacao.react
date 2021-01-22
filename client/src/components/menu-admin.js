@@ -62,7 +62,7 @@ export default function MenuAdmin(props) {
             />
           </div>
 
-          {/* Nome do usuário logado */}
+          {/* Nome do usuário logado que está vindo do Auth */}
           {getNameUser()}
         </Toolbar>
       </AppBar>

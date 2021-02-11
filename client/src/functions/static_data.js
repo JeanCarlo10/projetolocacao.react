@@ -9,3 +9,9 @@ export const getTypeUserLabel = (value) => {
 
     return array[value-1];
 };
+
+export const getTypeClient = (value) => {
+    var array = ['Física', 'Jurídica'];
+
+    return array[value-1];
+};

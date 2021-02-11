@@ -2,6 +2,7 @@ const express = require('express');
 const routes = express.Router();
 const User = require('./controllers/UsersController');
 const Client = require('./controllers/ClientsController');
+const Material = require('./controllers/MaterialsController');
 
 routes.get('/', User.index);
 
@@ -21,5 +22,12 @@ routes.get('/api/clients', Client.index);
 routes.get('/api/clients.details/:_id', Client.details);
 routes.delete('/api/clients/:_id', Client.delete);
 routes.put('/api/clients', Client.update);
+
+//Rotas de Materiais
+routes.post('/api/materials', Material.create);
+routes.get('/api/materials', Material.index);
+routes.get('/api/materials.details/:_id', Material.details);
+routes.delete('/api/materials/:_id', Material.delete);
+routes.put('/api/materials', Material.update);
 
 module.exports = routes;

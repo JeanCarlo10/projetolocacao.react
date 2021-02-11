@@ -1,21 +1,22 @@
 import React, { useState, useEffect } from 'react';
+import { TextField, InputLabel, FormControl, Select } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import Grid from '@material-ui/core/Grid';
-import Typography from '@material-ui/core/Typography';
-import TextField from '@material-ui/core/TextField';
-import Container from '@material-ui/core/Container';
-import InputLabel from '@material-ui/core/InputLabel';
+
+import CachedIcon from '@material-ui/icons/Cached';
+import SaveIcon from '@material-ui/icons/Save';
+import ArrowBackIcon from '@material-ui/icons/ArrowBack';
+
 import MenuItem from '@material-ui/core/MenuItem';
-import FormControl from '@material-ui/core/FormControl';
-import Select from '@material-ui/core/Select';
-import Accordion from '@material-ui/core/Accordion';
-import AccordionDetails from '@material-ui/core/AccordionDetails';
-import AccordionActions from '@material-ui/core/AccordionActions';
+import Typography from '@material-ui/core/Typography';
+import Container from '@material-ui/core/Container';
+import Card from '@material-ui/core/Card';
+import CardActions from '@material-ui/core/CardActions';
+import CardContent from '@material-ui/core/CardContent';
+import CardHeader from '@material-ui/core/CardHeader';
 import Divider from '@material-ui/core/Divider';
 import Button from '@material-ui/core/Button';
-import SaveIcon from '@material-ui/icons/Save';
-import CachedIcon from '@material-ui/icons/Cached';
-import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
+import Breadcrumbs from '@material-ui/core/Breadcrumbs';
+import Link from '@material-ui/core/Link';
 import MenuAdmin from '../../../components/menu-admin';
 import api from '../../../services/api';
 import { useParams, useHistory } from 'react-router-dom';
@@ -49,6 +50,12 @@ export default function EditUsuario() {
         history.goBack('/admin/usuarios')
     }
 
+    function handleClear() {
+        setNome('');
+        setEmail('');
+        setSenha('');
+        setTipo('');
+      }
 
     async function handleSubmit() {
         const data = {
@@ -74,182 +81,134 @@ export default function EditUsuario() {
 
     return (
         <div className={classes.root}>
-            <MenuAdmin title={'Editar usuário'}/>
+            <MenuAdmin/>
             <main className={classes.content}>
-                <div className={classes.appBarSpacer} />
-                <Container maxWidth="lg" className={classes.container}>
-                    <Accordion defaultExpanded>
-                        <AccordionActions>
-                            <Typography>
-                                Editar usuário
-                            </Typography>
-                        </AccordionActions>
-
-                        <Divider />
-
-                        <AccordionDetails className={classes.details}>
-                            <Grid container spacing={3}>
-                                <Grid item sm={12}>
-                                    <Grid container spacing={3}>
-                                        <Grid item xs={12} sm={12}>
-                                            <TextField
-                                                required
-                                                id="nome"
-                                                name="nome"
-                                                label="Nome usuário"
-                                                fullWidth
-                                                autoComplete="nome"
-                                                value={nome}
-                                                onChange={e => setNome(e.target.value)}
-                                            />
-                                        </Grid>
-
-                                        <Grid item xs={12} sm={6}>
-                                            <TextField
-                                                required
-                                                id="email"
-                                                name="email"
-                                                label="Email"
-                                                fullWidth
-                                                autoComplete="email"
-                                                value={email}
-                                                onChange={e => setEmail(e.target.value)}
-                                            />
-                                        </Grid>
-
-                                        <Grid item xs={12} sm={3}>
-                                            <FormControl className={classes.formControl}>
-                                                <InputLabel id="labelTipo">Tipo usuário</InputLabel>
-                                                <Select
-                                                    labelId="labelTipo"
-                                                    id="tipo"
-                                                    value={tipo}
-                                                    onChange={e => setTipo(e.target.value)}
-                                                >
-                                                    <MenuItem value={1}>Administrador</MenuItem>
-                                                    <MenuItem value={2}>Funcionário</MenuItem>
-                                                </Select>
-                                            </FormControl>
-                                        </Grid>
-
-                                        <Grid item xs={12} sm={3}>
-                                            <TextField
-                                                type="password"
-                                                required
-                                                id="senha"
-                                                name="senha"
-                                                label="Senha"
-                                                fullWidth
-                                                autoComplete="senha"
-                                                value={senha}
-                                                onChange={e => setSenha(e.target.value)}
-                                            />
-                                        </Grid>
-                                    </Grid>
-                                </Grid>
-                            </Grid>
-                        </AccordionDetails>
-
-                        <Divider />
-
-                        <AccordionActions>
-                            <Button
-                                onClick={goBack}
-                                variant="contained"
-                                className={classes.button}
-                                startIcon={<ChevronLeftIcon />}
+                
+            <Container maxWidth="lg" component="main" className={classes.container}>
+            <Card>
+                <CardHeader
+                    title="Editar usuários"
+                    subheader={
+                    <Breadcrumbs aria-label="breadcrumb">
+                    <Link color="inherit" href={'/admin/usuarios'} >
+                        Usuários
+                    </Link>
+                    <Typography color="textPrimary">Editar usuário</Typography>
+                    </Breadcrumbs>
+                    }
+                    titleTypographyProps={{ align: 'left' }}
+                    subheaderTypographyProps={{ align: 'left' }}
+                    className={classes.cardHeader}
+                />
+                <CardContent className={classes.inputs}>
+                    <TextField
+                        required
+                        variant="outlined"
+                        id="nome"
+                        name="nome"
+                        label="Nome usuário"
+                        autoComplete="nome"
+                        autoFocus
+                        value={nome}
+                        onChange={e => setNome(e.target.value)}
+                    />
+                    <TextField
+                        required
+                        variant="outlined"
+                        id="email"
+                        name="email"
+                        label="Email"
+                        autoComplete="email"
+                        value={email}
+                        onChange={e => setEmail(e.target.value)}
+                    />
+                    <div className={classes.twoInputs}>
+                        <TextField
+                            variant="outlined"
+                            type="password"
+                            required
+                            id="senha"
+                            name="senha"
+                            label="Senha"
+                            autoComplete="senha"
+                            value={senha}
+                            onChange={e => setSenha(e.target.value)}
+                        />
+                        <FormControl variant="outlined" className={classes.formControl}>
+                            <InputLabel id="tipo">Tipo de usuário</InputLabel>
+                            <Select
+                                id="tipo"
+                                value={tipo}
+                                onChange={e => setTipo(e.target.value)}
+                                label="Tipo de usuário"
                             >
-                                Voltar
-                        </Button>
-
-                            <Button
-                                variant="contained"
-                                color="secondary"
-                                className={classes.button}
-                                startIcon={<CachedIcon />}
-                            >
-                                Limpar
-                        </Button>
-
-                            <Button
-                                variant="contained"
-
-                                color="primary"
-                                className={classes.button}
-                                startIcon={<SaveIcon />}
-                                onClick={handleSubmit}
-                            >
-                                Salvar
-                        </Button>
-                        </AccordionActions>
-                    </Accordion>
-                </Container>
+                            <MenuItem value="" />
+                            <MenuItem  value={1}>Administrador</MenuItem>
+                            <MenuItem  value={2}>Funcionário</MenuItem>
+                            </Select>
+                        </FormControl>
+                    </div>
+                </CardContent>
+                <Divider variant="middle" />
+                <CardActions>
+                    <Button variant="contained" size="small" className={classes.button} color='default' href={'/admin/usuarios'} startIcon={<ArrowBackIcon />}>Voltar</Button>
+                    <Button variant="contained" size="small"  className={classes.button} color='primary' onClick={handleClear} startIcon={<CachedIcon />}>Limpar</Button>
+                    <Button variant="contained" size="small" href={'/admin/usuarios'} className={classes.btnSalvar} onClick={handleSubmit} startIcon={<SaveIcon />}>Salvar</Button>
+                </CardActions>
+            </Card>   
+            </Container>
             </main>
         </div>
     );
 }
 
-const drawerWidth = 240;
-
 const useStyles = makeStyles((theme) => ({
     root: {
         display: 'flex',
     },
-    title: {
-        flexGrow: 1,
-    },
-    appBarSpacer: theme.mixins.toolbar,
     content: {
         flexGrow: 1,
         height: '100vh',
         overflow: 'auto',
     },
-    container: {
-        paddingTop: theme.spacing(4),
-        paddingBottom: theme.spacing(4),
+    cardHeader: {
+        backgroundColor:
+          theme.palette.type === 'light' ? theme.palette.grey[200] : theme.palette.grey[700],
+          "& .MuiCardHeader-title": {
+            textTransform: 'uppercase',
+            fontWeight: 700,
+            color: '#7F8F97'
+          },
     },
-    paper: {
-        padding: 15,
+    container: {
+        marginTop: 90
+      },
+    inputs: {
         display: 'flex',
         overflow: 'auto',
         flexDirection: 'column',
+        '& .MuiTextField-root': {
+          margin: theme.spacing(1),
+        }
     },
-    formControl: {
-        width: '100%',
-    },
-    button: {
+    twoInputs: {
+        display: 'flex',
+        '& .MuiTextField-root': {
         margin: theme.spacing(1),
-    },
-
-    //coloquei agora
-
-    heading: {
-        fontSize: theme.typography.pxToRem(15),
-    },
-    secondaryHeading: {
-        fontSize: theme.typography.pxToRem(15),
-        color: theme.palette.text.secondary,
-    },
-    icon: {
-        verticalAlign: 'bottom',
-        height: 20,
-        width: 20,
-    },
-    details: {
-        alignItems: 'center',
-    },
-    column: {
-        flexBasis: '33.33%',
-    },
-    helper: {
-        borderLeft: `2px solid ${theme.palette.divider}`,
-        padding: theme.spacing(1, 2),
-    },
-    link: {
-        color: theme.palette.primary.main,
-        textDecoration: 'none',
-        '&:hover': {
-            textDecoration: 'underline',
+        width: '50%',
         },
     },
+    formControl: {
+        margin: theme.spacing(1),
+        minWidth: '50%',
+    },
+    button: {
+        margin: theme.spacing(0.5),
+    },
+    btnSalvar: {
+        backgroundColor: "#36A420",
+        color: "#FFF",
+        "&:hover": {backgroundColor: "green"} //1bb934
+    },  
+    appBarSpacer: theme.mixins.toolbar,
 }));

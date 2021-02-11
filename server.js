@@ -18,7 +18,6 @@ mongoose.connect('mongodb://localhost:27017/LocacaoDB',{
     }else{
         console.log('MongoDB conectado com sucesso!')
     }
-    
 });
 
 app.use(cors());

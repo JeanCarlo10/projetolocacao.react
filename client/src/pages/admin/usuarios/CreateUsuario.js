@@ -1,12 +1,16 @@
 import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
+import { TextField, InputLabel, FormControl, Select } from '@material-ui/core';
+
+import CachedIcon from '@material-ui/icons/Cached';
+import SaveIcon from '@material-ui/icons/Save';
+import ArrowBackIcon from '@material-ui/icons/ArrowBack';
+
 import Divider from '@material-ui/core/Divider';
 import Button from '@material-ui/core/Button';
-import AddCircleIcon from '@material-ui/icons/AddCircle';
 import Container from '@material-ui/core/Container';
 import MenuAdmin from '../../../components/menu-admin';
 import api from '../../../services/api';
-import { Grid, TextField, InputLabel, FormControl, Select } from '@material-ui/core';
 import Breadcrumbs from '@material-ui/core/Breadcrumbs';
 import Link from '@material-ui/core/Link';
 import Typography from '@material-ui/core/Typography';
@@ -56,7 +60,7 @@ export default function CreateUsuario() {
       <MenuAdmin/>
       <main className={classes.content}>
 
-      <Container maxWidth="lg" component="main" style={{ marginTop: 90 }}>
+      <Container maxWidth="lg" component="main" className={classes.container}>
         <Card>
           <CardHeader
             title="Cadastrar usuários"
@@ -72,7 +76,7 @@ export default function CreateUsuario() {
             subheaderTypographyProps={{ align: 'left' }}
             className={classes.cardHeader}
           />
-          <CardContent className={classes.conteudo}>
+          <CardContent className={classes.inputs}>
             <TextField
               required
               variant="outlined"
@@ -94,7 +98,7 @@ export default function CreateUsuario() {
               value={email}
               onChange={e => setEmail(e.target.value)}
             />
-            <div className={classes.subConteudo}>
+            <div className={classes.twoInputs}>
               <TextField
                 variant="outlined"
                 type="password"
@@ -123,9 +127,9 @@ export default function CreateUsuario() {
           </CardContent>
           <Divider variant="middle" />
           <CardActions>
-            <Button variant="contained" size="small" className={classes.button} color='default' href={'/admin/usuarios'} startIcon={<AddCircleIcon />}>Voltar</Button>
-            <Button variant="contained" size="small"  className={classes.button} color='primary' onClick={handleClear} startIcon={<AddCircleIcon />}>Limpar</Button>
-            <Button variant="contained" size="small" href={'/admin/usuarios'} className={classes.btnSalvar} onClick={handleSubmit} startIcon={<AddCircleIcon />}>Salvar</Button>
+            <Button variant="contained" size="small" className={classes.button} color='default' href={'/admin/usuarios'} startIcon={<ArrowBackIcon />}>Voltar</Button>
+            <Button variant="contained" size="small"  className={classes.button} color='primary' onClick={handleClear} startIcon={<CachedIcon />}>Limpar</Button>
+            <Button variant="contained" size="small" href={'/admin/usuarios'} className={classes.btnSalvar} onClick={handleSubmit} startIcon={<SaveIcon />}>Salvar</Button>
           </CardActions>
         </Card>
       </Container>
@@ -138,7 +142,24 @@ const useStyles = makeStyles((theme) => ({
   root: {
     display: 'flex',
   },
-  conteudo: {
+  content: {
+    flexGrow: 1,
+    height: '100vh',
+    overflow: 'auto',
+  },
+  cardHeader: {
+    backgroundColor:
+      theme.palette.type === 'light' ? theme.palette.grey[200] : theme.palette.grey[700],
+      "& .MuiCardHeader-title": {
+        textTransform: 'uppercase',
+        fontWeight: 700,
+        color: '#7F8F97'
+      },
+  },
+  container: {
+    marginTop: 90
+  },
+  inputs: {
     display: 'flex',
     overflow: 'auto',
     flexDirection: 'column',
@@ -146,7 +167,7 @@ const useStyles = makeStyles((theme) => ({
       margin: theme.spacing(1),
     }
   },
-  subConteudo: {
+  twoInputs: {
      display: 'flex',
     '& .MuiTextField-root': {
       margin: theme.spacing(1),
@@ -157,25 +178,13 @@ const useStyles = makeStyles((theme) => ({
     margin: theme.spacing(1),
     minWidth: '50%',
   },
-  cardHeader: {
-    backgroundColor:
-      theme.palette.type === 'light' ? theme.palette.grey[200] : theme.palette.grey[700],
-  },
-  content: {
-    flexGrow: 1,
-    height: '100vh',
-    overflow: 'auto',
-  },
-  container: {
-    padding: theme.spacing(10),
+  button: {
+    margin: theme.spacing(0.5),
   },
   btnSalvar: {
     backgroundColor: "#36A420",
     color: "#FFF",
     "&:hover": {backgroundColor: "green"} //1bb934
-  },
-  button: {
-    margin: theme.spacing(0.5),
   },
   appBarSpacer: theme.mixins.toolbar,
 }));

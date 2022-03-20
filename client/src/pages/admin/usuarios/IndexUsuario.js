@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { withStyles, makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
-import Paper from '@material-ui/core/Paper';
+import TablePagination from '@mui/material/TablePagination';
 import Drawer from '@material-ui/core/Drawer';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -9,20 +9,10 @@ import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
-import IconButton from '@material-ui/core/IconButton';
-import DeleteIcon from '@material-ui/icons/Delete';
-import EditIcon from '@material-ui/icons/Edit';
 import Tooltip from '@material-ui/core/Tooltip';
 import Chip from '@material-ui/core/Chip';
-import FilterListRoundedIcon from '@material-ui/icons/FilterListRounded';
 import Button from '@material-ui/core/Button';
-import AddCircleRoundedIcon from '@material-ui/icons/AddCircleRounded';
-import MenuAdmin from '../../../components/menu-admin';
-import api from '../../../services/api';
-import { getTypeUser, getTypeUserLabel } from '../../../functions/static_data';
-import lottie from 'lottie-web';
 import Card from '@material-ui/core/Card';
-import CardContent from '@material-ui/core/CardContent';
 import Breadcrumbs from '@material-ui/core/Breadcrumbs';
 import Link from '@material-ui/core/Link';
 import Typography from '@material-ui/core/Typography';
@@ -31,9 +21,21 @@ import Avatar from '@material-ui/core/Avatar';
 import Divider from '@material-ui/core/Divider';
 import FormGroup from '@material-ui/core/FormGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
+import { Menu, MenuItem, IconButton, ListItemIcon, ListItemText } from '@mui/material';
 import Checkbox from '@material-ui/core/Checkbox';
 import InputBase from '@material-ui/core/InputBase';
+
+import DeleteIcon from '@material-ui/icons/Delete';
+import EditIcon from '@material-ui/icons/Edit';
+import FilterListRoundedIcon from '@material-ui/icons/FilterListRounded';
 import SearchIcon from '@material-ui/icons/Search';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import AddCircleRoundedIcon from '@material-ui/icons/AddCircleRounded';
+
+import lottie from 'lottie-web';
+import api from '../../../services/api';
+import MenuAdmin from '../../../components/menu-admin';
+import { getTypeUser, getTypeUserLabel } from '../../../functions/static_data';
 
 const StyledTableRow = withStyles((theme) => ({
   root: {
@@ -45,11 +47,15 @@ const StyledTableRow = withStyles((theme) => ({
 
 export default function IndexUsuario() {
   const classes = useStyles();
-  
+  const container = useRef(null);
+  const ref = useRef(null);
+
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);  
   const [open, setOpen] = useState(false);
-  const container = useRef(null);
+  const [isOpenMenu, setIsOpenMenu] = useState(false);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
 
   useEffect(() => {
     lottie.loadAnimation({
@@ -68,7 +74,8 @@ export default function IndexUsuario() {
       setUsers(response.data);
       setLoading(false);
     }
-    setTimeout(() => loadUsers(), 2000);
+    loadUsers();
+    // setTimeout(() => loadUsers(), 2000);
   }, []);
 
   async function handleDelete(id) {
@@ -83,14 +90,23 @@ export default function IndexUsuario() {
     }
   }
 
-  const handleDrawerFilter = () => {
-    setOpen(true);
-  };
-
   const [selectTypeUser, setSelectTypeUser] = useState({
     administrador: false,
     funcionario: false,
   });
+
+  const handleDrawerFilter = () => {
+    setOpen(true);
+  };
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
 
   const handleChange = (event) => {
     setSelectTypeUser({ ...selectTypeUser, [event.target.name]: event.target.checked });
@@ -104,35 +120,27 @@ export default function IndexUsuario() {
         <div className={classes.appBarSpacer} />
 
         <Container maxWidth="lg" className={classes.container}>
-        <Card>
           <CardHeader className={classes.cardHeader}
             title="Usuários"
             subheader={
-            <Breadcrumbs aria-label="breadcrumb">
+            <Breadcrumbs style={{ fontSize: 14 }} separator="•" aria-label="breadcrumb">
               <Link color="inherit" href={'/admin'} >
                 Painel
               </Link>
-              <Typography color="textPrimary">Lista de usuário</Typography>
+              <Typography color="textPrimary" style={{ fontSize: 14 }}>Lista de usuários</Typography>
             </Breadcrumbs>
             }
             action={
               <div style={{ paddingTop: 10}}>
                 <Button 
+                  className={classes.btnDefaultGreen}
                   variant="contained" 
                   size="medium"
-                  color='primary' 
                   href={'/admin/usuarios/create'} 
                   startIcon={<AddCircleRoundedIcon/>}>
                     Cadastrar
                 </Button>
                 
-                <Tooltip title="Filtros">
-                  <IconButton size="large" onClick={handleDrawerFilter}>
-                    <FilterListRoundedIcon />
-                  </IconButton>
-                  
-                </Tooltip>
-
                 <Drawer anchor='right' open={open} onClose={() => setOpen(false)}>
                   <div style={{ width: "350px"}}>
                     <div className={classes.drawerFilter}>
@@ -176,73 +184,116 @@ export default function IndexUsuario() {
                       <Button variant="contained" color='default' startIcon={<SearchIcon />}>Buscar</Button>
                       </div>
                     </div>
-                    
                   </div>
-                    {/* <List>{secondaryListItems}</List> */}
                   </Drawer>
               </div>
             }
           />
           
-          {loading ? (<div style={{width: 400, margin: '0 auto'}} ref={container} />) : (
-          <CardContent>
-          <TableContainer component={Paper}>
-            <Table className={classes.table}>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Data de cadastro</TableCell>
-                  <TableCell>Nome</TableCell>
-                  <TableCell>Email</TableCell>
-                  <TableCell align="center">Tipo</TableCell>
-                  <TableCell align="right">Ações</TableCell>
-                </TableRow>
-              </TableHead>
+          {loading ? (<div style={{width: 300, margin: '0 auto'}} ref={container} />) : (
+            <Card style= {{ borderRadius: 15 }}>
 
-            <TableBody>
-              {users.map((row) => (
-                <TableRow hover key={row._id}>
-                  <TableCell>{new Date(row.createdAt).toLocaleDateString('pt-br')}</TableCell>
-                  <TableCell>{row.nmUsuario}</TableCell>
-                  <TableCell>{row.dsEmail}</TableCell>
-                  <TableCell align="center"><Chip label={getTypeUser(row.flUsuario)} color={getTypeUserLabel(row.flUsuario)} /></TableCell>
-                  <TableCell component="th" scope="row" align="right">
-                    <Tooltip title="Editar">
-                      <IconButton  href={'/admin/usuarios/edit/' + row._id}>
-                        <EditIcon
-                          className={classes.buttonTable}
-                          color="primary"
-                        />
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip title="Excluir">
-                      <IconButton onClick={() => handleDelete(row._id)}>
-                        <DeleteIcon
-                          className={classes.buttonTable}
-                          color="error"
-                        />
-                      </IconButton>
-                    </Tooltip>
-                  </TableCell>
-                </TableRow>
-              ))}
-              </TableBody>
-              </Table>
-            </TableContainer>
-          </CardContent>
+              <div className={classes.twoElements}>
+              <Tooltip title="Filtros">
+                <IconButton size="large" onClick={handleDrawerFilter}>
+                  <SearchIcon />
+                </IconButton>
+              </Tooltip>
+
+              <Tooltip title="Filtros">
+                <IconButton size="large" onClick={handleDrawerFilter}>
+                  <FilterListRoundedIcon />
+                </IconButton>
+              </Tooltip>
+              </div>
+              
+              <TableContainer>
+                <Table className={classes.table} size="small" >
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Data de cadastro</TableCell>
+                      <TableCell>Nome</TableCell>
+                      <TableCell>Email</TableCell>
+                      <TableCell align="center">Tipo</TableCell>
+                      <TableCell align="right">Ações</TableCell>
+                    </TableRow>
+                  </TableHead>
+
+                  <TableBody>
+                    {users.map((row) => (
+                      <TableRow hover key={row._id}>
+                        <TableCell>{new Date(row.createdAt).toLocaleDateString('pt-br')}</TableCell>
+                        <TableCell>{row.nmUsuario}</TableCell>
+                        <TableCell>{row.dsEmail}</TableCell>
+                        <TableCell align="center"><Chip label={getTypeUser(row.flUsuario)} color={getTypeUserLabel(row.flUsuario)} /></TableCell>
+                        <TableCell component="th" scope="row" align="right">
+                          <IconButton onClick={() => setIsOpenMenu(true)}>
+                              <MoreVertIcon 
+                                className={classes.buttonTable}
+                              />
+                          </IconButton>
+                        </TableCell>
+                        
+                        <Menu
+                          open={isOpenMenu}
+                          anchorEl={ref.current}
+                          onClose={() => setIsOpenMenu(false)}
+                          PaperProps={{
+                            sx: { width: 200, maxWidth: '100%' }
+                          }}
+                          anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+                          transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+                        >
+                          <MenuItem>
+                            <ListItemIcon>
+                                <IconButton onClick={() => handleDelete(row._id)}>
+                                  <DeleteIcon />
+                                </IconButton>
+                            </ListItemIcon>
+                            <ListItemText primary="Excluir" />
+                          </MenuItem>
+
+                          <MenuItem >
+                            <ListItemIcon >
+                                <IconButton href={'/admin/usuarios/edit/' + row._id}>
+                                  <EditIcon />
+                                </IconButton>
+                            </ListItemIcon>
+                            <ListItemText primary="Editar" />
+                          </MenuItem>
+                        </Menu>
+                      </TableRow>
+                    ))}
+                    </TableBody>
+                  </Table>
+              </TableContainer>
+              <TablePagination
+                rowsPerPageOptions={[5, 10, 25]}
+                component="div"
+                count={users.length}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                onPageChange={handleChangePage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+              />
+            </Card>
           )}
-        </Card>
         </Container>     
       </main>
     </div>
   );
 }
 
-const drawerWidth = 240;
-
 const useStyles = makeStyles((theme) => ({
   root: {
     display: 'flex',
   },
+  content: {
+    flexGrow: 1,
+    height: '100vh',
+    overflow: 'auto',
+  },
+  
   drawerFilter: {
     display: 'flex', 
     padding: '15px', 
@@ -266,11 +317,7 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
     flexDirection: 'column',
   },
-  content: {
-    flexGrow: 1,
-    height: '100vh',
-    overflow: 'auto',
-  },
+
   container: {
     paddingTop: theme.spacing(4),
     paddingBottom: theme.spacing(4),
@@ -280,20 +327,42 @@ const useStyles = makeStyles((theme) => ({
     minWidth: 750,
     '& .MuiTableCell-head': {
       fontWeight: 'bold',
-      fontSize: 15
-    }
+      fontSize: 14
+    },
   },
+  
   buttonTable: {
-    margin: theme.spacing(0.5)
+    // margin: theme.spacing(0.5)
   },
-  cardHeader: {
-    backgroundColor:
-      theme.palette.type === 'light' ? theme.palette.grey[200] : theme.palette.grey[700],
+  btnDefaultGreen: {
+    background: '#00AB55',
+    color: '#FFF',
+    borderRadius: 10,
+    border: 'none',
+    textTransform: 'none',
+    boxShadow: 'none',
+
+    '&:hover': {
+      backgroundColor: '#007B55',
+      color: '#FFF',
+    },
+  },
+  twoElements: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    margin: theme.spacing(1),
+    
+    '& .MuiTextField-root': {
+      margin: theme.spacing(1),
+    },
+  },
+  cardHeader: {    
       "& .MuiCardHeader-title": {
-        textTransform: 'uppercase',
         fontWeight: 700,
-        color: '#7F8F97'
+        color: '#212B36',
+        marginBottom: theme.spacing(1),
       },
   },
+
   appBarSpacer: theme.mixins.toolbar,
 }));

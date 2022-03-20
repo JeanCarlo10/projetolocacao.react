@@ -1,7 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { fade, makeStyles } from '@material-ui/core/styles';
 import clsx from 'clsx';
-import Typography from '@material-ui/core/Typography';
 import List from '@material-ui/core/List';
 import Divider from '@material-ui/core/Divider';
 import Drawer from '@material-ui/core/Drawer';
@@ -13,14 +12,24 @@ import IconButton from '@material-ui/core/IconButton';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import InputBase from '@material-ui/core/InputBase';
 import SearchIcon from '@material-ui/icons/Search';
+import Avatar from '@material-ui/core/Avatar';
+import Stack from '@mui/material/Stack';
+import { DatePicker, DateTimePicker } from '@material-ui/pickers';
+import TextField from '@mui/material/TextField';
 
 import { mainListItems, secondaryListItems } from './list-menu-admin';
 import { getNameUser } from '../services/auth';
 
 export default function MenuAdmin(props) {
   const classes = useStyles();
-  const [open, setOpen] = React.useState(true);
+
+  const [open, setOpen] = useState(true);
   const { title } = props;
+  const [value, setValue] = useState(new Date(Date.now()));
+
+  const handleChange = (newValue) => {
+    setValue(newValue);
+  };
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -34,21 +43,17 @@ export default function MenuAdmin(props) {
     <>
       <CssBaseline />
       <AppBar position="absolute" className={clsx(classes.appBar, open && classes.appBarShift)}>
+      
         <Toolbar className={classes.toolbar}>
-          <IconButton
+          <IconButton style={{ color: '#00AB55'}}
             edge="start"
-            color="inherit"
-            aria-label="open drawer"
             onClick={handleDrawerOpen}
             className={clsx(classes.menuButton, open && classes.menuButtonHidden)}
           >
             <MenuIcon />
           </IconButton>
-          <Typography component="h1" variant="h6" color="inherit" noWrap className={classes.title}>
-            {title}
-          </Typography>
-
-          <div className={classes.search}>
+          
+          {/* <div className={classes.search}>
             <div className={classes.searchIcon}>
               <SearchIcon />
             </div>
@@ -60,10 +65,16 @@ export default function MenuAdmin(props) {
               }}
               inputProps={{ 'aria-label': 'search' }}
             />
-          </div>
+          </div> */}
 
           {/* Nome do usuário logado que está vindo do Auth */}
-          {getNameUser()}
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <Avatar aria-label="Avatar" src={require('../assets/avatar_10.jpg')} />
+              <div style={{ color: '#00AB55', fontWeight: 'bold', marginLeft: 5 }}> 
+                {getNameUser()}
+              </div>
+          </div>
+          
         </Toolbar>
       </AppBar>
       <Drawer
@@ -73,6 +84,7 @@ export default function MenuAdmin(props) {
         }}
         open={open}>
         <div className={classes.toolbarIcon}>
+          <img src={require('../assets/logo.svg')} style={{marginRight: 130 }} width={40} height={40}/>
           <IconButton onClick={handleDrawerClose}>
             <ChevronLeftIcon />
           </IconButton>
@@ -98,7 +110,7 @@ const useStyles = makeStyles((theme) => ({
   },
   toolbarIcon: {
     display: 'flex',
-    backgroundColor: '#222C3C',
+    backgroundColor: '#FFF',    
     alignItems: 'center',
     justifyContent: 'flex-end',
     padding: '0 8px',
@@ -106,7 +118,7 @@ const useStyles = makeStyles((theme) => ({
   },
   appBar: {
     zIndex: theme.zIndex.drawer + 1,
-    backgroundColor: '#222C3C',
+    backgroundColor: '#FFF',
     transition: theme.transitions.create(['width', 'margin'], {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
@@ -122,31 +134,32 @@ const useStyles = makeStyles((theme) => ({
   },
   menuButton: {
     marginRight: theme.spacing(2),
-    color: "#1976D2",
+    color: "#dedede",
   },
-
+  
   menuButtonHidden: {
-    display: 'none',
-
+    display: 'none'
   },
+  
   title: {
     flexGrow: 1,
   },
   search: {
     position: 'relative',
-    borderRadius: theme.shape.borderRadius,
-    backgroundColor: fade(theme.palette.common.white, 0.15),
+    borderRadius: 5,
+    borderWidth: 1,
+    borderStyle: 'solid',
+    borderColor: '#dedede',
+    backgroundColor: "#bcbcbc",
     '&:hover': {
-      backgroundColor: fade(theme.palette.common.white, 0.25),
+      backgroundColor: '#bcbcbc'[500],
     },
-    marginRight: theme.spacing(2),
+    marginRight: theme.spacing(3),
     marginLeft: 0,
-    width: '100%',
-    [theme.breakpoints.up('sm')]: {
-      marginLeft: theme.spacing(3),
-      width: 'auto',
-    },
+    // width: '100%',
+    marginLeft: theme.spacing(3),
   },
+
   searchIcon: {
     padding: theme.spacing(0, 2),
     height: '100%',
@@ -175,10 +188,17 @@ const useStyles = makeStyles((theme) => ({
   drawerPaper: {
     position: 'relative',
     whiteSpace: 'nowrap',
-    backgroundColor: "#222C3C",
-
+    backgroundColor: "#FFF",
+    borderRightWidth: 1,
+    borderColor: '#dedede',
+    "& .MuiListItem-button": {
+      color: "#00ab55",
+      
+    },
     "& .MuiListItem-button:hover": {
-      backgroundColor: "#1D2531",
+      
+      backgroundColor: "#00ab5514",
+      
     },
     width: drawerWidth,
     transition: theme.transitions.create('width', {

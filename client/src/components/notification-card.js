@@ -1,103 +1,169 @@
-import React from 'react';
+import React, {useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import clsx from 'clsx';
+import { styled } from '@mui/material/styles';
 import Card from '@material-ui/core/Card';
 import CardHeader from '@material-ui/core/CardHeader';
 import CardContent from '@material-ui/core/CardContent';
 import CardActions from '@material-ui/core/CardActions';
 import Collapse from '@material-ui/core/Collapse';
-import Avatar from '@material-ui/core/Avatar';
 import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
-import { red } from '@material-ui/core/colors';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import MoreVertIcon from '@material-ui/icons/MoreVert';
-import { FullscreenExit } from '@material-ui/icons';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import api from '../services/api';
+import Avatar from '@mui/material/Avatar';
 
-const useStyles = makeStyles((theme) => ({
-    root: {
-        width: '100%',
-    },
-    expand: {
-        transform: 'rotate(0deg)',
-        marginLeft: 'auto',
-        transition: theme.transitions.create('transform', {
-            duration: theme.transitions.duration.shortest,
-        }),
-    },
-    expandOpen: {
-        transform: 'rotate(180deg)',
-    },
-    avatar: {
-        backgroundColor: red[500],
-    },
-    areaDate: {
-        width: 90,
-        height: 50,
-        backgroundColor: '#b45dac',
-        marginLeft: 'auto',
-        // marginRight: theme.spacing(22),
-    },
+const ExpandMore = styled((props) => {
+    const { expand, ...other } = props;
+    return <IconButton {...other} />;
+  })(({ theme, expand }) => ({
+    transform: !expand ? 'rotate(0deg)' : 'rotate(180deg)',
+    marginLeft: 'auto',
+    transition: theme.transitions.create('transform', {
+      duration: theme.transitions.duration.shortest,
+    }),
 }));
-
+  
 export default function NotificationCard() {
     const classes = useStyles();
-    const [expanded, setExpanded] = React.useState(true);
+
+    const [expanded, setExpanded] = useState(false);
+    const [dados, setDados] = useState([]);
 
     const handleExpandClick = () => {
         setExpanded(!expanded);
     };
 
+    useEffect(() => {
+        const fetchClients = async() => {
+            const {data} = await api.get (
+                '/api/users'
+            );
+
+            console.log(data);
+            setDados(data);
+        };
+        fetchClients();
+    }, []);
+
+    function stringToColor(string) {
+        let hash = 0;
+        let i;
+      
+        /* eslint-disable no-bitwise */
+        for (i = 0; i < string.length; i += 1) {
+          hash = string.charCodeAt(i) + ((hash << 5) - hash);
+        }
+      
+        let color = '#';
+      
+        for (i = 0; i < 3; i += 1) {
+          const value = (hash >> (i * 8)) & 0xff;
+          color += `00${value.toString(16)}`.substr(-2);
+        }
+        /* eslint-enable no-bitwise */
+      
+        return color;
+    }
+    
+    function stringAvatar(name) {
+        return {
+          sx: {
+            bgcolor: stringToColor(name),
+          },
+          children: `${name.split(' ')[0][0]}${name.split(' ')[1][0]}`,
+        };
+    }
+      
+    
+
     return (
-        <Card className={classes.root}>
-            <CardHeader
+        <Card style={{ borderRadius: 15}} className={classes.root}>
+            {/* {dados.map((row) => (
+            <CardHeader key={row._id}
                 avatar={
-                    <Avatar aria-label="recipe" className={classes.avatar}>
-                        R
-                    </Avatar>
+                    <Avatar aria-label="recipe" {...stringAvatar('Jean Carlo')} />
                 }
-
-                action={
-                    <CardActions disableSpacing>
-                        <IconButton
-                            className={clsx(classes.expand, {
-                                [classes.expandOpen]: expanded,
-                            })}
-                            onClick={handleExpandClick}
-                            aria-expanded={expanded}
-                            aria-label="show more">
-                            <ExpandMoreIcon />
-                        </IconButton>
-                    </CardActions>
-                }
-
-                text={
-                    <div className={classes.areaDate}>
-                        <Typography paragraph>Data retirada</Typography>
-                    </div>
-                }
-
-                title="Cliente: Ruth Paola"
+                title={row.nmUsuario}
                 subheader="Endereço: Av. Nacional, 482 - Três bandeiras">
-
-                
             </CardHeader>
+            ))}
 
-            <Collapse in={expanded} timeout="auto" unmountOnExit>
+            <CardContent>
+                Observação: 
+                <Typography variant="body2" color="text.secondary">
+                    Retirar as 14:30h, falar com João.
+                </Typography>
+            </CardContent>
+
+            <CardActions disableSpacing>
+                <IconButton aria-label="add to favorites">
+                    <CalendarTodayIcon  />
+                </IconButton>
+                05/01/2021
+
+                <IconButton aria-label="share">
+                    <ShareIcon />
+                </IconButton>
+
+                <ExpandMore
+                    expand={expanded}
+                    onClick={handleExpandClick}
+                    aria-expanded={expanded}
+                    aria-label="show more"
+                    >
+                    <ExpandMoreIcon />
+                </ExpandMore>
+                
+            </CardActions>
+
+            <Collapse in={expanded} timeout={'auto'} unmountOnExit>
                 <CardContent>
-                    <Typography paragraph>Method:</Typography>
+                    <Typography paragraph>MATERIAIS</Typography>
                     <Typography paragraph>
                         Heat 1/2 cup of the broth in a pot until simmering, add saffron and set aside for 10
                         minutes.
                     </Typography>
-                    
+                </CardContent>
+            </Collapse> */}
+
+            <CardHeader
+                avatar={
+                    <Avatar aria-label="recipe" {...stringAvatar('Janete Nunes')}/>
+                }
+                title='Janete Nunes'
+                subheader="Endereço: Av. Nacional, 482 - Três bandeiras">
+            </CardHeader>
+
+            <CardActions disableSpacing>
+                <div style={{ color: '#FF5252' }}> 
+                    <IconButton aria-label="add to favorites">
+                        <CalendarTodayIcon />
+                    </IconButton>
+                    Data de retirada: 25/02/2022
+                </div>
+                <CardContent>
+                    <Typography variant="body2">
+                        Observação: Retirar as 14:30h, falar com João.
+                    </Typography>
+                </CardContent>
+
+                <ExpandMore
+                    expand={expanded}
+                    onClick={handleExpandClick}
+                    aria-expanded={expanded}
+                    >
+                    <ExpandMoreIcon />
+                </ExpandMore>
+                
+            </CardActions>
+
+            <Collapse in={expanded} timeout={'auto'} unmountOnExit>
+                <CardContent>
+                    <Typography paragraph>MATERIAIS</Typography>
                     <Typography paragraph>
-                        Heat oil in a (14- to 16-inch) paella pan or a large, deep skillet over medium-high
-                        heat. Add chicken, shrimp and chorizo, and cook, stirring occasionally until lightly
-                        browned, 6 to 8 minutes. Transfer shrimp to a large plate and set aside, leaving chicken
-                        and chorizo in the pan. Add pimentón, bay leaves, garlic, tomatoes, onion, salt and
-                        pepper, and cook, stirring often until thickened and fragrant, about 10 minutes. Add
-                        saffron broth and remaining 4 1/2 cups chicken broth; bring to a boil.
+                        Heat 1/2 cup of the broth in a pot until simmering, add saffron and set aside for 10
+                        minutes.
                     </Typography>
                     <Typography paragraph>
                         Add rice and stir very gently to distribute. Top with artichokes and peppers, and cook
@@ -112,5 +178,14 @@ export default function NotificationCard() {
                 </CardContent>
             </Collapse>
         </Card>
+
+
+        
     );
 }
+
+const useStyles = makeStyles((theme) => ({
+    root: {
+        width: '100%',
+    },
+}));

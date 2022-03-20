@@ -1,20 +1,36 @@
 import React from 'react';
+import { makeStyles } from '@material-ui/core/styles';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import ListSubheader from '@material-ui/core/ListSubheader';
+import Button from '@material-ui/core/Button';
 import ShoppingCartIcon from '@material-ui/icons/ShoppingCart';
+
 import PeopleIcon from '@material-ui/icons/People';
 import ExitToApp from '@material-ui/icons/ExitToApp';
 import HouseIcon from '@material-ui/icons/House';
 import BuildIcon from '@material-ui/icons/Build';
 import PersonAddIcon from '@material-ui/icons/PersonAdd';
+import AddCircleRoundedIcon from '@material-ui/icons/AddCircleRounded';
+
 import api from '../services/api';
 import { getToken, logout } from '../services/auth';
 
 export const mainListItems = (
   <div>
-    <ListItem button component="a" href="/admin" MuiListItem	>
+    <ListItem >
+      <Button 
+        style={{ background: '#00AB55', color: '#FFF', borderRadius: 10, border: 'none', textTransform: 'none', boxShadow: 'none' }}
+        variant="contained" 
+        size="large"
+        fullWidth
+        href={'/admin/pedidos/create'} 
+        startIcon={<AddCircleRoundedIcon/>}>
+          Novo pedido
+      </Button>
+    </ListItem>
+    <ListItem button component="a" href="/admin">
       <ListItemIcon style={{ color: "#7F8F97" }}>
         <HouseIcon />
       </ListItemIcon>
@@ -72,3 +88,19 @@ async function confirmSair() {
     }
   }
 }
+
+// const useStyles = makeStyles((theme) => ({
+//   btnDefaultGreen: {
+//     background: '#00AB55',
+//     color: '#FFF',
+//     borderRadius: 10,
+//     border: 'none',
+//     textTransform: 'none',
+//     boxShadow: 'none',
+
+//     '&:hover': {
+//       backgroundColor: '#007B55',
+//       color: '#FFF',
+//     },
+//   },
+// }));

@@ -4,21 +4,15 @@ import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
 import CircularProgress from '@material-ui/core/CircularProgress';
-// import OutlinedInput from '@mui/material/OutlinedInput';
 import OutlinedInput from '@material-ui/core/OutlinedInput';
 import IconButton from '@material-ui/core/IconButton';
-// import IconButton from '@mui/material/IconButton';
-
 import InputLabel from '@material-ui/core/InputLabel';
-// import InputLabel from '@mui/material/InputLabel';
 import InputAdornment from '@material-ui/core/InputAdornment';
-// import InputAdornment from '@mui/material/InputAdornment';
 import Link from '@material-ui/core/Link';
 import Box from '@material-ui/core/Box';
-
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
 import Typography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles, styled } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 
 import Visibility from '@material-ui/icons/Visibility';
@@ -26,10 +20,12 @@ import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Notification from '../../../components/notification';
 import api from '../../../services/api';
 import { login, setNameUser, setIdUser } from '../../../services/auth';
-import { Grid } from '@material-ui/core';
+import { Grid, Icon } from '@material-ui/core';
 import Paper from '@mui/material/Paper';
-// import FormControl from '@mui/material/FormControl';
-import FormControl from '@material-ui/core/FormControl';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Checkbox from '@mui/material/Checkbox';
+import Stack from '@mui/material/Stack';
+import FormControl from '@mui/material/FormControl';
 
 // function Copyright() {
 //   return (
@@ -120,75 +116,96 @@ export default function SignIn() {
     );
   }
 
-  const handleMouseDownPassword = (event) => {
-    event.preventDefault();
-  };
+  const ContentStyle = styled('div')(({ theme }) => ({
+    maxWidth: 480,
+    margin: 'auto',
+    display: 'flex',
+    minHeight: '100vh',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    padding: theme.spacing(12, 0)
+  }));
+
   return (
-    
     <Container component="main" maxWidth="xl">
       <CssBaseline />
 
       <Notification notify={notify} setNotify={setNotify} />
-          {/* <Box
-                component="img"
-                src="src={require('../assets/logo.svg')} style={{marginRight: 130 }} width={40} height={40}"
-                src="../../../assets/Mobile login-bro.svg"
-                sx={{ height: 260, mx: 'auto', my: { xs: 5, sm: 10 } }}
-              /> */}
-          {/* <Grid container>
-            <img src={require('../../../assets/Mobile login-bro.svg')} />
-        </Grid> */}
-      <Grid container spacing={2}>
+          
+      <Grid container>
         <Grid item xs={6}>
-            <Box>
-              <Paper>
+          <Paper>
+            <Box >
                 <img src={require('../../../assets/Mobile login-bro.svg')} />
-              </Paper>
             </Box>
+          </Paper>
         </Grid>
-        <Grid item xs={6} >
-          <Box p={10} className={classes.inputs}>
+
+        <Grid item xs={6}>
+        <Container maxWidth="sm">
+          <ContentStyle>
             <Typography style={{ fontSize:24, fontWeight: 700, color: '#212B36' }}>
-              Login
+              Entrar
             </Typography>
             <Typography style={{ fontSize: 16, fontWeight: 400, color: '#637381' }}>
               Insira os dados abaixo
             </Typography>
 
-            <TextField 
-              variant="outlined"
-              margin="normal"
-              required
-              fullWidth
-              id="email"
-              label="Digite seu email"
-              name="email"
-              autoComplete="email"
-              autoFocus
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-            />
-            <FormControl fullWidth variant="outlined">
-              <InputLabel htmlFor="password">Digite sua senha</InputLabel>
-              <OutlinedInput
-                id="password"
-                type={showPassword ? 'text' : 'password'}
-                value={senha}
-                onChange={e => setSenha(e.target.value)}
-                
-                endAdornment={
-                  <InputAdornment position="end">
-                    <IconButton
-                      onClick={e => setShowPassword(!showPassword)}
-                      edge="end"
-                    >
-                      {showPassword ? <Visibility /> : <VisibilityOff />}
-                    </IconButton>
-                  </InputAdornment>
-                }
-                labelWidth={120}
+              <TextField
+                variant="outlined"
+                margin="normal"
+                required
+                fullWidth
+                id="email"
+                label="Digite seu email"
+                name="email"
+                autoComplete="off"
+                autoFocus
+                value={email}
+                onChange={e => setEmail(e.target.value)}
               />
-            </FormControl>
+
+          {/* <TextField
+            fullWidth
+            autoComplete="current-password"
+            variant="outlined"
+            type={showPassword ? 'text' : 'password'}
+            onChange={e => setSenha(e.target.value)}
+            label="Password"
+            // {...getFieldProps('password')}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton onClick={e => setShowPassword(!showPassword)} edge="end">
+                    {showPassword ? <Visibility /> : <VisibilityOff /> }
+                  </IconButton>
+                </InputAdornment>
+              )
+            }}
+            
+          /> */}
+
+              <FormControl variant="outlined">
+                <InputLabel htmlFor="password">Digite sua senha</InputLabel>
+                <OutlinedInput
+                  id="password"
+                  type={showPassword ? 'text' : 'password'}
+                  value={senha}
+                  onChange={e => setSenha(e.target.value)}
+                  
+                  endAdornment={
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={e => setShowPassword(!showPassword)}
+                        edge="end"
+                      >
+                        {showPassword ? <Visibility /> : <VisibilityOff />}
+                      </IconButton>
+                    </InputAdornment>
+                  }
+                  labelWidth={120}
+                />
+              </FormControl>
 
             <Button 
               fullWidth
@@ -200,30 +217,37 @@ export default function SignIn() {
             >
               {loading ? <FacebookCircularProgress /> : 'Entrar'}
             </Button>
-          </Box>
+
+            <Grid container>
+              <Grid item xs>
+                {/* <FormControlLabel  
+                  control={<Checkbox defaultChecked 
+                    sx={{ 
+                      color: '#92E3A9',
+                      '&.Mui-checked': {
+                        color: '#00AB55',
+                      },
+                    }}/> } 
+                  label="Manter-me logado" 
+                  style={{color: '#637381'}}
+                />               */}
+              </Grid>
+              {/* <Grid item>
+                <Link href="#" variant="body2">
+                  {"Don't have an account? Sign Up"}
+                </Link>
+              </Grid> */}
+            </Grid>
+          </ContentStyle>
+        </Container>
         </Grid>
       </Grid>
-      
-
-      <div className={classes.paper}>
+      {/* <div className={classes.paper}>
         
-        
-        {/* <Grid container>
-            <Grid item xs>
-              <Link href="#" variant="body2">
-                Esqueceu sua senha?
-              </Link>
-            </Grid>
-            <Grid item>
-              <Link href="#" variant="body2">
-                {"Don't have an account? Sign Up"}
-              </Link>
-            </Grid>
-          </Grid> */}
-      </div>
-      <Box mt={8}>
-        {/* <Copyright /> */}
-      </Box>
+      </div> */}
+      {/* <Box mt={8}>
+        <Copyright />
+      </Box> */}
     </Container>
   );
 }
@@ -244,7 +268,6 @@ const useStylesFacebook = makeStyles((theme) => ({
   circle: {
     strokeLinecap: 'round',
   },
-  
 }));
 
 const useStyles = makeStyles((theme) => ({
@@ -255,34 +278,6 @@ const useStyles = makeStyles((theme) => ({
   //   alignItems: 'center',
   // },
 
-  // avatar: {
-  //   margin: theme.spacing(1),
-  //   backgroundColor: theme.palette.secondary.main,
-  // },
-  form: {
-    width: '100%', // Fix IE 11 issue.
-    marginTop: theme.spacing(1),
-  },
-  inputs: {
-    display: 'flex',
-    overflow: 'auto',
-    flexDirection: 'column',
-
-    '& label.Mui-focused': {
-      color: '#00AB55',
-    },
-    '& .MuiOutlinedInput-root': {
-      '& fieldset': {
-        borderColor: '#dce0e4',
-      },
-      '&:hover fieldset': {
-        borderColor: '#3d3d3d',
-      },
-      '&.Mui-focused fieldset': {
-        borderColor: '#00AB55',
-      },
-    },
-  },
   btnDefaultGreen: {
     background: '#00AB55',
     color: '#FFF',

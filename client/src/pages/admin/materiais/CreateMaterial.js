@@ -1,16 +1,8 @@
 import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { TextField } from '@material-ui/core';
-
-import CachedIcon from '@material-ui/icons/Cached';
-import SaveIcon from '@material-ui/icons/Save';
-import ArrowBackIcon from '@material-ui/icons/ArrowBack';
-
-import Divider from '@material-ui/core/Divider';
 import Button from '@material-ui/core/Button';
 import Container from '@material-ui/core/Container';
-import MenuAdmin from '../../../components/menu-admin';
-import api from '../../../services/api';
 import Breadcrumbs from '@material-ui/core/Breadcrumbs';
 import Link from '@material-ui/core/Link';
 import Typography from '@material-ui/core/Typography';
@@ -18,6 +10,11 @@ import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import CardHeader from '@material-ui/core/CardHeader';
+
+import SaveIcon from '@material-ui/icons/Save';
+
+import MenuAdmin from '../../../components/menu-admin';
+import api from '../../../services/api';
 
 export default function CreateMaterial() {
   const classes = useStyles();
@@ -41,50 +38,45 @@ export default function CreateMaterial() {
     }
   }
 
-  function handleClear() {
-    setNmMaterial('');
-  }
-
   return (
     <div className={classes.root}>
       <MenuAdmin/>
       <main className={classes.content}>
 
       <Container maxWidth="lg" component="main" className={classes.container}>
-        <Card>
+        
           <CardHeader
             title="Cadastrar materiais"
             subheader={
-            <Breadcrumbs aria-label="breadcrumb">
+            <Breadcrumbs style={{ fontSize: 14 }} separator="•" aria-label="breadcrumb">
               <Link color="inherit" href={'/admin/materiais'} >
                 Materiais
               </Link>
-              <Typography color="textPrimary">Cadastrar material</Typography>
+              <Typography color="textPrimary" style={{ fontSize: 14 }}>Cadastrar material</Typography>
             </Breadcrumbs>
             }
             titleTypographyProps={{ align: 'left' }}
             subheaderTypographyProps={{ align: 'left' }}
             className={classes.cardHeader}
           />
-          <CardContent className={classes.inputs}>
-            <TextField
-              required
-              variant="outlined"
-              id="nmMaterial"
-              name="nmMaterial"
-              label="Nome material"
-              autoFocus
-              value={nmMaterial}
-              onChange={e => setNmMaterial(e.target.value)}
-            />
-          </CardContent>
-          <Divider variant="middle" />
-          <CardActions>
-            <Button variant="contained" size="small" className={classes.button} color='default' href={'/admin/materiais'} startIcon={<ArrowBackIcon />}>Voltar</Button>
-            <Button variant="contained" size="small"  className={classes.button} color='primary' onClick={handleClear} startIcon={<CachedIcon />}>Limpar</Button>
-            <Button variant="contained" size="small" href={'/admin/materiais'} className={classes.btnSalvar} onClick={handleSubmit} startIcon={<SaveIcon />}>Salvar</Button>
-          </CardActions>
-        </Card>
+          <Card style= {{ borderRadius: 15 }}>
+            <CardContent className={classes.inputs}>
+              <TextField
+                required
+                variant="outlined"
+                size="small"
+                id="nmMaterial"
+                name="nmMaterial"
+                label="Descrição"
+                autoFocus
+                value={nmMaterial}
+                onChange={e => setNmMaterial(e.target.value)}
+              />
+            </CardContent>
+            <CardActions style={{ justifyContent: 'flex-end', marginRight: 15 }}>
+              <Button variant="contained" size="medium"  href={'/admin/materiais'} className={classes.btnDefaultGreen} onClick={handleSubmit} startIcon={<SaveIcon />}>Salvar</Button>
+            </CardActions>
+          </Card>
       </Container>
       </main>
     </div>
@@ -100,14 +92,12 @@ const useStyles = makeStyles((theme) => ({
     height: '100vh',
     overflow: 'auto',
   },
-  cardHeader: {
-    backgroundColor:
-      theme.palette.type === 'light' ? theme.palette.grey[200] : theme.palette.grey[700],
-      "& .MuiCardHeader-title": {
-        textTransform: 'uppercase',
-        fontWeight: 700,
-        color: '#7F8F97'
-      },
+  cardHeader: {    
+    "& .MuiCardHeader-title": {
+      fontWeight: 700,
+      color: '#212B36',
+      marginBottom: theme.spacing(1),
+    },
   },
   container: {
     marginTop: 90
@@ -118,7 +108,22 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: 'column',
     '& .MuiTextField-root': {
       margin: theme.spacing(1),
-    }
+    },
+
+    '& label.Mui-focused': {
+      color: '#00AB55',
+    },
+    '& .MuiOutlinedInput-root': {
+      '& fieldset': {
+        borderColor: '#dce0e4',
+      },
+      '&:hover fieldset': {
+        borderColor: '#3d3d3d',
+      },
+      '&.Mui-focused fieldset': {
+        borderColor: '#00AB55',
+      },
+    },
   },
   formControl: {
     margin: theme.spacing(1),
@@ -127,10 +132,18 @@ const useStyles = makeStyles((theme) => ({
   button: {
     margin: theme.spacing(0.5),
   },
-  btnSalvar: {
-    backgroundColor: "#36A420",
-    color: "#FFF",
-    "&:hover": {backgroundColor: "green"} //1bb934
+  btnDefaultGreen: {
+    background: '#00AB55',
+    color: '#FFF',
+    borderRadius: 10,
+    border: 'none',
+    textTransform: 'none',
+    boxShadow: 'none',
+
+    '&:hover': {
+      backgroundColor: '#007B55',
+      color: '#FFF',
+    },
   },
   appBarSpacer: theme.mixins.toolbar,
 }));

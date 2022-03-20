@@ -1,7 +1,8 @@
 const mongoose = require('mongoose');
 
-const DataSchema = new mongoose.Schema({
+const ClientSchema = new mongoose.Schema({
     nmCliente: String,
+    nmRazaoSocial: String,
     flSexo: {type: Number, default: 1}, //Masculino ou Feminino
     flTipo: {type: Number, default: 1}, //Fisica ou Juridica
     nrCPF: String,
@@ -10,6 +11,8 @@ const DataSchema = new mongoose.Schema({
     nrCNPJ: String,
     dtNascimento: Date,
     dsEmail: String,
+
+    //DADOS CEP
     nrEndereco: String,
     dsComplemento: String,
     dsLogradouro: String,
@@ -17,16 +20,21 @@ const DataSchema = new mongoose.Schema({
     dsCidade: String,
     dsUF: String,
     nrCEP: String,
-    nmRazaoSocial: String,
+    //DADOS CEP
+
     //public byte[] byFoto
-    phoneclients: [{
+    user: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'PhoneClient',
-    }]
+        ref: 'users'
+    },
+    contacts: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Contact',
+    }],
 },{
     timestamps: true
 });
 
-const clients = mongoose.model('clients', DataSchema);
+const Client = mongoose.model('Client', ClientSchema);
 
-module.exports = clients;
+module.exports = Client;

@@ -1,3 +1,15 @@
+<!-- Executar o projeto -->
+<!-- npm run dev -->
+
+<!-- Para dá um COMMIT -->
+<!-- git commit -m "Texto" -->
+
+<!-- Para dá um PUSH  -->
+<!-- git push origin master -->
+
+<!-- Para dá um PULL  -->
+<!-- git pull origin master -->
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
@@ -67,12 +79,4 @@ This section has moved here: https://facebook.github.io/create-react-app/docs/de
 
 This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
 
-<!-- Para dá um COMMIT -->
-<!-- git commit -m "Texto" -->
-
-<!-- Para dá um PUSH  -->
-<!-- git push origin master -->
-
-<!-- Para dá um PULL  -->
-<!-- git pull origin master -->
 

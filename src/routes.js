@@ -3,6 +3,7 @@ const routes = express.Router();
 const User = require('./controllers/UsersController');
 const Client = require('./controllers/ClientsController');
 const Material = require('./controllers/MaterialsController');
+const Rent = require('./controllers/RentsController');
 
 routes.get('/', User.index);
 
@@ -29,5 +30,13 @@ routes.get('/api/materials', Material.index);
 routes.get('/api/materials.details/:_id', Material.details);
 routes.delete('/api/materials/:_id', Material.delete);
 routes.put('/api/materials', Material.update);
+
+//Rotas de Pedidos
+routes.post('/api/rents', Rent.create);
+routes.get('/api/rents', Rent.index);
+routes.get('/api/rents.details/:_id', Rent.details);
+routes.delete('/api/rents/:_id', Rent.delete);
+routes.put('/api/rents', Rent.update);
+
 
 module.exports = routes;

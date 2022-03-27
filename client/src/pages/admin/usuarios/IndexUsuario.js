@@ -55,7 +55,7 @@ export default function IndexUsuario() {
   const [open, setOpen] = useState(false);
   const [isOpenMenu, setIsOpenMenu] = useState(false);
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
 
   useEffect(() => {
     lottie.loadAnimation({
@@ -104,7 +104,7 @@ export default function IndexUsuario() {
   };
 
   const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
+    setRowsPerPage(+event.target.value);
     setPage(0);
   };
 
@@ -220,7 +220,7 @@ export default function IndexUsuario() {
                   </TableHead>
 
                   <TableBody>
-                    {users.map((row) => (
+                    {users.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
                       <TableRow hover key={row._id}>
                         <TableCell>{new Date(row.createdAt).toLocaleDateString('pt-br')}</TableCell>
                         <TableCell>{row.nmUsuario}</TableCell>
@@ -267,7 +267,7 @@ export default function IndexUsuario() {
                     </TableBody>
                   </Table>
               </TableContainer>
-              <TablePagination
+              <TablePagination 
                 rowsPerPageOptions={[5, 10, 25]}
                 component="div"
                 count={users.length}
@@ -275,7 +275,7 @@ export default function IndexUsuario() {
                 page={page}
                 onPageChange={handleChangePage}
                 onRowsPerPageChange={handleChangeRowsPerPage}
-              />
+            />
             </Card>
           )}
         </Container>     

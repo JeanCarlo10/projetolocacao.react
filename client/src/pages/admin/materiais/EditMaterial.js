@@ -85,10 +85,7 @@ export default function EditMaterial() {
                             required
                             variant="outlined"
                             size="small"
-                            id="nmMaterial"
-                            name="nmMaterial"
                             label="Descrição"
-                            autoComplete="nmMaterial"
                             autoFocus
                             value={nmMaterial}
                             onChange={e => setNmMaterial(e.target.value)}

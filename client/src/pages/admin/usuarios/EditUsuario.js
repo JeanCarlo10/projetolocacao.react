@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useHistory } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { TextField, InputLabel, FormControl, Select } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -17,7 +17,6 @@ import SaveIcon from '@material-ui/icons/Save';
 
 import MenuAdmin from '../../../components/menu-admin';
 import api from '../../../services/api';
-
 
 export default function EditUsuario() {
     const classes = useStyles();
@@ -41,12 +40,6 @@ export default function EditUsuario() {
 
         getUsuario();
     }, [])
-
-    /*Volta tela anterior */
-    let history = useHistory();
-    function goBack() {
-        history.goBack('/admin/usuarios')
-    }
 
     function handleClear() {
         setNome('');
@@ -88,7 +81,7 @@ export default function EditUsuario() {
                     title="Editar usuário"
                     subheader={
                     <Breadcrumbs style={{ fontSize: 14 }} separator="•"  aria-label="breadcrumb">
-                    <Link color="inherit" href={'/admin/usuarios'} >
+                    <Link color="inherit" href={'/admin/usuarios'}>
                         Usuários
                     </Link>
                     <Typography color="textPrimary" style={{ fontSize: 14 }}>Editar usuário</Typography>
@@ -103,13 +96,10 @@ export default function EditUsuario() {
                     <CardContent className={classes.inputs}>
                         <TextField
                             required
+                            autoFocus
                             variant="outlined"
                             size="small"
-                            id="nome"
-                            name="nome"
                             label="Nome usuário"
-                            autoComplete="nome"
-                            autoFocus
                             value={nome}
                             onChange={e => setNome(e.target.value)}
                         />
@@ -117,30 +107,23 @@ export default function EditUsuario() {
                             required
                             variant="outlined"
                             size="small"
-                            id="email"
-                            name="email"
                             label="Email"
-                            autoComplete="email"
                             value={email}
                             onChange={e => setEmail(e.target.value)}
                         />
                         <div className={classes.twoInputs}>
                             <TextField
+                                required
                                 variant="outlined"
                                 size="small"
                                 type="password"
-                                required
-                                id="senha"
-                                name="senha"
                                 label="Senha"
-                                autoComplete="senha"
                                 value={senha}
                                 onChange={e => setSenha(e.target.value)}
                             />
                             <FormControl variant="outlined" size="small" className={classes.formControl}>
-                                <InputLabel id="tipo">Tipo de usuário</InputLabel>
+                                <InputLabel>Tipo de usuário</InputLabel>
                                 <Select
-                                    id="tipo"
                                     value={tipo}
                                     onChange={e => setTipo(e.target.value)}
                                     label="Tipo de usuário"

@@ -45,13 +45,6 @@ export default function CreateUsuario() {
     }
   }
 
-  // function handleClear() {
-  //   setNome('');
-  //   setEmail('');
-  //   setSenha('');
-  //   setTipo('');
-  // }
-
   return (
     <div className={classes.root}>
       <MenuAdmin/>
@@ -79,10 +72,7 @@ export default function CreateUsuario() {
               required
               variant="outlined"
               size="small"
-              id="nome"
-              name="nome"
               label="Nome usuário"
-              autoComplete="nome"
               autoFocus
               value={nome}
               onChange={e => setNome(e.target.value)}
@@ -91,10 +81,7 @@ export default function CreateUsuario() {
               required
               variant="outlined"
               size="small"
-              id="email"
-              name="email"
               label="Email"
-              autoComplete="email"
               value={email}
               onChange={e => setEmail(e.target.value)}
             />
@@ -104,17 +91,13 @@ export default function CreateUsuario() {
                 size="small"
                 type="password"
                 required
-                id="senha"
-                name="senha"
                 label="Senha"
-                autoComplete="senha"
                 value={senha}
                 onChange={e => setSenha(e.target.value)}
               />
               <FormControl variant="outlined" size="small" className={classes.formControl}>
-                <InputLabel id="tipo">Tipo de usuário</InputLabel>
+                <InputLabel>Tipo de usuário</InputLabel>
                 <Select
-                    id="tipo"
                     value={tipo}
                     onChange={e => setTipo(e.target.value)}
                     label="Tipo de usuário"

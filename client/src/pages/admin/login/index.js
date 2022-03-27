@@ -163,7 +163,6 @@ export default function SignIn() {
               id="email"
               label="Digite seu email"
               name="email"
-              autoComplete="email"
               autoFocus
               value={email}
               onChange={e => setEmail(e.target.value)}
@@ -203,11 +202,8 @@ export default function SignIn() {
           </Box>
         </Grid>
       </Grid>
-      
 
       <div className={classes.paper}>
-        
-        
         {/* <Grid container>
             <Grid item xs>
               <Link href="#" variant="body2">

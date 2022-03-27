@@ -102,9 +102,8 @@ export default function CreateCliente() {
           <CardContent className={classes.inputs}>
           
             <FormControl variant="outlined" size="small" className={classes.formControl}>
-                <InputLabel id="tipo" >Tipo</InputLabel>
+                <InputLabel>Tipo</InputLabel>
                 <Select
-                    id="tipo"
                     value={tipo}
                     onChange={e => setTipo(e.target.value)}
                     label="Tipo de pessoa"
@@ -117,10 +116,7 @@ export default function CreateCliente() {
             {tipo == 1 && 
               <TextField
                 variant="outlined"
-                id="nome"
-                name="nome"
                 label="Nome cliente"
-                autoComplete="nome"
                 size="small"
                 autoFocus
                 value={nome}
@@ -131,10 +127,7 @@ export default function CreateCliente() {
             {tipo == 2 && 
               <TextField
                 variant="outlined"
-                id="razaoSocial"
-                name="razaoSocial"
                 label="Razão Social"
-                autoComplete="razaosocial"
                 size="small"
                 autoFocus
                 value={razaoSocial}
@@ -148,16 +141,13 @@ export default function CreateCliente() {
                   required
                   variant="outlined"
                   size="small"
-                  id="nascimento"
-                  name="nascimento"
                   label="Data de nascimento"
                   value={nascimento}
                   onChange={e => setNascimento(e.target.value)}
                 />
                 <FormControl variant="outlined" size="small" className={classes.formControl}>
-                  <InputLabel id="sexo">Sexo</InputLabel>
+                  <InputLabel>Sexo</InputLabel>
                   <Select
-                      id="sexo"
                       value={sexo}
                       onChange={e => setSexo(e.target.value)}
                       label="Sexo"
@@ -176,8 +166,6 @@ export default function CreateCliente() {
                 variant="outlined"
                 size="small"
                 required
-                id="cpf"
-                name="cpf"
                 label="CPF"
                 value={cpf}
                 onChange={e => setCpf(e.target.value)}
@@ -189,8 +177,6 @@ export default function CreateCliente() {
                 variant="outlined"
                 size="small"
                 required
-                id="cnpj"
-                name="cnpj"
                 label="CNPJ"
                 value={cnpj}
                 onChange={e => setCnpj(e.target.value)}
@@ -202,8 +188,6 @@ export default function CreateCliente() {
                 className={classes.formControl}
                 variant="outlined"
                 size="small"
-                id="rg"
-                name="rg"
                 label="RG"
                 value={rg}
                 onChange={e => setRg(e.target.value)}
@@ -214,8 +198,6 @@ export default function CreateCliente() {
                 className={classes.formControl}
                 variant="outlined"
                 size="small"
-                id="ie"
-                name="ie"
                 label="IE"
                 value={ie}
                 onChange={e => setIe(e.target.value)}
@@ -227,10 +209,7 @@ export default function CreateCliente() {
               required
               size="small"
               variant="outlined"
-              id="email"
-              name="email"
               label="Email"
-              autoComplete="email"
               value={email}
               onChange={e => setEmail(e.target.value)}
             />

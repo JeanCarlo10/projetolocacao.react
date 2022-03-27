@@ -191,58 +191,58 @@ export default function IndexCliente() {
                 </TableRow>
               </TableHead>
 
-            <TableBody>
-              {clients.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
-                <TableRow hover key={row._id}>
-                    <TableCell align="left"><Chip label={getTypeClient(row.flTipo)} /></TableCell>
-                    <TableCell> {row.flTipo == 1 ? row.nmCliente : row.nmRazaoSocial}</TableCell> 
-                    <TableCell>{row.flTipo == 1 ? row.nrCPF : row.nrCNPJ}</TableCell>
-                    <TableCell>{row.dsLogradouro == null || undefined ?  " " : row.dsLogradouro + ", " + row.nrEndereco + " - " + row.dsBairro}</TableCell>
-                    <TableCell component="th" scope="row" align="right">
-                      {/* <IconButton onClick={() => setIsOpenMenu(true) }>
-                          <MoreVertIcon 
-                            className={classes.buttonTable}
-                          />
-                      </IconButton> */}
-                      <IconButton onClick={() => handleDelete(row._id)}>
-                        <DeleteIcon />
-                      </IconButton>
-                      <IconButton href={'/admin/clientes/edit/' + row._id}>
-                        <EditIcon />
-                      </IconButton>
-                    </TableCell>
+              <TableBody>
+                {clients.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
+                  <TableRow hover key={row._id}>
+                      <TableCell align="left"><Chip label={getTypeClient(row.flTipo)} /></TableCell>
+                      <TableCell> {row.flTipo == 1 ? row.nmCliente : row.nmRazaoSocial}</TableCell> 
+                      <TableCell>{row.flTipo == 1 ? row.nrCPF : row.nrCNPJ}</TableCell>
+                      <TableCell>{row.dsLogradouro == null || undefined ?  " " : row.dsLogradouro + ", " + row.nrEndereco + " - " + row.dsBairro}</TableCell>
+                      <TableCell component="th" scope="row" align="right">
+                        {/* <IconButton onClick={() => setIsOpenMenu(true) }>
+                            <MoreVertIcon 
+                              className={classes.buttonTable}
+                            />
+                        </IconButton> */}
+                        <IconButton onClick={() => handleDelete(row._id)}>
+                          <DeleteIcon />
+                        </IconButton>
+                        <IconButton href={'/admin/clientes/edit/' + row._id}>
+                          <EditIcon />
+                        </IconButton>
+                      </TableCell>
 
-                    {/* <Menu
-                          open={isOpenMenu}
-                          anchorEl={ref.current}
-                          onClose={() => setIsOpenMenu(false)}
-                          PaperProps={{
-                            sx: { width: 200, maxWidth: '100%' }
-                          }}
-                          anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-                          transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-                        >
-                          <MenuItem>
-                            <ListItemIcon>
-                                <IconButton onClick={() => handleDelete(row._id)}>
-                                  <DeleteIcon />
-                                </IconButton>
-                            </ListItemIcon>
-                            <ListItemText primary="Excluir" />
-                          </MenuItem>
+                      {/* <Menu
+                            open={isOpenMenu}
+                            anchorEl={ref.current}
+                            onClose={() => setIsOpenMenu(false)}
+                            PaperProps={{
+                              sx: { width: 200, maxWidth: '100%' }
+                            }}
+                            anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+                            transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+                          >
+                            <MenuItem>
+                              <ListItemIcon>
+                                  <IconButton onClick={() => handleDelete(row._id)}>
+                                    <DeleteIcon />
+                                  </IconButton>
+                              </ListItemIcon>
+                              <ListItemText primary="Excluir" />
+                            </MenuItem>
 
-                          <MenuItem >
-                            <ListItemIcon >
-                                <IconButton href={'/admin/clientes/edit/' + row._id}>
-                                  <EditIcon />
-                                </IconButton>
-                            </ListItemIcon>
-                            <ListItemText primary="Editar" />
-                          </MenuItem>
-                        </Menu> */}
-                </TableRow>
-              ))}
-              </TableBody>
+                            <MenuItem >
+                              <ListItemIcon >
+                                  <IconButton href={'/admin/clientes/edit/' + row._id}>
+                                    <EditIcon />
+                                  </IconButton>
+                              </ListItemIcon>
+                              <ListItemText primary="Editar" />
+                            </MenuItem>
+                          </Menu> */}
+                  </TableRow>
+                ))}
+                </TableBody>
               </Table>
             </TableContainer>
             <TablePagination 
@@ -253,7 +253,7 @@ export default function IndexCliente() {
                 page={page}
                 onPageChange={handleChangePage}
                 onRowsPerPageChange={handleChangeRowsPerPage}
-              />
+            />
         </Card>
           )}
         </Container>     

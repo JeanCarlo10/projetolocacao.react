@@ -122,10 +122,9 @@ export default function CreatePedido() {
           <CardContent className={classes.inputs}>
           
             <FormControl>
-                <FormLabel id="status">Status</FormLabel>
+                <FormLabel>Status</FormLabel>
                 <RadioGroup
                     row
-                    name="status"
                     value={status}
                     // onChange={handleChange}
                 >
@@ -134,9 +133,8 @@ export default function CreatePedido() {
             </FormControl>
 
             <FormControl variant="outlined" size="small" className={classes.formControl}>
-                <InputLabel id="selectClients" >Cliente</InputLabel>
+                <InputLabel>Cliente</InputLabel>
                 <Select
-                    id="selectClients"
                     onChange={handleSelectClients}
                     value={clientId}
                     label="Cliente"
@@ -148,10 +146,9 @@ export default function CreatePedido() {
             </FormControl> 
             
             <FormControl>
-                <FormLabel id="enderecoAtual"></FormLabel>
+                <FormLabel></FormLabel>
                 <RadioGroup
                     row
-                    name="enderecoAtual"
                     value={enderecoAtual}
                     onChange={handleChange}
                 >

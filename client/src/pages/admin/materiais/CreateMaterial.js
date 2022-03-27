@@ -65,8 +65,6 @@ export default function CreateMaterial() {
                 required
                 variant="outlined"
                 size="small"
-                id="nmMaterial"
-                name="nmMaterial"
                 label="Descrição"
                 autoFocus
                 value={nmMaterial}

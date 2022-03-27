@@ -44,6 +44,10 @@ export default function EditCliente() {
 
     const { idCliente } = useParams();
 
+    const [contatos, setContatos] = useState([]);
+    
+    
+
     useEffect(() => {
         async function getCliente() {
             var response = await api.get('/api/clients.details/' + idCliente);
@@ -65,11 +69,16 @@ export default function EditCliente() {
             setUf(response.data.dsUF);
             setCep(response.data.nrCEP);
             setRazaoSocial(response.data.nmRazaoSocial);
+            setContatos(response.data.contacts);
         }
 
         getCliente();
     }, [])
     
+    const handleAddContato = (contato) => {
+        setContatos([...contatos, contato]);
+    } 
+
     async function handleSubmit() {
         const data = {
             _id: idCliente,
@@ -90,6 +99,7 @@ export default function EditCliente() {
             dsUF: uf,
             nrCEP: cep,
             nmRazaoSocial: razaoSocial,
+            contacts: contatos,
         }
 
         if (nome != '' && tipo != '') {
@@ -266,7 +276,7 @@ export default function EditCliente() {
                     />
 
                     <BuscarCEP /> 
-                    <ListaContatos /> 
+                    <ListaContatos contatos={contatos} addContato={handleAddContato}  /> 
 
                     </CardContent>
                     <CardActions style={{ justifyContent: 'flex-end', marginRight: 15 }}>

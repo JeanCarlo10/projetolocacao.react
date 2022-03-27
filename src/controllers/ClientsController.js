@@ -8,19 +8,11 @@ module.exports = {
     },
 
     //ADD CLIENT
-
     async create(req, res) { 
         try {
-            const { nmCliente, contacts } = req.body
-            const client = await Client.create({ nmCliente });
+            const model = req.body
 
-            await Promise.all(contacts.map(async contact => {
-                const clientContact = new Contact({ ...contact });
-
-                await clientContact.save();
-                
-                client.contacts.push(clientContact);
-            }));
+            const client = await Client.create(model);
 
             await client.save();
 
@@ -32,9 +24,7 @@ module.exports = {
             })
         }
     },
-
     
-
     //GET CLIENTS
     async details(req, res){
         const {_id} = req.params;
@@ -52,11 +42,9 @@ module.exports = {
 
     //UPDATE CLIENT
     async update(req, res){
-        const {_id, nmCliente, dtNascimento, flSexo, flTipo, nrCPF, nrRG, nrIE, nrCNPJ, dsEmail, nrEndereco, dsComplemento, dsLogradouro, dsBairro, dsCidade, dsUF, nrCEP, nmRazaoSocial} = req.body;
+        const model = req.body;
 
-        const data = {nmCliente, dtNascimento, flSexo, flTipo, nrCPF, nrRG, nrIE, nrCNPJ, dsEmail, nrEndereco, dsComplemento, dsLogradouro, dsBairro, dsCidade, dsUF, nrCEP, nmRazaoSocial};
-
-        const client = await Client.findOneAndUpdate({_id}, data, {new:true});
+        const client = await Client.findOneAndUpdate({_id: model._id}, model, {new:true});
 
         return res.json(client);
     }

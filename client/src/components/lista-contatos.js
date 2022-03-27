@@ -18,9 +18,8 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import AddCircleOutlinedIcon from '@mui/icons-material/AddCircleOutlined';
 import { flexbox } from '@mui/system';
 
-export default function ListaContatos() {
+export default function ListaContatos(props) {
     const classes = useStyles(); 
-
     const StyledTableRow = withStyles((theme) => ({
         root: {
           '&:nth-of-type(odd)': {
@@ -28,39 +27,29 @@ export default function ListaContatos() {
           },
         },
     }))(TableRow);
-
-    const [contacts, setContacts] = useState([]);
-    const [phoneclients, setPhoneClients] = useState({
-        flTipoTelefone: '',
-        nrTelefone: '',
-        dsObservacao: '',
-    });
-
-  const handleChangeContact = (event) => {
-    event.preventDefault();
     
-    const fieldName = event.target.getAttribute('name');
-    const fieldValue = event.target.value;
+    const telefoneMap = {30: 'Celular', 40: 'Fixo'};
+    const {contatos, addContato} = props;
 
-    const newPhone = { ...phoneclients };
-    newPhone[fieldName] = fieldValue;
-    
-    setPhoneClients(newPhone);
-  };
+    const [tipoTelefone, setTipoTelefone] = useState(30);
+    const [telefone, setTelefone] = useState('');
+    const [observacao, setObservacao] = useState('');
 
-  const handleSubmitAddContact = (event) => {
-    event.preventDefault();
-
-    const newContact = {
-      // id: nanoid(),
-      flTipoTelefone: phoneclients.flTipoTelefone,
-      nrTelefone: phoneclients.nrTelefone,
-      dsObservacao: phoneclients.dsObservacao,
+    const handleTipoTelefoneChange = (event) => {
+      setTipoTelefone(event.target.value);
     };
 
-    const newContacts = [ ...contacts, newContact ];
-    setContacts(newContacts);
-  }
+    const handleAddContact = () => {
+      addContato({
+        flTipoTelefone: tipoTelefone,
+        nrTelefone: telefone,
+        dsObservacao: observacao
+      });
+
+      setTipoTelefone(30);
+      setTelefone('');
+      setObservacao('');
+    }
 
     return (
         <Box sx={{
@@ -78,14 +67,14 @@ export default function ListaContatos() {
               Contato(s) 
               <Divider variant="fullWidth" />
             </Typography>
-            <form onSubmit={handleSubmitAddContact}>
+
+            <form>
               <div className={classes.twoInputs}>
                 <FormControl variant="outlined" size="small" className={classes.formControl}>
-                  <InputLabel id="flTipoTelefone">Tipo</InputLabel>
+                  <InputLabel>Tipo</InputLabel>
                   <Select
-                      id="flTipoTelefone"
-                      // value={flTipoTelefone}
-                      // onChange={handleChangeContact}
+                      value={tipoTelefone}
+                      onChange={handleTipoTelefoneChange}
                       label="Tipo"
                     >
                     <MenuItem  value={30}>Celular</MenuItem>
@@ -94,29 +83,24 @@ export default function ListaContatos() {
                 </FormControl>
 
                 <TextField
-                  required
                   variant="outlined"
                   size="small"
-                  id="nrTelefone"
-                  name="nrTelefone"
                   label="Número"
-                  // value={nrTelefone}
-                  onChange={handleChangeContact}
+                  value={telefone}
+                  onChange={(event) => setTelefone(event.target.value)}
                 />
               </div>
               <Box style={{ marginLeft: -7, display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
                 <TextField
                   variant="outlined"
-                  id="dsObservacao"
-                  name="dsObservacao"
                   label="Observação"
                   size="small"
                   fullWidth
-                  // value={dsObservacao}
-                  onChange={handleChangeContact}
+                  value={observacao}
+                  onChange={(event) => setObservacao(event.target.value)}
                 />
                 <div style={{ marginLeft: 10 }}>
-                  <Button variant="contained" size="medium" className={classes.btnAddBlue} type='submit' startIcon={<AddCircleOutlinedIcon />}>Adicionar</Button>
+                  <Button onClick={handleAddContact} variant="contained" size="medium" className={classes.btnAddBlue} startIcon={<AddCircleOutlinedIcon />}>Adicionar</Button>
                 </div>
               </Box>
             </form>
@@ -133,9 +117,9 @@ export default function ListaContatos() {
                 </TableHead>
 
                 <TableBody>
-                  {contacts.map((contact) => ( 
+                  {contatos.map((contact) => ( 
                     <TableRow hover >
-                        <TableCell align="left"><Chip label={contact.flTipoTelefone} /></TableCell>
+                        <TableCell align="left"><Chip label={telefoneMap[contact.flTipoTelefone]} /></TableCell>
                         <TableCell>{contact.nrTelefone}</TableCell>
                         <TableCell>{contact.dsObservacao}</TableCell>
                         <TableCell component="th" scope="row" align="right">

@@ -1,6 +1,9 @@
 <!-- Executar o projeto -->
 <!-- npm run dev -->
 
+<!-- Adicionar todas as mudanças -->
+<!-- git add . -->
+
 <!-- Para dá um COMMIT -->
 <!-- git commit -m "Texto" -->
 

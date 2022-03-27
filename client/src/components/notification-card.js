@@ -40,7 +40,6 @@ export default function NotificationCard() {
                 '/api/users'
             );
 
-            console.log(data);
             setDados(data);
         };
         fetchClients();

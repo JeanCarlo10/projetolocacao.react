@@ -27,10 +27,7 @@ const ClientSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'users'
     },
-    contacts: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Contact',
-    }],
+    contacts: {type: Array, "default":[]} 
 },{
     timestamps: true
 });

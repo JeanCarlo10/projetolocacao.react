@@ -37,6 +37,11 @@ export default function CreateCliente() {
   const [cidade, setCidade] = useState('');
   const [uf, setUf] = useState('');
   const [cep, setCep] = useState('');
+  const [contatos, setContatos] = useState([]);
+
+  const handleAddContato = (contato) => {
+    setContatos([...contatos, contato]);
+  } 
 
   async function handleSubmit() {
     const data = {
@@ -57,8 +62,7 @@ export default function CreateCliente() {
         dsUF: uf,
         nrCEP: cep,
         nmRazaoSocial: razaoSocial,
-
-        
+        contacts: contatos,
     }
     if (nome !== '' && email != '' && tipo != '') {
       const response = await api.post('/api/clients', data);
@@ -232,7 +236,7 @@ export default function CreateCliente() {
             />
 
             <BuscarCEP /> 
-            <ListaContatos /> 
+            <ListaContatos contatos={contatos} addContato={handleAddContato}  /> 
 
           </CardContent>
           <CardActions style={{ justifyContent: 'flex-end', marginRight: 15 }}>

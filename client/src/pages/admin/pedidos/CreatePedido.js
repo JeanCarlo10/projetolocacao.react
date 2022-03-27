@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import { TextField, InputLabel, FormControl, Select } from '@material-ui/core';
+import { TextField } from '@material-ui/core';
+import Select from '@mui/material/Select';
+import InputLabel from '@mui/material/InputLabel';
+import FormControl from '@mui/material/FormControl';
 import Button from '@material-ui/core/Button';
 import Container from '@material-ui/core/Container';
 import Breadcrumbs from '@material-ui/core/Breadcrumbs';
@@ -10,7 +13,7 @@ import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import CardHeader from '@material-ui/core/CardHeader';
-import MenuItem from '@material-ui/core/MenuItem';
+import MenuItem from '@mui/material/MenuItem';
 import { IconButton } from '@mui/material';
 import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
@@ -29,42 +32,25 @@ import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 export default function CreatePedido() {
   const classes = useStyles(); 
 
-  const [dadosCliente, setDadosCliente] = useState();
-  const [clients, setClients] = useState([]);
+  const [selectClients, setSelectClients] = useState([]);
+  const [clientId, setClientId] = useState('');
+  const [currentClient, setCurrentClient] = useState({});
 
   useEffect(() => {
-    const getDados = async () => {
+    async function getDadosCliente() {
       
-        let results = api.post('http://localhost:5000/api/clients');
-        setClients(results);
+        const results = await api.get('http://localhost:5000/api/clients');
+        console.log(results);
+        setSelectClients(results.data);
     }
     
-    getDados();
-  }, [])
-
-
-  useEffect(() => {
-    fetch("/api/clients", {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-    })
-    .then((res) => res.json())
-    .then((data) => {
-        setClients(data)
-    })
-    .catch((err) => console.log(err))
+    getDadosCliente();
   }, []);
 
   function handleSelectClients(e) {
-      setClients({ 
-          clientes: {
-              id: e.target.value,
-              name: e.target.options[e.target.selectedIndex].text,
-          }
-      })
-      console.log(clients)
+      const clientId = e.target.value;
+      setCurrentClient(selectClients.find(e => e._id == clientId));
+      setClientId(clientId);
   }
 
   const [status, setStatus] = useState('entrega');
@@ -82,7 +68,7 @@ export default function CreatePedido() {
 
   async function handleSubmit() {
     const data = {
-        nmCliente: clients,
+        nmCliente: selectClients,
         status: status,
         vlTotalGeral: vlTotalGeral,
 
@@ -94,7 +80,7 @@ export default function CreatePedido() {
         dsUF: uf,
         nrCEP: cep,
     }
-    if (clients !== '') {
+    if (selectClients !== '') {
       const response = await api.post('/api/rents', data);
 
       if (response.status == 200) {
@@ -108,7 +94,6 @@ export default function CreatePedido() {
   }
 
   const handleChange = (event) => {
-    setStatus(event.target.value);
     setEnderecoAtual(event.target.value);
   };
 
@@ -142,24 +127,23 @@ export default function CreatePedido() {
                     row
                     name="status"
                     value={status}
-                    onChange={handleChange}
+                    // onChange={handleChange}
                 >
-                    <FormControlLabel value="entrega" control={<Radio />} label="Entrega" />
-                    <FormControlLabel value="retirada" control={<Radio />} label="Retirada" />
+                    <FormControlLabel value="entrega" disabled control={<Radio />} label="Entrega" />
                 </RadioGroup>
             </FormControl>
 
-            
-
             <FormControl variant="outlined" size="small" className={classes.formControl}>
-                <InputLabel id="clients" >Cliente</InputLabel>
+                <InputLabel id="selectClients" >Cliente</InputLabel>
                 <Select
-                    id="clients"
-                    // value={clients}
+                    id="selectClients"
                     onChange={handleSelectClients}
+                    value={clientId}
                     label="Cliente"
                   >
-                  <MenuItem>{clients}</MenuItem>
+                    {selectClients.map((clients) => (
+                      <MenuItem value={clients._id} key={clients._id}>{clients.nmCliente}</MenuItem>
+                    ))}
                 </Select>
             </FormControl> 
             
@@ -178,7 +162,7 @@ export default function CreatePedido() {
 
             {enderecoAtual == 'novo' ? <BuscarCEP /> : <div>
               
-                <LocationOnOutlinedIcon style={{color: '#CDCDCD', fontSize: 40 }}/> Avenida Nacional, 482 - Três Bandeiras
+                <LocationOnOutlinedIcon style={{color: '#CDCDCD', fontSize: 40 }}/> {currentClient.nmCliente}
             </div>
             }
 

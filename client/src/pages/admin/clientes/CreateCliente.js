@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { TextField, InputLabel, FormControl, Select } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
@@ -16,6 +16,8 @@ import MenuAdmin from '../../../components/menu-admin';
 import api from '../../../services/api';
 import BuscarCEP from '../../../components/buscar-cep';
 import ListaContatos from '../../../components/lista-contatos';
+
+import { mask, unMask } from 'remask';
 
 export default function CreateCliente() {
   const classes = useStyles(); 
@@ -43,6 +45,18 @@ export default function CreateCliente() {
     setContatos([...contatos, contato]);
   } 
 
+  const handleChangeCPF = (event) => {
+    setCpf(mask(unMask(event.target.value), ['999.999.999-99']));
+  }
+
+  const handleChangeCNPJ = (event) => {
+    setCnpj(mask(unMask(event.target.value), ['99.999.999/9999-99']));
+  }
+
+  const handleChangeDataNascimento = (event) => {
+    setNascimento(mask(unMask(event.target.value), ['99/99/9999']));
+  }
+
   async function handleSubmit() {
     const data = {
         nmCliente: nome,
@@ -64,7 +78,7 @@ export default function CreateCliente() {
         nmRazaoSocial: razaoSocial,
         contacts: contatos,
     }
-    if (nome !== '' && email != '' && tipo != '') {
+    if (nome !== '' && nascimento != '' && tipo != '' && cpf != '') {
       const response = await api.post('/api/clients', data);
 
       if (response.status == 200) {
@@ -143,7 +157,7 @@ export default function CreateCliente() {
                   size="small"
                   label="Data de nascimento"
                   value={nascimento}
-                  onChange={e => setNascimento(e.target.value)}
+                  onChange={handleChangeDataNascimento}
                 />
                 <FormControl variant="outlined" size="small" className={classes.formControl}>
                   <InputLabel>Sexo</InputLabel>
@@ -168,7 +182,7 @@ export default function CreateCliente() {
                 required
                 label="CPF"
                 value={cpf}
-                onChange={e => setCpf(e.target.value)}
+                onChange={handleChangeCPF}
               />
             }
 
@@ -179,7 +193,7 @@ export default function CreateCliente() {
                 required
                 label="CNPJ"
                 value={cnpj}
-                onChange={e => setCnpj(e.target.value)}
+                onChange={handleChangeCNPJ}
               />
             }
             
@@ -206,7 +220,6 @@ export default function CreateCliente() {
           </div>
             
             <TextField
-              required
               size="small"
               variant="outlined"
               label="Email"

@@ -1,4 +1,4 @@
-import React, { useState} from 'react';
+import React, { useState, useCallback } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
@@ -9,10 +9,11 @@ import Typography from '@material-ui/core/Typography';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import apiCEP from '../services/apiCEP';
+import { mask, unMask } from 'remask';
 
 export default function BuscarCep() {
     const classes = useStyles(); 
-
+    
     const [nrEndereco, setNrEndereco] = useState('');
     const [complemento, setComplemento] = useState('');
     const [logradouro, setLogradouro] = useState('');
@@ -20,6 +21,10 @@ export default function BuscarCep() {
     const [cidade, setCidade] = useState('');
     const [uf, setUf] = useState('');
     const [cep, setCep] = useState('');
+
+    const handleChangeCEP = (event) => {
+        setCep(mask(unMask(event.target.value), ['99999-999']));
+    }
 
     async function handleSearchCEP() {
         if (cep === '') {
@@ -58,14 +63,13 @@ export default function BuscarCep() {
             </Typography>
 
           <form>
-            <FormControl size="small" variant="outlined">
+              <FormControl size="small" variant="outlined">
                 <InputLabel htmlFor="cep">CEP</InputLabel>
                 <OutlinedInput
                 id="cep"
                 name='cep'
-                type="number"
                 value={cep}
-                onChange={e => setCep(e.target.value)}
+                onChange={handleChangeCEP}
                 labelWidth={120}
                 endAdornment={
                     <InputAdornment position="end">

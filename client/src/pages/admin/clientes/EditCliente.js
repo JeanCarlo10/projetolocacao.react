@@ -20,6 +20,7 @@ import api from '../../../services/api';
 
 import BuscarCEP from '../../../components/buscar-cep';
 import ListaContatos from '../../../components/lista-contatos';
+import { mask, unMask } from 'remask';
 
 export default function EditCliente() {
     const classes = useStyles();
@@ -45,8 +46,6 @@ export default function EditCliente() {
     const { idCliente } = useParams();
 
     const [contatos, setContatos] = useState([]);
-
-    
 
     useEffect(() => {
         async function getCliente() {
@@ -74,10 +73,23 @@ export default function EditCliente() {
 
         getCliente();
     }, [])
-    
+
     const handleAddContato = (contato) => {
         setContatos([...contatos, contato]);
     } 
+
+    const handleChangeCPF = (event) => {
+        setCpf(mask(unMask(event.target.value), ['999.999.999-99']));
+    }
+    
+    const handleChangeCNPJ = (event) => {
+        setCnpj(mask(unMask(event.target.value), ['99.999.999/9999-99']));
+    }
+    
+    const handleChangeDataNascimento = (event) => {
+        setNascimento(mask(unMask(event.target.value), ['99/99/9999']));
+    }
+
 
     async function handleSubmit() {
         const data = {
@@ -182,7 +194,7 @@ export default function EditCliente() {
                                 size="small"
                                 label="Data de nascimento"
                                 value={nascimento}
-                                onChange={e => setNascimento(e.target.value)}
+                                onChange={handleChangeDataNascimento}
                             />
                             <FormControl variant="outlined" size="small" className={classes.formControl}>
                                 <InputLabel>Sexo</InputLabel>
@@ -207,7 +219,7 @@ export default function EditCliente() {
                                 required
                                 label="CPF"
                                 value={cpf}
-                                onChange={e => setCpf(e.target.value)}
+                                onChange={handleChangeCPF}
                             />
                         }
 
@@ -218,7 +230,7 @@ export default function EditCliente() {
                                 required
                                 label="CNPJ"
                                 value={cnpj}
-                                onChange={e => setCnpj(e.target.value)}
+                                onChange={handleChangeCNPJ}
                             />
                         }
 
@@ -226,7 +238,6 @@ export default function EditCliente() {
                             <TextField 
                                 className={classes.formControl}
                                 variant="outlined"
-                                required
                                 size="small"
                                 label="RG"
                                 value={rg}
@@ -246,7 +257,6 @@ export default function EditCliente() {
                     </div>
                     
                     <TextField
-                        required
                         size="small"
                         variant="outlined"
                         label="Email"

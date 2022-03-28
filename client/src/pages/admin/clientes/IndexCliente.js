@@ -196,7 +196,7 @@ export default function IndexCliente() {
                   <TableRow hover key={row._id}>
                       <TableCell align="left"><Chip label={getTypeClient(row.flTipo)} /></TableCell>
                       <TableCell> {row.flTipo == 1 ? row.nmCliente : row.nmRazaoSocial}</TableCell> 
-                      <TableCell>{row.flTipo == 1 ? row.nrCPF : row.nrCNPJ}</TableCell>
+                      <TableCell>{row.nrTelefone == null || undefined ? " " : row.nrTelefone}</TableCell>
                       <TableCell>{row.dsLogradouro == null || undefined ?  " " : row.dsLogradouro + ", " + row.nrEndereco + " - " + row.dsBairro}</TableCell>
                       <TableCell component="th" scope="row" align="right">
                         {/* <IconButton onClick={() => setIsOpenMenu(true) }>

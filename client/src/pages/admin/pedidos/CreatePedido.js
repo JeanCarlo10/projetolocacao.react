@@ -14,7 +14,7 @@ import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import CardHeader from '@material-ui/core/CardHeader';
 import MenuItem from '@mui/material/MenuItem';
-import { IconButton } from '@mui/material';
+import { Autocomplete, IconButton } from '@mui/material';
 import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
@@ -27,8 +27,6 @@ import BuscarCEP from '../../../components/buscar-cep';
 import ListaContatos from '../../../components/lista-contatos';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 
-
-
 export default function CreatePedido() {
   const classes = useStyles(); 
 
@@ -40,7 +38,6 @@ export default function CreatePedido() {
     async function getDadosCliente() {
       
         const results = await api.get('http://localhost:5000/api/clients');
-        console.log(results);
         setSelectClients(results.data);
     }
     
@@ -132,6 +129,7 @@ export default function CreatePedido() {
                 </RadioGroup>
             </FormControl>
 
+            
             <FormControl variant="outlined" size="small" className={classes.formControl}>
                 <InputLabel>Cliente</InputLabel>
                 <Select
@@ -144,6 +142,8 @@ export default function CreatePedido() {
                     ))}
                 </Select>
             </FormControl> 
+            
+            
             
             <FormControl>
                 <FormLabel></FormLabel>

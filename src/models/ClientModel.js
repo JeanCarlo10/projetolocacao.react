@@ -9,7 +9,7 @@ const ClientSchema = new mongoose.Schema({
     nrRG: String,
     nrIE: String,
     nrCNPJ: String,
-    dtNascimento: Date,
+    dtNascimento: String,
     dsEmail: String,
 
     //DADOS CEP
@@ -22,12 +22,10 @@ const ClientSchema = new mongoose.Schema({
     nrCEP: String,
     //DADOS CEP
 
-    //public byte[] byFoto
-    user: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'users'
-    },
+    //Contatos de telefone do cliente
     contacts: {type: Array, "default":[]} 
+
+    //public byte[] byFoto
 },{
     timestamps: true
 });

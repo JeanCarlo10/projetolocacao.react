@@ -17,6 +17,7 @@ import Button from '@material-ui/core/Button';
 import DeleteIcon from '@material-ui/icons/Delete';
 import AddCircleOutlinedIcon from '@mui/icons-material/AddCircleOutlined';
 import { flexbox } from '@mui/system';
+import { mask, unMask } from 'remask';
 
 export default function ListaContatos(props) {
     const classes = useStyles(); 
@@ -34,6 +35,10 @@ export default function ListaContatos(props) {
     const [tipoTelefone, setTipoTelefone] = useState(30);
     const [telefone, setTelefone] = useState('');
     const [observacao, setObservacao] = useState('');
+
+    const handleChangeTelefone = (event) => {
+      setTelefone(mask(unMask(event.target.value), ['(99) 9999-9999', '(99) 9 9999-9999']));
+  }
 
     const handleTipoTelefoneChange = (event) => {
       setTipoTelefone(event.target.value);
@@ -87,7 +92,7 @@ export default function ListaContatos(props) {
                   size="small"
                   label="Número"
                   value={telefone}
-                  onChange={(event) => setTelefone(event.target.value)}
+                  onChange={handleChangeTelefone}
                 />
               </div>
               <Box style={{ marginLeft: -7, display: 'flex', flexDirection: 'row', alignItems: 'center'}}>

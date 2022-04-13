@@ -46,6 +46,7 @@ export default function EditCliente() {
     const { idCliente } = useParams();
 
     const [contatos, setContatos] = useState([]);
+    const [dadosEndereco, setDadosEndereco] = useState([]);
 
     useEffect(() => {
         async function getCliente() {
@@ -77,6 +78,17 @@ export default function EditCliente() {
     const handleAddContato = (contato) => {
         setContatos([...contatos, contato]);
     } 
+
+    const handleEndereco = (logradouro) => {
+        const newEndereco = [
+          ...dadosEndereco,
+          {
+            dsLogradouro: logradouro,
+          }
+        ];
+    
+        setDadosEndereco(newEndereco);
+      }
 
     const handleChangeCPF = (event) => {
         setCpf(mask(unMask(event.target.value), ['999.999.999-99']));
@@ -264,7 +276,7 @@ export default function EditCliente() {
                         onChange={e => setEmail(e.target.value)}
                     />
 
-                    <BuscarCEP /> 
+                    <BuscarCEP dadosEndereco={handleEndereco}/> 
                     <ListaContatos contatos={contatos} addContato={handleAddContato}  /> 
 
                     </CardContent>

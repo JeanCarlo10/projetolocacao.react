@@ -9,19 +9,24 @@ module.exports = {
     },
 
     //ADD RENT
-    async create(req, res){
-        const newRent = new Rent(req.body);
+    async create(req, res) { 
+        try {
+            const model = req.body
 
-        try{
-            const savedRent = await newRent.save();
-            res.status(200).json(savedRent);
-        
-        } catch (err) {
-            res.status(500).json(err);
+            const rent = await Rent.create(model);
+
+            await rent.save();
+
+            return res.send({ rent });
+
+        } catch (err){
+            return res.status(500).send({
+                 error: 'Por favor, contate o administrador! Erro ao cadastrar o pedido'
+            })
         }
     },
-
-    //GET RENT
+    
+    //GET RENTS
     async details(req, res){
         const {_id} = req.params;
 
@@ -38,11 +43,9 @@ module.exports = {
 
     //UPDATE RENT
     async update(req, res){
-        const {_id, nmCliente, status, vlTotalGeral, dsObservacao, nrEndereco, dsComplemento, dsLogradouro, dsBairro, dsCidade, dsUF, nrCEP } = req.body;
+        const model = req.body;
 
-        const data = {nmCliente, status, vlTotalGeral, dsObservacao, nrEndereco, dsComplemento, dsLogradouro, dsBairro, dsCidade, dsUF, nrCEP};
-
-        const rent = await Rent.findOneAndUpdate({_id}, data, {new:true});
+        const rent = await Rent.findOneAndUpdate({_id: model._id}, model, {new:true});
 
         return res.json(rent);
     }

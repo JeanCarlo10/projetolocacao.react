@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { TextField, InputLabel, FormControl, Select } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
@@ -32,14 +32,12 @@ export default function CreateCliente() {
   const [cnpj, setCnpj] = useState('');
   const [nascimento, setNascimento] = useState('');
   const [email, setEmail] = useState('');
-  const [nrEndereco, setNrEndereco] = useState('');
-  const [complemento, setComplemento] = useState('');
-  const [logradouro, setLogradouro] = useState('');
-  const [bairro, setBairro] = useState('');
-  const [cidade, setCidade] = useState('');
-  const [uf, setUf] = useState('');
-  const [cep, setCep] = useState('');
   const [contatos, setContatos] = useState([]);
+  const [dadosEndereco, setDadosEndereco] = useState({});
+
+  const handleSearchCEP = (data) => {
+    setDadosEndereco(data);
+  }
 
   const handleAddContato = (contato) => {
     setContatos([...contatos, contato]);
@@ -57,9 +55,12 @@ export default function CreateCliente() {
     setNascimento(mask(unMask(event.target.value), ['99/99/9999']));
   }
 
-  async function handleSubmit() {
+  async function handleSubmit(event) {
+    event.preventDefault();
+
     const data = {
         nmCliente: nome,
+        nmRazaoSocial: razaoSocial,
         flSexo: sexo,
         flTipo: tipo,
         nrCPF: cpf,
@@ -68,16 +69,20 @@ export default function CreateCliente() {
         nrCNPJ: cnpj,
         dtNascimento: nascimento,
         dsEmail: email,
-        nrEndereco: nrEndereco,
-        dsComplemento: complemento,
-        dsLogradouro: logradouro,
-        dsBairro: bairro,
-        dsCidade: cidade,
-        dsUF: uf,
-        nrCEP: cep,
-        nmRazaoSocial: razaoSocial,
+
+        //Dados Endereço
+        nrEndereco: dadosEndereco.nrEndereco,
+        dsComplemento: dadosEndereco.complemento,
+        dsLogradouro: dadosEndereco.logradouro,
+        dsBairro: dadosEndereco.bairro,
+        dsCidade: dadosEndereco.cidade,
+        dsUF: dadosEndereco.uf,
+        nrCEP: dadosEndereco.cep,
+
+        //Lista de Contatos
         contacts: contatos,
     }
+
     if (nome !== '' && nascimento != '' && tipo != '' && cpf != '') {
       const response = await api.post('/api/clients', data);
 
@@ -112,10 +117,13 @@ export default function CreateCliente() {
             subheaderTypographyProps={{ align: 'left' }}
             className={classes.cardHeader}
           />
+
           <Card style= {{ borderRadius: 15 }}>
+          <form onSubmit={handleSubmit}>
           <CardContent className={classes.inputs}>
           
-            <FormControl variant="outlined" size="small" className={classes.formControl}>
+          
+          <FormControl variant="outlined" size="small" className={classes.formControl}>
                 <InputLabel>Tipo</InputLabel>
                 <Select
                     value={tipo}
@@ -227,13 +235,16 @@ export default function CreateCliente() {
               onChange={e => setEmail(e.target.value)}
             />
 
-            <BuscarCEP /> 
+            <BuscarCEP onUpdate={handleSearchCEP}/> 
+
             <ListaContatos contatos={contatos} addContato={handleAddContato}  /> 
+          
 
           </CardContent>
           <CardActions style={{ justifyContent: 'flex-end', marginRight: 15 }}>
-            <Button variant="contained" size="medium" href={'/admin/clientes'} className={classes.btnDefaultGreen} onClick={handleSubmit} startIcon={<SaveIcon />}>Salvar</Button>
+            <Button variant="contained" size="medium" className={classes.btnDefaultGreen} type="submit" startIcon={<SaveIcon />}>Salvar</Button>
           </CardActions>
+          </form>
         </Card>
       </Container>
       </main>

@@ -14,11 +14,14 @@ const DataSchema = new mongoose.Schema({
     nrCEP: String,
     //DADOS CEP
 
-    clientes: [
-        {
-            type: Array,
-        }
-    ],
+    //Contatos de telefone do cliente
+    products: { type: Array, "default":[] } 
+
+    // clientes: [
+    //     {
+    //         type: Array,
+    //     }
+    // ],
 },{
     timestamps: true
 });

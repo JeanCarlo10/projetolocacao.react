@@ -24,15 +24,33 @@ import MenuAdmin from '../../../components/menu-admin';
 import api from '../../../services/api';
 import { NavigateNextOutlined } from '@material-ui/icons';
 import BuscarCEP from '../../../components/buscar-cep';
-import ListaContatos from '../../../components/lista-contatos';
+import ListaProdutos from '../../../components/lista-produtos';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 
 export default function CreatePedido() {
   const classes = useStyles(); 
 
+  const [status, setStatus] = useState('entrega');
+  const [enderecoAtual, setEnderecoAtual] = useState('atual');
+  const [vlTotalGeral, setVlTotalGeral] = useState(0);
+  const [dsObservacao, setDsObservacao] = useState('');
+
+  //Dados Endereço
+  const [endereco, setEndereco] = useState('');
+  const [complemento, setComplemento] = useState('');
+  const [logradouro, setLogradouro] = useState('');
+  const [bairro, setBairro] = useState('');
+  const [cidade, setCidade] = useState('');
+  const [uf, setUf] = useState('');
+  const [cep, setCep] = useState('');
+
+  //Dados cliente
   const [selectClients, setSelectClients] = useState([]);
   const [clientId, setClientId] = useState('');
   const [currentClient, setCurrentClient] = useState({});
+  
+  //Dados Produto
+  const [produtos, setProdutos] = useState([]);
 
   useEffect(() => {
     async function getDadosCliente() {
@@ -50,18 +68,13 @@ export default function CreatePedido() {
       setClientId(clientId);
   }
 
-  const [status, setStatus] = useState('entrega');
-  const [enderecoAtual, setEnderecoAtual] = useState('atual');
-  const [vlTotalGeral, setVlTotalGeral] = useState(0);
-  const [dsObservacao, setDsObservacao] = useState('');
+  const handleAddProduto = (produto) => {
+    setProdutos([...produtos, produto]);
+  } 
 
-  const [endereco, setEndereco] = useState('');
-  const [complemento, setComplemento] = useState('');
-  const [logradouro, setLogradouro] = useState('');
-  const [bairro, setBairro] = useState('');
-  const [cidade, setCidade] = useState('');
-  const [uf, setUf] = useState('');
-  const [cep, setCep] = useState('');
+  const handleChangeAddress = (event) => {
+    setEnderecoAtual(event.target.value);
+  };
 
   async function handleSubmit() {
     const data = {
@@ -76,6 +89,9 @@ export default function CreatePedido() {
         dsCidade: cidade,
         dsUF: uf,
         nrCEP: cep,
+
+        //Lista de produtos
+        products: produtos,
     }
     if (selectClients !== '') {
       const response = await api.post('/api/rents', data);
@@ -90,9 +106,7 @@ export default function CreatePedido() {
     }
   }
 
-  const handleChange = (event) => {
-    setEnderecoAtual(event.target.value);
-  };
+  
 
   return (
     <div className={classes.root}>
@@ -122,14 +136,13 @@ export default function CreatePedido() {
                 <FormLabel>Status</FormLabel>
                 <RadioGroup
                     row
+                    // onChange={e => setStatus(e.target.value)}
                     value={status}
-                    // onChange={handleChange}
                 >
                     <FormControlLabel value="entrega" disabled control={<Radio />} label="Entrega" />
                 </RadioGroup>
             </FormControl>
 
-            
             <FormControl variant="outlined" size="small" className={classes.formControl}>
                 <InputLabel>Cliente</InputLabel>
                 <Select
@@ -143,14 +156,12 @@ export default function CreatePedido() {
                 </Select>
             </FormControl> 
             
-            
-            
             <FormControl>
                 <FormLabel></FormLabel>
                 <RadioGroup
                     row
                     value={enderecoAtual}
-                    onChange={handleChange}
+                    onChange={handleChangeAddress}
                 >
                     <FormControlLabel value="atual" control={<Radio />} label="Endereço atual" />
                     <FormControlLabel value="novo" control={<Radio />} label="Novo endereço" />
@@ -162,6 +173,8 @@ export default function CreatePedido() {
                 <LocationOnOutlinedIcon style={{color: '#CDCDCD', fontSize: 40 }}/> {currentClient.nmCliente}
             </div>
             }
+
+          <ListaProdutos produtos={produtos} addProduto={handleAddProduto}/>
 
           </CardContent>
           <CardActions style={{ justifyContent: 'flex-end', marginRight: 15 }}>

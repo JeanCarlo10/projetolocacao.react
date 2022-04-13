@@ -16,7 +16,6 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Button from '@material-ui/core/Button';
 import DeleteIcon from '@material-ui/icons/Delete';
 import AddCircleOutlinedIcon from '@mui/icons-material/AddCircleOutlined';
-import { flexbox } from '@mui/system';
 import { mask, unMask } from 'remask';
 
 export default function ListaContatos(props) {
@@ -38,7 +37,7 @@ export default function ListaContatos(props) {
 
     const handleChangeTelefone = (event) => {
       setTelefone(mask(unMask(event.target.value), ['(99) 9999-9999', '(99) 9 9999-9999']));
-  }
+    }
 
     const handleTipoTelefoneChange = (event) => {
       setTipoTelefone(event.target.value);
@@ -46,6 +45,7 @@ export default function ListaContatos(props) {
 
     const handleAddContact = () => {
       addContato({
+        id: new Date().getTime(),
         flTipoTelefone: tipoTelefone,
         nrTelefone: telefone,
         dsObservacao: observacao
@@ -123,7 +123,7 @@ export default function ListaContatos(props) {
 
                 <TableBody>
                   {contatos.map((contact) => ( 
-                    <TableRow hover >
+                    <TableRow hover key={contact.id}>
                         <TableCell align="left"><Chip label={telefoneMap[contact.flTipoTelefone]} /></TableCell>
                         <TableCell>{contact.nrTelefone}</TableCell>
                         <TableCell>{contact.dsObservacao}</TableCell>

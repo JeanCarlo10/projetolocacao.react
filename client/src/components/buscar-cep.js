@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
@@ -11,9 +11,11 @@ import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import apiCEP from '../services/apiCEP';
 import { mask, unMask } from 'remask';
 
-export default function BuscarCep() {
+export default function BuscarCep(props) {
     const classes = useStyles(); 
     
+    const { onUpdate } = props;
+
     const [nrEndereco, setNrEndereco] = useState('');
     const [complemento, setComplemento] = useState('');
     const [logradouro, setLogradouro] = useState('');
@@ -22,6 +24,17 @@ export default function BuscarCep() {
     const [uf, setUf] = useState('');
     const [cep, setCep] = useState('');
 
+    useEffect(() => {
+        onUpdate && onUpdate({
+            nrEndereco, 
+            complemento, 
+            logradouro, 
+            bairro, 
+            cidade, 
+            uf, cep
+        });
+    }, [nrEndereco, complemento, logradouro, bairro, cidade, uf, cep]);
+
     const handleChangeCEP = (event) => {
         setCep(mask(unMask(event.target.value), ['99999-999']));
     }
@@ -29,20 +42,21 @@ export default function BuscarCep() {
     async function handleSearchCEP() {
         if (cep === '') {
             alert('Por favor, informe o cep!')
-
+            
             return;
         }
         try {
             const response = await apiCEP.get(`${cep}/json`);
+            const { data } = response;
+            const { logradouro, bairro, localidade, uf } = data;
 
-            setLogradouro(response.data.logradouro);
-            setBairro(response.data.bairro);
-            setCidade(response.data.localidade);
-            setUf(response.data.uf);
-
+            setLogradouro(logradouro);
+            setBairro(bairro);
+            setCidade(localidade);
+            setUf(uf);
+            
         }catch {
             alert("CEP inválido!");
-            setCep("");
         }
     }
 
@@ -66,8 +80,6 @@ export default function BuscarCep() {
               <FormControl size="small" variant="outlined">
                 <InputLabel htmlFor="cep">CEP</InputLabel>
                 <OutlinedInput
-                id="cep"
-                name='cep'
                 value={cep}
                 onChange={handleChangeCEP}
                 labelWidth={120}
@@ -88,8 +100,6 @@ export default function BuscarCep() {
                 <TextField
                     variant="outlined"
                     size="small"
-                    id="bairro"
-                    name="bairro"
                     label="Bairro"
                     value={bairro}
                     onChange={e => setBairro(e.target.value)}
@@ -97,8 +107,6 @@ export default function BuscarCep() {
                 <TextField
                     variant="outlined"
                     size="small"
-                    id="logradouro"
-                    name="logradouro"
                     label="Logradouro"
                     value={logradouro}
                     onChange={e => setLogradouro(e.target.value)}
@@ -109,8 +117,6 @@ export default function BuscarCep() {
                 <TextField style={{ minWidth: '74%'}}
                     variant="outlined"
                     size="small"
-                    id="cidade"
-                    name="cidade"
                     label="Cidade"
                     value={cidade}
                     onChange={e => setCidade(e.target.value)}
@@ -118,8 +124,6 @@ export default function BuscarCep() {
                 <TextField
                     variant="outlined"
                     size="small"
-                    id="uf"
-                    name="uf"
                     label="Estado"
                     value={uf}
                     onChange={e => setUf(e.target.value)}
@@ -130,17 +134,16 @@ export default function BuscarCep() {
                 <TextField
                     variant="outlined"
                     size="small"
-                    id="nrEndereco"
-                    name="nrEndereco"
                     label="Número"
                     value={nrEndereco}
-                    onChange={e => setNrEndereco(e.target.value)}
+                    onChange={e => {
+                        setNrEndereco(e.target.value);
+                        onUpdate();
+                    }}
                 />
                 <TextField style={{ minWidth: '74%'}}
                     variant="outlined"
                     size="small"
-                    id="complemento"
-                    name="complemento"
                     label="Complemento"
                     value={complemento}
                     onChange={e => setComplemento(e.target.value)}

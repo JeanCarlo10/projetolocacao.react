@@ -40,7 +40,7 @@ export default function ListaProdutos(props) {
     const [materialId, setMaterialId] = useState('');
     const [currentMaterial, setCurrentMaterial] = useState({});
 
-    const [locacao, setLocacao] = useState(new Date(Date.now()));
+    const [locacao, setLocacao] = useState(Date.now());
     const [devolucao, setDevolucao] = useState('');
     const [metro, setMetro] = useState('');
     const [qtde, setQtde] = useState('');
@@ -127,15 +127,16 @@ export default function ListaProdutos(props) {
                 inputVariant='outlined'
                 format="dd/MM/yyyy"
                 value={locacao}
-                onChange={(locacao) => setLocacao(locacao)}
+                // onChange={(locacao) => setLocacao(locacao)}
               />
               
-              <TextField
-                variant="outlined"
-                size="small"
-                label="Data devolução"
+              <DatePicker
+                label='Data devolução'
+                size='small'
+                autoOk
+                inputVariant='outlined'
+                format="dd/MM/yyyy"
                 value={devolucao}
-                onChange={(event) => setDevolucao(event.target.value)}
               />
             </div>
 

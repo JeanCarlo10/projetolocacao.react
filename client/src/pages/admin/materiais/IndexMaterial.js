@@ -46,6 +46,9 @@ export default function IndexMaterial() {
   const ref = useRef(null);
 
   const [materials, setMaterials] = useState([]);
+  const [filterMaterials, setFilterMaterials] = useState([]);
+  const [search, setSearch] = useState ("");
+
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const [isOpenMenu, setIsOpenMenu] = useState(false);
@@ -67,10 +70,10 @@ export default function IndexMaterial() {
       const response = await api.get("/api/materials");
 
       setMaterials(response.data);
+      setFilterMaterials(response.data);
       setLoading(false);
     }
     loadMaterials();
-    // setTimeout(() => loadMaterials(), 2000);
   }, []);
 
   async function handleDelete(id) {
@@ -97,6 +100,22 @@ export default function IndexMaterial() {
     setRowsPerPage(+event.target.value);
     setPage(0);
   };
+
+  //Filtrar Lista
+  const handleChangeSearch = ({target}) => {
+    setSearch(target.value);
+    filter(target.value);
+  }
+
+  const filter = (endSearch) => {
+    var resultSearch = filterMaterials.filter((result) => {
+      if (result.nmMaterial.toString().toLowerCase().includes(endSearch.toLowerCase())
+      ){
+        return result;
+      }
+    });
+    setMaterials(resultSearch);
+  }
 
   return (
     <div className={classes.root}>
@@ -164,11 +183,16 @@ export default function IndexMaterial() {
           {loading ? (<div style={{width: 300, margin: '0 auto'}} ref={container} />) : (
           <Card style= {{ borderRadius: 15 }}>
             <div className={classes.twoElements}>
-              <Tooltip title="Filtros">
-                <IconButton size="large" onClick={handleDrawerFilter}>
-                  <SearchIcon />
-                </IconButton>
-              </Tooltip>
+              <div className={classes.iconButton}>
+                  <IconButton>
+                    <SearchIcon />
+                  </IconButton>
+                  <InputBase
+                    value={search}
+                    onChange={handleChangeSearch}
+                    placeholder="Buscar..."
+                  />
+              </div>
 
               <Tooltip title="Filtros">
                 <IconButton size="large" onClick={handleDrawerFilter}>
@@ -257,6 +281,11 @@ export default function IndexMaterial() {
 const useStyles = makeStyles((theme) => ({
   root: {
     display: 'flex',
+  },
+  iconButton: {
+    borderRadius: 50, 
+    borderColor: '#F4F4F4',
+    borderStyle: 'solid'
   },
   drawerFilter: {
     display: 'flex', 

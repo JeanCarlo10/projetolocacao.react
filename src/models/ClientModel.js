@@ -13,13 +13,13 @@ const ClientSchema = new mongoose.Schema({
     dsEmail: String,
 
     //DADOS CEP
-    nrEndereco: String,
-    dsComplemento: String,
-    dsLogradouro: String,
-    dsBairro: String,
-    dsCidade: String,
-    dsUF: String,
-    nrCEP: String,
+    numero: String,
+    complemento: String,
+    logradouro: String,
+    bairro: String,
+    cidade: String,
+    uf: String,
+    cep: String,
     //DADOS CEP
 
     //Contatos de telefone do cliente

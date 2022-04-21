@@ -26,6 +26,7 @@ import { NavigateNextOutlined } from '@material-ui/icons';
 import BuscarCEP from '../../../components/buscar-cep';
 import ListaProdutos from '../../../components/lista-produtos';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
+import Grid from '@mui/material/Grid';
 
 export default function CreatePedido() {
   const classes = useStyles(); 
@@ -169,8 +170,17 @@ export default function CreatePedido() {
             </FormControl>
 
             {enderecoAtual == 'novo' ? <BuscarCEP /> : <div>
-              
-                <LocationOnOutlinedIcon style={{color: '#CDCDCD', fontSize: 40 }}/> {currentClient.nmCliente}
+              <div style={{ flexDirection: 'row', display: 'flex', padding: 10, borderRadius: 15, marginBottom: 10, backgroundColor: '#FFF',border: 2, borderColor: '#CDCDCD', borderStyle: 'dotted' }}>
+                <Grid item xs={2} sm={6} md={4}>
+                  <LocationOnOutlinedIcon style={{  color: '#CDCDCD', fontSize: 40 }}/>
+                </Grid>
+                <Grid item xs={10} sm={6} md={4}>
+                  {currentClient.logradouro}
+                  {currentClient.numero} 
+                  {currentClient.bairro}
+                  {currentClient.cidade}
+                </Grid>
+              </div>
             </div>
             }
 

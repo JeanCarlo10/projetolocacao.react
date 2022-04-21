@@ -60,20 +60,22 @@ export default function CreateMaterial() {
             className={classes.cardHeader}
           />
           <Card style= {{ borderRadius: 15 }}>
-            <CardContent className={classes.inputs}>
-              <TextField
-                required
-                variant="outlined"
-                size="small"
-                label="Descrição"
-                autoFocus
-                value={nmMaterial}
-                onChange={e => setNmMaterial(e.target.value)}
-              />
-            </CardContent>
-            <CardActions style={{ justifyContent: 'flex-end', marginRight: 15 }}>
-              <Button variant="contained" size="medium"  href={'/admin/materiais'} className={classes.btnDefaultGreen} onClick={handleSubmit} startIcon={<SaveIcon />}>Salvar</Button>
-            </CardActions>
+            <form onSubmit={handleSubmit}>
+              <CardContent className={classes.inputs}>
+                <TextField
+                  required
+                  variant="outlined"
+                  size="small"
+                  label="Descrição"
+                  autoFocus
+                  value={nmMaterial}
+                  onChange={e => setNmMaterial(e.target.value)}
+                />
+              </CardContent>
+              <CardActions style={{ justifyContent: 'flex-end', marginRight: 15 }}>
+                <Button variant="contained" size="medium" className={classes.btnDefaultGreen} type="submit" startIcon={<SaveIcon />}>Salvar</Button>
+              </CardActions>
+            </form>
           </Card>
       </Container>
       </main>

@@ -71,19 +71,19 @@ export default function CreateCliente() {
         dsEmail: email,
 
         //Dados Endereço
-        nrEndereco: dadosEndereco.nrEndereco,
-        dsComplemento: dadosEndereco.complemento,
-        dsLogradouro: dadosEndereco.logradouro,
-        dsBairro: dadosEndereco.bairro,
-        dsCidade: dadosEndereco.cidade,
-        dsUF: dadosEndereco.uf,
-        nrCEP: dadosEndereco.cep,
+        numero: dadosEndereco.numero,
+        complemento: dadosEndereco.complemento,
+        logradouro: dadosEndereco.logradouro,
+        bairro: dadosEndereco.bairro,
+        cidade: dadosEndereco.cidade,
+        uf: dadosEndereco.uf,
+        cep: dadosEndereco.cep,
 
         //Lista de Contatos
         contacts: contatos,
     }
 
-    if (nome !== '' && nascimento != '' && tipo != '' && cpf != '') {
+    if (tipo != '') {
       const response = await api.post('/api/clients', data);
 
       if (response.status == 200) {
@@ -119,131 +119,126 @@ export default function CreateCliente() {
           />
 
           <Card style= {{ borderRadius: 15 }}>
-          <form onSubmit={handleSubmit}>
-          <CardContent className={classes.inputs}>
-          
-          
-          <FormControl variant="outlined" size="small" className={classes.formControl}>
-                <InputLabel>Tipo</InputLabel>
-                <Select
-                    value={tipo}
-                    onChange={e => setTipo(e.target.value)}
-                    label="Tipo de pessoa"
-                  >
-                  <MenuItem  value={1}>Pessoa Física</MenuItem>
-                  <MenuItem  value={2}>Pessoa Jurídica</MenuItem>
-                </Select>
-            </FormControl> 
-
-            {tipo == 1 && 
-              <TextField
-                variant="outlined"
-                label="Nome cliente"
-                size="small"
-                autoFocus
-                value={nome}
-                onChange={e => setNome(e.target.value)}
-              />
-            }
-
-            {tipo == 2 && 
-              <TextField
-                variant="outlined"
-                label="Razão Social"
-                size="small"
-                autoFocus
-                value={razaoSocial}
-                onChange={e => setRazaoSocial(e.target.value)}
-              />
-            }
-
-            {tipo == 1 && 
-              <div className={classes.twoInputs}>
-                <TextField
-                  required
-                  variant="outlined"
-                  size="small"
-                  label="Data de nascimento"
-                  value={nascimento}
-                  onChange={handleChangeDataNascimento}
-                />
+            <form onSubmit={handleSubmit}>
+              <CardContent className={classes.inputs}>
                 <FormControl variant="outlined" size="small" className={classes.formControl}>
-                  <InputLabel>Sexo</InputLabel>
-                  <Select
-                      value={sexo}
-                      onChange={e => setSexo(e.target.value)}
-                      label="Sexo"
-                    >
-                    <MenuItem value="" />
-                    <MenuItem  value={10}>Feminino</MenuItem>
-                    <MenuItem  value={20}>Masculino</MenuItem>
-                  </Select>
-                </FormControl>
-              </div>
-            }
+                      <InputLabel>Tipo</InputLabel>
+                      <Select
+                          value={tipo}
+                          onChange={e => setTipo(e.target.value)}
+                          label="Tipo de pessoa"
+                        >
+                        <MenuItem  value={1}>Pessoa Física</MenuItem>
+                        <MenuItem  value={2}>Pessoa Jurídica</MenuItem>
+                      </Select>
+                  </FormControl> 
+
+                  {tipo == 1 && 
+                    <TextField
+                      variant="outlined"
+                      label="Nome cliente"
+                      size="small"
+                      autoFocus
+                      value={nome}
+                      onChange={e => setNome(e.target.value)}
+                    />
+                  }
+
+                  {tipo == 2 && 
+                    <TextField
+                      variant="outlined"
+                      label="Razão Social"
+                      size="small"
+                      autoFocus
+                      value={razaoSocial}
+                      onChange={e => setRazaoSocial(e.target.value)}
+                    />
+                  }
+
+                  {tipo == 1 && 
+                    <div className={classes.twoInputs}>
+                      <TextField
+                        required
+                        variant="outlined"
+                        size="small"
+                        label="Data de nascimento"
+                        value={nascimento}
+                        onChange={handleChangeDataNascimento}
+                      />
+                      <FormControl variant="outlined" size="small" className={classes.formControl}>
+                        <InputLabel>Sexo</InputLabel>
+                        <Select
+                            value={sexo}
+                            onChange={e => setSexo(e.target.value)}
+                            label="Sexo"
+                          >
+                          <MenuItem value="" />
+                          <MenuItem  value={10}>Feminino</MenuItem>
+                          <MenuItem  value={20}>Masculino</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </div>
+                  }
             
-            <div className={classes.twoInputs}>
-            {tipo == 1 && 
-              <TextField
-                variant="outlined"
-                size="small"
-                required
-                label="CPF"
-                value={cpf}
-                onChange={handleChangeCPF}
-              />
-            }
+                  <div className={classes.twoInputs}>
+                    {tipo == 1 && 
+                      <TextField
+                        variant="outlined"
+                        size="small"
+                        required
+                        label="CPF"
+                        value={cpf}
+                        onChange={handleChangeCPF}
+                      />
+                    }
 
-            {tipo == 2 && 
-              <TextField
-                variant="outlined"
-                size="small"
-                required
-                label="CNPJ"
-                value={cnpj}
-                onChange={handleChangeCNPJ}
-              />
-            }
+                    {tipo == 2 && 
+                      <TextField
+                        variant="outlined"
+                        size="small"
+                        required
+                        label="CNPJ"
+                        value={cnpj}
+                        onChange={handleChangeCNPJ}
+                      />
+                    }
+                  
+                    {tipo == 1 && 
+                      <TextField 
+                        className={classes.formControl}
+                        variant="outlined"
+                        size="small"
+                        label="RG"
+                        value={rg}
+                        onChange={e => setRg(e.target.value)}
+                      />
+                    }
+                    {tipo == 2 && 
+                      <TextField 
+                        className={classes.formControl}
+                        variant="outlined"
+                        size="small"
+                        label="IE"
+                        value={ie}
+                        onChange={e => setIe(e.target.value)}
+                      />
+                    }
+                </div>
             
-            {tipo == 1 && 
-              <TextField 
-                className={classes.formControl}
-                variant="outlined"
-                size="small"
-                label="RG"
-                value={rg}
-                onChange={e => setRg(e.target.value)}
-              />
-            }
-            {tipo == 2 && 
-              <TextField 
-                className={classes.formControl}
-                variant="outlined"
-                size="small"
-                label="IE"
-                value={ie}
-                onChange={e => setIe(e.target.value)}
-              />
-            }
-          </div>
-            
-            <TextField
-              size="small"
-              variant="outlined"
-              label="Email"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-            />
+                <TextField
+                  size="small"
+                  variant="outlined"
+                  label="Email"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                />
 
-            <BuscarCEP onUpdate={handleSearchCEP}/> 
-
-            <ListaContatos contatos={contatos} addContato={handleAddContato}  /> 
-          
-
-          </CardContent>
-          <CardActions style={{ justifyContent: 'flex-end', marginRight: 15 }}>
-            <Button variant="contained" size="medium" className={classes.btnDefaultGreen} type="submit" startIcon={<SaveIcon />}>Salvar</Button>
-          </CardActions>
+                <BuscarCEP onUpdate={handleSearchCEP}/> 
+                <ListaContatos contatos={contatos} addContato={handleAddContato}  /> 
+              </CardContent>
+            <CardActions style={{ justifyContent: 'flex-end', marginRight: 15 }}>
+              <Button variant="contained" size="medium" className={classes.btnDefaultGreen} type="submit" startIcon={<SaveIcon />}>Salvar</Button>
+            </CardActions>
           </form>
         </Card>
       </Container>

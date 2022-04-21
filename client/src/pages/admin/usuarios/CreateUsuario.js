@@ -66,54 +66,55 @@ export default function CreateUsuario() {
             className={classes.cardHeader}
           />
         <Card style= {{ borderRadius: 15 }}>
-          
-          <CardContent className={classes.inputs}>
-            <TextField
-              required
-              variant="outlined"
-              size="small"
-              label="Nome usuário"
-              autoFocus
-              value={nome}
-              onChange={e => setNome(e.target.value)}
-            />
-            <TextField
-              required
-              variant="outlined"
-              size="small"
-              label="Email"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-            />
-            <div className={classes.twoInputs}>
+          <form onSubmit={handleSubmit}>
+            <CardContent className={classes.inputs}>
               <TextField
+                required
                 variant="outlined"
                 size="small"
-                type="password"
-                required
-                label="Senha"
-                value={senha}
-                onChange={e => setSenha(e.target.value)}
+                label="Nome usuário"
+                autoFocus
+                value={nome}
+                onChange={e => setNome(e.target.value)}
               />
-              <FormControl variant="outlined" size="small" className={classes.formControl}>
-                <InputLabel>Tipo de usuário</InputLabel>
-                <Select
-                    value={tipo}
-                    onChange={e => setTipo(e.target.value)}
-                    label="Tipo de usuário"
-                  >
-                  <MenuItem value="" />
-                  <MenuItem  value={1}>Administrador</MenuItem>
-                  <MenuItem  value={2}>Funcionário</MenuItem>
-                </Select>
-              </FormControl>
-            </div>
-          </CardContent>
-          {/* <Divider variant="fullWidth" /> */}
-          <CardActions style={{ justifyContent: 'flex-end', marginRight: 15 }}>
-            {/* <Button variant="contained" size="small"  className={classes.button} color='primary' onClick={handleClear} startIcon={<CachedIcon />}>Limpar</Button> */}
-            <Button variant="contained" size="medium" href={'/admin/usuarios'} className={classes.btnDefaultGreen} onClick={handleSubmit} startIcon={<SaveIcon />}>Salvar</Button>
-          </CardActions>
+              <TextField
+                required
+                variant="outlined"
+                size="small"
+                label="Email"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+              />
+              <div className={classes.twoInputs}>
+                <TextField
+                  variant="outlined"
+                  size="small"
+                  type="password"
+                  required
+                  label="Senha"
+                  value={senha}
+                  onChange={e => setSenha(e.target.value)}
+                />
+                <FormControl variant="outlined" size="small" className={classes.formControl}>
+                  <InputLabel>Tipo de usuário</InputLabel>
+                  <Select
+                      value={tipo}
+                      onChange={e => setTipo(e.target.value)}
+                      label="Tipo de usuário"
+                    >
+                    <MenuItem value="" />
+                    <MenuItem  value={1}>Administrador</MenuItem>
+                    <MenuItem  value={2}>Funcionário</MenuItem>
+                  </Select>
+                </FormControl>
+              </div>
+            </CardContent>
+            {/* <Divider variant="fullWidth" /> */}
+            <CardActions style={{ justifyContent: 'flex-end', marginRight: 15 }}>
+              {/* <Button variant="contained" size="small"  className={classes.button} color='primary' onClick={handleClear} startIcon={<CachedIcon />}>Limpar</Button> */}
+              <Button variant="contained" size="medium" className={classes.btnDefaultGreen} type="submit" startIcon={<SaveIcon />}>Salvar</Button>
+            </CardActions>
+          </form>
         </Card>
       </Container>
       </main>

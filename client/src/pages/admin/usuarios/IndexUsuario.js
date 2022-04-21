@@ -51,6 +51,9 @@ export default function IndexUsuario() {
   const ref = useRef(null);
 
   const [users, setUsers] = useState([]);
+  const [filterUsers, setFilterUsers] = useState([]);
+  const [search, setSearch] = useState ("");
+
   const [loading, setLoading] = useState(true);  
   const [open, setOpen] = useState(false);
   const [isOpenMenu, setIsOpenMenu] = useState(false);
@@ -72,10 +75,10 @@ export default function IndexUsuario() {
       const response = await api.get("/api/users");
 
       setUsers(response.data);
+      setFilterUsers(response.data);
       setLoading(false);
     }
     loadUsers();
-    // setTimeout(() => loadUsers(), 2000);
   }, []);
 
   async function handleDelete(id) {
@@ -111,6 +114,22 @@ export default function IndexUsuario() {
   const handleChange = (event) => {
     setSelectTypeUser({ ...selectTypeUser, [event.target.name]: event.target.checked });
   };
+
+  //Filtrar Lista
+  const handleChangeSearch = ({target}) => {
+    setSearch(target.value);
+    filter(target.value);
+  }
+
+  const filter = (endSearch) => {
+    var resultSearch = filterUsers.filter((result) => {
+      if (result.nmUsuario.toString().toLowerCase().includes(endSearch.toLowerCase())
+      ){
+        return result;
+      }
+    });
+    setUsers(resultSearch);
+  }
 
   return (
     <div className={classes.root}>
@@ -192,19 +211,23 @@ export default function IndexUsuario() {
           
           {loading ? (<div style={{width: 300, margin: '0 auto'}} ref={container} />) : (
             <Card style= {{ borderRadius: 15 }}>
-
               <div className={classes.twoElements}>
-              <Tooltip title="Filtros">
-                <IconButton size="large" onClick={handleDrawerFilter}>
-                  <SearchIcon />
-                </IconButton>
-              </Tooltip>
+                <div className={classes.iconButton}>
+                    <IconButton>
+                      <SearchIcon />
+                    </IconButton>
+                    <InputBase
+                      value={search}
+                      onChange={handleChangeSearch}
+                      placeholder="Buscar..."
+                    />
+                </div>
 
-              <Tooltip title="Filtros">
-                <IconButton size="large" onClick={handleDrawerFilter}>
-                  <FilterListRoundedIcon />
-                </IconButton>
-              </Tooltip>
+                <Tooltip title="Filtros">
+                  <IconButton size="large" onClick={handleDrawerFilter}>
+                    <FilterListRoundedIcon />
+                  </IconButton>
+                </Tooltip>
               </div>
               
               <TableContainer>
@@ -287,6 +310,11 @@ export default function IndexUsuario() {
 const useStyles = makeStyles((theme) => ({
   root: {
     display: 'flex',
+  },
+  iconButton: {
+    borderRadius: 50, 
+    borderColor: '#F4F4F4',
+    borderStyle: 'solid'
   },
   content: {
     flexGrow: 1,

@@ -48,6 +48,9 @@ export default function IndexPedido() {
   const ref = useRef(null);
 
   const [rents, setRents] = useState([]);
+  const [filterRents, setFilterRents] = useState([]);
+  const [search, setSearch] = useState ("");
+
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
 //   const [isOpenMenu, setIsOpenMenu] = useState(false);
@@ -69,6 +72,7 @@ export default function IndexPedido() {
       const response = await api.get("/api/rents");
 
       setRents(response.data);
+      setFilterRents(response.data);
       setLoading(false);
     }
     loadRents();
@@ -99,7 +103,24 @@ export default function IndexPedido() {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
+  //Filtrar Lista
+  const handleChangeSearch = ({target}) => {
+    setSearch(target.value);
+    filter(target.value);
+  }
 
+  const filter = (endSearch) => {
+    var resultSearch = filterRents.filter((result) => {
+      if (result.nmCliente.toString().toLowerCase().includes(endSearch.toLowerCase()) 
+      || result.nmRazaoSocial.toString().toLowerCase().includes(endSearch.toLowerCase())
+      || result.nrCPF.toString().toLowerCase().includes(endSearch.toLowerCase())
+      || result.nrCNPJ.toString().toLowerCase().includes(endSearch.toLowerCase())
+      ){
+        return result;
+      }
+    });
+    setRents(resultSearch);
+  }
   return (
     <div className={classes.root}>
       <MenuAdmin/>
@@ -166,17 +187,22 @@ export default function IndexPedido() {
           {loading ? (<div style={{width: 300, margin: '0 auto'}} ref={container} />) : (
           <Card style= {{ borderRadius: 15 }}>
             <div className={classes.twoElements}>
-                <Tooltip title="Filtros">
-                  <IconButton size="large" onClick={handleDrawerFilter}>
-                    <SearchIcon />
-                  </IconButton>
-                </Tooltip>
+              <div className={classes.iconButton}>
+                <IconButton>
+                  <SearchIcon />
+                </IconButton>
+                <InputBase
+                  value={search}
+                  onChange={handleChangeSearch}
+                  placeholder="Buscar..."
+                />
+              </div>
 
-                <Tooltip title="Filtros">
-                  <IconButton size="large" onClick={handleDrawerFilter}>
-                    <FilterListRoundedIcon />
-                  </IconButton>
-                </Tooltip>
+              <Tooltip title="Filtros">
+                <IconButton size="large" onClick={handleDrawerFilter}>
+                  <FilterListRoundedIcon />
+                </IconButton>
+              </Tooltip>
             </div>
 
           <TableContainer >
@@ -229,6 +255,11 @@ export default function IndexPedido() {
 const useStyles = makeStyles((theme) => ({
   root: {
     display: 'flex',
+  },
+  iconButton: {
+    borderRadius: 50, 
+    borderColor: '#F4F4F4',
+    borderStyle: 'solid'
   },
   drawerFilter: {
     display: 'flex', 

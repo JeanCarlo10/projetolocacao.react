@@ -48,6 +48,9 @@ export default function IndexCliente() {
   const ref = useRef(null);
 
   const [clients, setClients] = useState([]);
+  const [filterClients, setFilterClients] = useState([]);
+  const [search, setSearch] = useState ("");
+
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const [isOpenMenu, setIsOpenMenu] = useState(false);
@@ -66,9 +69,12 @@ export default function IndexCliente() {
 
   useEffect(() => {
     async function loadClients() {
+
       const response = await api.get("/api/clients");
 
       setClients(response.data);
+      setFilterClients(response.data);
+
       setLoading(false);
     }
     loadClients();
@@ -99,6 +105,25 @@ export default function IndexCliente() {
     setRowsPerPage(+event.target.value);
     setPage(0);
   };
+  
+  //Filtrar Lista
+  const handleChangeSearch = ({target}) => {
+    setSearch(target.value);
+    filter(target.value);
+  }
+
+  const filter = (endSearch) => {
+    var resultSearch = filterClients.filter((result) => {
+      if (result.nmCliente.toString().toLowerCase().includes(endSearch.toLowerCase())
+      || result.nmRazaoSocial.toString().toLowerCase().includes(endSearch.toLowerCase())
+      || result.nrCPF.toString().toLowerCase().includes(endSearch.toLowerCase())
+      || result.nrCNPJ.toString().toLowerCase().includes(endSearch.toLowerCase())
+      ){
+        return result;
+      }
+    });
+    setClients(resultSearch);
+  }
 
   return (
     <div className={classes.root}>
@@ -145,7 +170,7 @@ export default function IndexCliente() {
                         Buscar por nome
                       </div>
                       <Divider variant="fullWidth" />
-                      <div>
+                      <div style={{ borderRadius: 10, borderColor: 'red', borderStyle: 'solid'}}>
                         <IconButton type="submit" className={classes.iconButton} aria-label="search">
                           <SearchIcon />
                         </IconButton>
@@ -166,12 +191,16 @@ export default function IndexCliente() {
           {loading ? (<div style={{width: 300, margin: '0 auto'}} ref={container} />) : (
           <Card style= {{ borderRadius: 15 }}>
             <div className={classes.twoElements}>
-                <Tooltip title="Filtros">
-                  <IconButton size="large" onClick={handleDrawerFilter}>
+              <div className={classes.iconButton}>
+                  <IconButton >
                     <SearchIcon />
                   </IconButton>
-                </Tooltip>
-
+                  <InputBase
+                    value={search}
+                    onChange={handleChangeSearch}
+                    placeholder="Buscar..."
+                  />
+              </div>
                 <Tooltip title="Filtros">
                   <IconButton size="large" onClick={handleDrawerFilter}>
                     <FilterListRoundedIcon />
@@ -185,7 +214,7 @@ export default function IndexCliente() {
                 <TableRow>
                   <TableCell>Tipo</TableCell>
                   <TableCell>Nome/Razão social</TableCell>
-                  <TableCell>Telefone(s)</TableCell>
+                  <TableCell>CPF/CNPJ</TableCell>
                   <TableCell>Endereço</TableCell>
                   <TableCell align="right">Ações</TableCell>
                 </TableRow>
@@ -196,8 +225,8 @@ export default function IndexCliente() {
                   <TableRow hover key={row._id}>
                       <TableCell align="left"><Chip label={getTypeClient(row.flTipo)} /></TableCell>
                       <TableCell> {row.flTipo == 1 ? row.nmCliente : row.nmRazaoSocial}</TableCell> 
-                      <TableCell>{row.nrTelefone == null || undefined ? " " : row.nrTelefone}</TableCell>
-                      <TableCell>{row.dsLogradouro == null || undefined ?  " " : row.dsLogradouro + ", " + row.nrEndereco + " - " + row.dsBairro}</TableCell>
+                      <TableCell>{row.flTipo == 1 ? row.nrCPF : row.nrCNPJ }</TableCell>
+                      <TableCell>{row.logradouro == null || undefined ?  " " : row.logradouro + ", " + row.numero + " - " + row.bairro}</TableCell>
                       <TableCell component="th" scope="row" align="right">
                         {/* <IconButton onClick={() => setIsOpenMenu(true) }>
                             <MoreVertIcon 
@@ -265,6 +294,11 @@ export default function IndexCliente() {
 const useStyles = makeStyles((theme) => ({
   root: {
     display: 'flex',
+  },
+  iconButton: {
+    borderRadius: 50, 
+    borderColor: '#F4F4F4',
+    borderStyle: 'solid'
   },
   drawerFilter: {
     display: 'flex', 

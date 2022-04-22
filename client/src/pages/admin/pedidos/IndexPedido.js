@@ -28,11 +28,14 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import SearchIcon from '@material-ui/icons/Search';
 import AddCircleRoundedIcon from '@material-ui/icons/AddCircleRounded';
 import FilterListRoundedIcon from '@material-ui/icons/FilterListRounded';
+import EventAvailableRoundedIcon from '@mui/icons-material/EventAvailableRounded';
+import EventBusyRoundedIcon from '@mui/icons-material/EventBusyRounded';
 
 import lottie from 'lottie-web';
 import { getStatusRent } from '../../../functions/static_data';
 import MenuAdmin from '../../../components/menu-admin';
 import api from '../../../services/api';
+
 
 const StyledTableRow = withStyles((theme) => ({
   root: {
@@ -211,7 +214,8 @@ export default function IndexPedido() {
                 <TableRow>
                   <TableCell>Status</TableCell>
                   <TableCell>Cliente</TableCell>
-                  <TableCell>Endereço</TableCell>
+                  <TableCell align="center">Data Pedido</TableCell>
+                  <TableCell align="center">Período</TableCell>
                   <TableCell align="right">Ações</TableCell>
                 </TableRow>
               </TableHead>
@@ -219,9 +223,13 @@ export default function IndexPedido() {
             <TableBody>
               {rents.map((row) => (
                 <TableRow hover key={row._id}>
-                    <TableCell align="left"><Chip label={getStatusRent(row.status)} /></TableCell>
-                    <TableCell>{row.nmCliente}</TableCell>
-                    <TableCell>{row.dsComplemento}</TableCell>
+                    <TableCell align="left"><Chip label={row.status}/></TableCell>
+                    <TableCell align="left">{row.nomeCliente}</TableCell>
+                    <TableCell align="center">{new Date(row.dataPedido).toLocaleDateString('pt-br')}</TableCell>
+                    <TableCell align="center">
+                     <p><EventAvailableRoundedIcon /> {new Date(row.dataEntrega).toLocaleDateString('pt-br')}</p>
+                     <p><EventBusyRoundedIcon /> {new Date(row.dataDevolucao).toLocaleDateString('pt-br')}</p>
+                    </TableCell>
                     <TableCell component="th" scope="row" align="right">
                       <IconButton onClick={() => handleDelete(row._id)}>
                         <DeleteIcon />

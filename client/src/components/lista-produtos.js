@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { withStyles, makeStyles } from '@material-ui/core/styles';
 import Box from '@mui/material/Box';
-import Paper from '@mui/material/Paper';
 import TextField from '@mui/material/TextField';
 import Divider from '@mui/material/Divider';
 import Select from '@mui/material/Select';
@@ -22,7 +21,6 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import AddCircleOutlinedIcon from '@mui/icons-material/AddCircleOutlined';
 import { DatePicker, DateTimePicker } from '@material-ui/pickers';
 import api from '../services/api';
-import { mask, unMask } from 'remask';
 
 export default function ListaProdutos(props) {
     const classes = useStyles(); 
@@ -40,17 +38,12 @@ export default function ListaProdutos(props) {
     const [materialId, setMaterialId] = useState('');
     const [currentMaterial, setCurrentMaterial] = useState({});
 
-    const [locacao, setLocacao] = useState(Date.now());
-    const [devolucao, setDevolucao] = useState('');
+    // const [locacao, setLocacao] = useState(Date.now());
+    // const [devolucao, setDevolucao] = useState(null);
     const [metro, setMetro] = useState('');
     const [qtde, setQtde] = useState('');
     const [valorItem, setValorItem] = useState('');
     const [valorTotal, setValorTotal] = useState('');
-    const [observacao, setObservacao] = useState('');
-
-    const handleMaskValues = (event) => {
-      setValorItem(mask(unMask(event.target.value), ['99.999,00']));
-    }
 
     useEffect(() => {
         async function getDadosMaterial() {
@@ -68,29 +61,29 @@ export default function ListaProdutos(props) {
         setMaterialId(materialId);
     }
 
-//     const handleChangeTelefone = (event) => {
-//       setTelefone(mask(unMask(event.target.value), ['(99) 9999-9999', '(99) 9 9999-9999']));
-//   }
-
     const handleAddProduct = () => {
         addProduto({
-            dtLocacao: locacao,
-            dtDevolucao: devolucao,
-            nrMetro: metro,
-            nrQtde: qtde,
-            vlItem: valorItem,
+            _id: new Date().getTime(),
+            metro: metro,
+            qtde: qtde,
+            valorItem: valorItem,
             nmMaterial: currentMaterial.nmMaterial
         });
 
         setMaterialId('');
-        setLocacao('');
-        setDevolucao('');
         setMetro('');
         setQtde('');
         setValorItem('');
-        setObservacao('');
     }
 
+    // const handleDateLocacaoChange = (date) => {
+    //   setLocacao(date);
+    // }
+
+    // const handleDateDevolucaoChange = (date) => {
+    //   setDevolucao(date)
+    // }
+    
     return (
         <Box sx={{
               marginTop: '10px',
@@ -119,7 +112,7 @@ export default function ListaProdutos(props) {
                 </Select>
             </FormControl> 
 
-            <div className={classes.twoInputs}>
+            {/* <div className={classes.twoInputs}>
               <DatePicker
                 label='Data locação'
                 size='small'
@@ -127,7 +120,7 @@ export default function ListaProdutos(props) {
                 inputVariant='outlined'
                 format="dd/MM/yyyy"
                 value={locacao}
-                // onChange={(locacao) => setLocacao(locacao)}
+                onChange={handleDateLocacaoChange}
               />
               
               <DatePicker
@@ -137,8 +130,9 @@ export default function ListaProdutos(props) {
                 inputVariant='outlined'
                 format="dd/MM/yyyy"
                 value={devolucao}
+                onChange={handleDateDevolucaoChange}
               />
-            </div>
+            </div> */}
 
             <Box style={{ marginLeft: -7, display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
               {currentMaterial.nmMaterial == 'Andaime' && 
@@ -181,9 +175,7 @@ export default function ListaProdutos(props) {
                 <TableHead>
                   <TableRow>
                     <TableCell align="left">Produto</TableCell>
-                    <TableCell align="center">Locação</TableCell>
-                    <TableCell align="center">Devolução</TableCell>
-                    <TableCell align="center">Qtde</TableCell>
+                    <TableCell align="center">Qtde/Metros</TableCell>
                     <TableCell align="right">Valor</TableCell>
                     <TableCell align="right">Ações</TableCell>
                   </TableRow>
@@ -193,10 +185,8 @@ export default function ListaProdutos(props) {
                   {produtos.map((prod) => ( 
                     <TableRow hover key={prod._id}>
                         <TableCell align="left">{prod.nmMaterial}</TableCell>
-                        <TableCell>{new Date(prod.dtLocacao).toLocaleDateString('pt-br')}</TableCell>                      
-                        <TableCell align="center"> {prod.dtDevolucao}</TableCell>
-                        <TableCell align="center">{prod.nrQtde}</TableCell>
-                        <TableCell align="right">{prod.vlItem}</TableCell>
+                        <TableCell align="center">{prod.nmMaterial == "Andaime" ? prod.metro : prod.qtde }</TableCell>
+                        <TableCell align="right">{prod.valorItem}</TableCell>
                         <TableCell component="th" scope="row" align="right">
                           <IconButton>
                               <DeleteIcon />

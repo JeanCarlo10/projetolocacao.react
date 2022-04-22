@@ -16,8 +16,8 @@ export const getTypeClient = (value) => {
     return array[value-1];
 };
 
-export const getStatusRent = (value) => {
-    var array = ['Entrega', 'Retirada'];
+// export const getStatusRent = (value) => {
+//     var array = ['Pendente', 'Entregue', 'Devolvido', 'Cancelado'];
 
-    return array[value-1];
-};
+//     return array[value-1];
+// };

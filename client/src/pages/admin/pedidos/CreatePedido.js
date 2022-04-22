@@ -14,7 +14,6 @@ import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import CardHeader from '@material-ui/core/CardHeader';
 import MenuItem from '@mui/material/MenuItem';
-import { Autocomplete, IconButton } from '@mui/material';
 import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
@@ -22,19 +21,21 @@ import FormLabel from '@mui/material/FormLabel';
 import SaveIcon from '@material-ui/icons/Save';
 import MenuAdmin from '../../../components/menu-admin';
 import api from '../../../services/api';
-import { NavigateNextOutlined } from '@material-ui/icons';
 import BuscarCEP from '../../../components/buscar-cep';
 import ListaProdutos from '../../../components/lista-produtos';
-import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
-import Grid from '@mui/material/Grid';
+import { DatePicker } from '@material-ui/pickers';
+import '../../../assets/css/card-location.css';
 
 export default function CreatePedido() {
   const classes = useStyles(); 
 
-  const [status, setStatus] = useState('entrega');
+  const [status, setStatus] = useState('Pendente');
   const [enderecoAtual, setEnderecoAtual] = useState('atual');
-  const [vlTotalGeral, setVlTotalGeral] = useState(0);
-  const [dsObservacao, setDsObservacao] = useState('');
+  const [totalGeral, setTotalGeral] = useState(0);
+  const [observacao, setObservacao] = useState('');
+  const [dataPedido, setDataPedido] = useState();
+  const [dataEntrega, setDataEntrega] = useState(null);
+  const [dataDevolucao, setDataDevolucao] = useState(null);
 
   //Dados Endereço
   const [endereco, setEndereco] = useState('');
@@ -79,17 +80,21 @@ export default function CreatePedido() {
 
   async function handleSubmit() {
     const data = {
-        nmCliente: selectClients,
+        nomeCliente: currentClient.nmCliente,
         status: status,
-        vlTotalGeral: vlTotalGeral,
+        dataPedido: dataPedido,
+        dataEntrega: dataEntrega,
+        dataDevolucao: dataDevolucao,
+        totalGeral: totalGeral,
+        observacao: observacao,
 
-        nrEndereco: endereco,
-        dsComplemento: complemento,
-        dsLogradouro: logradouro,
-        dsBairro: bairro,
-        dsCidade: cidade,
-        dsUF: uf,
-        nrCEP: cep,
+        // nrEndereco: endereco,
+        // dsComplemento: complemento,
+        // dsLogradouro: logradouro,
+        // dsBairro: bairro,
+        // dsCidade: cidade,
+        // dsUF: uf,
+        // nrCEP: cep,
 
         //Lista de produtos
         products: produtos,
@@ -107,7 +112,13 @@ export default function CreatePedido() {
     }
   }
 
-  
+  const handleDateDeliveryChange = (date) => {
+      setDataEntrega(date);
+  }
+
+  const handleDateDevolutionChange = (date) => {
+    setDataDevolucao(date);
+  }
 
   return (
     <div className={classes.root}>
@@ -131,65 +142,100 @@ export default function CreatePedido() {
             className={classes.cardHeader}
           />
           <Card style= {{ borderRadius: 15 }}>
-          <CardContent className={classes.inputs}>
-          
-            <FormControl>
-                <FormLabel>Status</FormLabel>
-                <RadioGroup
-                    row
-                    // onChange={e => setStatus(e.target.value)}
-                    value={status}
-                >
-                    <FormControlLabel value="entrega" disabled control={<Radio />} label="Entrega" />
-                </RadioGroup>
-            </FormControl>
-
-            <FormControl variant="outlined" size="small" className={classes.formControl}>
-                <InputLabel>Cliente</InputLabel>
-                <Select
-                    onChange={handleSelectClients}
-                    value={clientId}
-                    label="Cliente"
+          <form onSubmit={handleSubmit}>
+            <CardContent className={classes.inputs}>
+              {/* <FormControl>
+                  <FormLabel>Status</FormLabel>
+                  <RadioGroup
+                      row
+                      value={status}
                   >
-                    {selectClients.map((clients) => (
-                      <MenuItem value={clients._id} key={clients._id}>{clients.nmCliente}</MenuItem>
-                    ))}
-                </Select>
-            </FormControl> 
-            
-            <FormControl>
-                <FormLabel></FormLabel>
-                <RadioGroup
-                    row
-                    value={enderecoAtual}
-                    onChange={handleChangeAddress}
-                >
-                    <FormControlLabel value="atual" control={<Radio />} label="Endereço atual" />
-                    <FormControlLabel value="novo" control={<Radio />} label="Novo endereço" />
-                </RadioGroup>
-            </FormControl>
+                      <FormControlLabel value="pendente" disabled control={<Radio />} label="Pendente" />
+                  </RadioGroup>
+              </FormControl> */}
 
-            {enderecoAtual == 'novo' ? <BuscarCEP /> : <div>
-              <div style={{ flexDirection: 'row', display: 'flex', padding: 10, borderRadius: 15, marginBottom: 10, backgroundColor: '#FFF',border: 2, borderColor: '#CDCDCD', borderStyle: 'dotted' }}>
-                <Grid item xs={2} sm={6} md={4}>
-                  <LocationOnOutlinedIcon style={{  color: '#CDCDCD', fontSize: 40 }}/>
-                </Grid>
-                <Grid item xs={10} sm={6} md={4}>
-                  {currentClient.logradouro}
-                  {currentClient.numero} 
-                  {currentClient.bairro}
-                  {currentClient.cidade}
-                </Grid>
-              </div>
+              <FormControl variant="outlined" size="small" className={classes.formControl}>
+                  <InputLabel>Cliente</InputLabel>
+                  <Select
+                      onChange={handleSelectClients}
+                      value={clientId}
+                      label="Cliente"
+                    >
+                      {selectClients.map((clients) => (
+                        <MenuItem value={clients._id} key={clients._id}>{clients.nmCliente}</MenuItem>
+                      ))}
+                  </Select>
+              </FormControl> 
+              
+              <FormControl>
+                  <FormLabel></FormLabel>
+                  <RadioGroup
+                      row
+                      value={enderecoAtual}
+                      onChange={handleChangeAddress}
+                  >
+                      <FormControlLabel value="atual" control={<Radio />} label="Endereço atual" />
+                      <FormControlLabel value="novo" control={<Radio />} label="Novo endereço" />
+                  </RadioGroup>
+              </FormControl>
+
+              {enderecoAtual == 'novo' ? <BuscarCEP /> :
+                currentClient.nmCliente != null ? 
+                <div className='container'>
+                  <div className="card">
+                    <div className='left-column'>
+                      <div>
+                        <h4>Endereço de entrega</h4>                    
+                      </div>
+
+                      <p>{currentClient.logradouro}, Nº {currentClient.numero}</p>
+                      <p>{currentClient.bairro} - {currentClient.cidade}</p>
+                      <p>CEP: {currentClient.cep}</p>
+                    </div>
+
+                    <div className='right-column'>
+                        <img className="img" src={require('../../../assets/Directions-bro.svg')} width={200} height={160} />
+                    </div>
+                  </div>
+                </div> : ""
+              }
+
+            <ListaProdutos produtos={produtos} addProduto={handleAddProduto}/>
+
+            <div className={classes.twoInputs}>
+              <DatePicker
+                label='Data entrega'
+                size='small'
+                autoOk
+                inputVariant='outlined'
+                format="dd/MM/yyyy"
+                value={dataEntrega}
+                onChange={handleDateDeliveryChange}
+              />
+              
+              <DatePicker
+                label='Data devolução'
+                size='small'
+                autoOk
+                inputVariant='outlined'
+                format="dd/MM/yyyy"
+                value={dataDevolucao}
+                onChange={handleDateDevolutionChange}
+              />
             </div>
-            }
-
-          <ListaProdutos produtos={produtos} addProduto={handleAddProduto}/>
-
-          </CardContent>
-          <CardActions style={{ justifyContent: 'flex-end', marginRight: 15 }}>
-            <Button variant="contained" size="medium" href={'/admin/pedidos'} className={classes.btnDefaultGreen} onClick={handleSubmit} startIcon={<SaveIcon />}>Salvar</Button>
-          </CardActions>
+            <TextField
+              variant="outlined"
+              label="Observação"
+              multiline
+              rows={4}
+              value={observacao}
+              onChange={e => setObservacao(e.target.value)}
+            />
+            </CardContent>
+            <CardActions style={{ justifyContent: 'flex-end', marginRight: 15 }}>
+              <Button variant="contained" size="medium" className={classes.btnDefaultGreen} type="submit" startIcon={<SaveIcon />}>Salvar</Button>
+            </CardActions>
+          </form>
         </Card>
       </Container>
       </main>

@@ -1,8 +1,12 @@
+const { Numbers } = require('@mui/icons-material');
 const mongoose = require('mongoose');
 const DataSchema = new mongoose.Schema({
-    Status: {type: String, default: 'Entrega'}, //Entrega ou Retirada
-    // vlTotalGeral: Decimal,
-    dsObservacao: String,
+    status: {type: String, default: 'Pendente'}, //Pedente, Entregue, Devolvido ou Cancelado
+    dataPedido: { type: Date, default: Date.now },
+    dataEntrega: { type: Date },
+    dataDevolucao: { type: Date },
+    totalGeral: Number,
+    observacao: String,
 
     //DADOS CEP
     nrEndereco: String,
@@ -14,14 +18,9 @@ const DataSchema = new mongoose.Schema({
     nrCEP: String,
     //DADOS CEP
 
-    //Contatos de telefone do cliente
+    nomeCliente: { type: String},
+    //Pedidos do cliente
     products: { type: Array, "default":[] } 
-
-    // clientes: [
-    //     {
-    //         type: Array,
-    //     }
-    // ],
 },{
     timestamps: true
 });

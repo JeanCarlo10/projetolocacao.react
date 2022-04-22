@@ -223,9 +223,9 @@ export default function IndexCliente() {
               <TableBody>
                 {clients.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
                   <TableRow hover key={row._id}>
-                      <TableCell align="left"><Chip label={getTypeClient(row.flTipo)} /></TableCell>
+                      <TableCell align="left"><Chip label={getTypeClient(row.flTipo)}/></TableCell>
                       <TableCell> {row.flTipo == 1 ? row.nmCliente : row.nmRazaoSocial}</TableCell> 
-                      <TableCell>{row.flTipo == 1 ? row.nrCPF : row.nrCNPJ }</TableCell>
+                      <TableCell>{row.flTipo == 1 ? row.nrCPF : row.nrCNPJ}</TableCell>
                       <TableCell>{row.logradouro == null || undefined ?  " " : row.logradouro + ", " + row.numero + " - " + row.bairro}</TableCell>
                       <TableCell component="th" scope="row" align="right">
                         {/* <IconButton onClick={() => setIsOpenMenu(true) }>

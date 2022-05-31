@@ -30,7 +30,7 @@ export default function CreateCliente() {
   const [nome, setNome] = useState('');
   const [razaoSocial, setRazaoSocial] = useState('');
   const [sexo, setSexo] = useState('');
-  const [tipo, setTipo] = useState(1);
+  const [tipo, setTipo] = useState('Fisica');
   const [cpf, setCpf] = useState('');
   const [rg, setRg] = useState('');
   const [ie, setIe] = useState('');
@@ -39,7 +39,14 @@ export default function CreateCliente() {
   const [email, setEmail] = useState('');
   const [contatos, setContatos] = useState([]);
   const [dadosEndereco, setDadosEndereco] = useState({});
-  const [image, setImage] = useState('');
+
+  const handleTipoPessoaChange = (e) => {
+    setTipo(e.target.value);
+  };
+
+  const handleSexoChange = (e) => {
+    setSexo(e.target.value);
+  };
 
   const handleSearchCEP = (data) => {
     setDadosEndereco(data);
@@ -50,9 +57,9 @@ export default function CreateCliente() {
   }
 
   const handleDeleteContato = (contato) => {
-    const newContacts = contatos.filter((item) => item.id !== contato);
+    const updatedContacts = contatos.filter((item) => item.id !== contato);
 
-    setContatos(newContacts);
+    setContatos(updatedContacts);
   }
 
   const handleChangeCPF = (event) => {
@@ -71,17 +78,16 @@ export default function CreateCliente() {
     event.preventDefault();
 
     const data = {
-      nmCliente: nome,
-      nmRazaoSocial: razaoSocial,
-      flSexo: sexo,
-      flTipo: tipo,
-      nrCPF: cpf,
-      nrRG: rg,
-      nrIE: ie,
-      nrCNPJ: cnpj,
-      dtNascimento: nascimento,
-      dsEmail: email,
-      image: image,
+      nomeCliente: nome,
+      razaoSocial: razaoSocial,
+      sexo: sexo,
+      tipoPessoa: tipo,
+      cpf: cpf,
+      rg: rg,
+      ie: ie,
+      cnpj: cnpj,
+      dataNascimento: nascimento,
+      email: email,
 
       //Dados Endereço
       numero: dadosEndereco.numero,
@@ -144,26 +150,26 @@ export default function CreateCliente() {
                   <InputLabel>Tipo</InputLabel>
                   <Select
                     value={tipo}
-                    onChange={e => setTipo(e.target.value)}
+                    onChange={handleTipoPessoaChange}
                     label="Tipo de pessoa"
                   >
-                    <MenuItem value={1}>Pessoa Física</MenuItem>
-                    <MenuItem value={2}>Pessoa Jurídica</MenuItem>
+                    <MenuItem value={'Fisica'}>Pessoa Física</MenuItem>
+                    <MenuItem value={'Juridica'}>Pessoa Jurídica</MenuItem>
                   </Select>
                 </FormControl>
 
-                {tipo == 1 &&
+                {tipo == 'Fisica' &&
                   <TextField
                     variant="outlined"
                     label="Nome cliente"
-                    size="small"
-                    autoFocus
+                    size="small"  
+                    autoFocus                  
                     value={nome}
                     onChange={e => setNome(e.target.value)}
                   />
                 }
 
-                {tipo == 2 &&
+                {tipo == 'Juridica' &&
                   <TextField
                     variant="outlined"
                     label="Razão Social"
@@ -174,7 +180,7 @@ export default function CreateCliente() {
                   />
                 }
 
-                {tipo == 1 &&
+                {tipo == 'Fisica' &&
                   <div className={classes.twoInputs}>
                     <TextField
                       required
@@ -188,19 +194,19 @@ export default function CreateCliente() {
                       <InputLabel>Sexo</InputLabel>
                       <Select
                         value={sexo}
-                        onChange={e => setSexo(e.target.value)}
+                        onChange={handleSexoChange}
                         label="Sexo"
                       >
                         <MenuItem value="" />
-                        <MenuItem value={10}>Feminino</MenuItem>
-                        <MenuItem value={20}>Masculino</MenuItem>
+                        <MenuItem value={'Feminino'}>Feminino</MenuItem>
+                        <MenuItem value={'Masculino'}>Masculino</MenuItem>
                       </Select>
                     </FormControl>
                   </div>
                 }
 
                 <div className={classes.twoInputs}>
-                  {tipo == 1 &&
+                  {tipo == 'Fisica' &&
                     <TextField
                       variant="outlined"
                       size="small"
@@ -211,7 +217,7 @@ export default function CreateCliente() {
                     />
                   }
 
-                  {tipo == 2 &&
+                  {tipo == 'Juridica' &&
                     <TextField
                       variant="outlined"
                       size="small"
@@ -222,7 +228,7 @@ export default function CreateCliente() {
                     />
                   }
 
-                  {tipo == 1 &&
+                  {tipo == 'Fisica' &&
                     <TextField
                       className={classes.formControl}
                       variant="outlined"
@@ -232,7 +238,7 @@ export default function CreateCliente() {
                       onChange={e => setRg(e.target.value)}
                     />
                   }
-                  {tipo == 2 &&
+                  {tipo == 'Juridica' &&
                     <TextField
                       className={classes.formControl}
                       variant="outlined"

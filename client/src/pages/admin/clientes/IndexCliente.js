@@ -30,7 +30,6 @@ import AddCircleRoundedIcon from '@material-ui/icons/AddCircleRounded';
 import FilterListRoundedIcon from '@material-ui/icons/FilterListRounded';
 
 import lottie from 'lottie-web';
-import { getTypeClient } from '../../../functions/static_data';
 import MenuAdmin from '../../../components/menu-admin';
 import api from '../../../services/api';
 import Swal from 'sweetalert2';
@@ -48,6 +47,7 @@ export default function IndexCliente() {
   const container = useRef(null);
   const ref = useRef(null);
 
+  const tipoPessoaMap = {'Fisica': 'Física', 'Juridica': 'Jurídica'};
   const [clients, setClients] = useState([]);
   const [filterClients, setFilterClients] = useState([]);
   const [search, setSearch] = useState("");
@@ -125,10 +125,10 @@ export default function IndexCliente() {
 
   const filter = (endSearch) => {
     var resultSearch = filterClients.filter((result) => {
-      if (result.nmCliente.toString().toLowerCase().includes(endSearch.toLowerCase())
-        || result.nmRazaoSocial.toString().toLowerCase().includes(endSearch.toLowerCase())
-        || result.nrCPF.toString().toLowerCase().includes(endSearch.toLowerCase())
-        || result.nrCNPJ.toString().toLowerCase().includes(endSearch.toLowerCase())
+      if (result.nomeCliente.toString().toLowerCase().includes(endSearch.toLowerCase())
+        || result.razaoSocial.toString().toLowerCase().includes(endSearch.toLowerCase())
+        || result.cpf.toString().toLowerCase().includes(endSearch.toLowerCase())
+        || result.cnpj.toString().toLowerCase().includes(endSearch.toLowerCase())
       ) {
         return result;
       }
@@ -223,7 +223,7 @@ export default function IndexCliente() {
                 <Table className={classes.table} size="small">
                   <TableHead>
                     <TableRow>
-                      <TableCell>Tipo</TableCell>
+                      <TableCell>Tipo pessoa</TableCell>
                       <TableCell>Nome/Razão social</TableCell>
                       <TableCell>CPF/CNPJ</TableCell>
                       <TableCell>Endereço</TableCell>
@@ -234,9 +234,9 @@ export default function IndexCliente() {
                   <TableBody>
                     {clients.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
                       <TableRow hover key={row._id}>
-                        <TableCell align="left"><Chip label={getTypeClient(row.flTipo)} /></TableCell>
-                        <TableCell> {row.flTipo == 1 ? row.nmCliente : row.nmRazaoSocial}</TableCell>
-                        <TableCell>{row.flTipo == 1 ? row.nrCPF : row.nrCNPJ}</TableCell>
+                        <TableCell align="left"><Chip label={tipoPessoaMap[(row.tipoPessoa)]} /></TableCell>
+                        <TableCell> {row.tipoPessoa == 'Fisica' ? row.nomeCliente : row.razaoSocial}</TableCell>
+                        <TableCell>{row.tipoPessoa == 'Fisica' ? row.cpf : row.cnpj}</TableCell>
                         <TableCell>{row.logradouro == null || undefined ? " " : row.logradouro + ", " + row.numero + " - " + row.bairro}</TableCell>
                         <TableCell component="th" scope="row" align="right">
                           {/* <IconButton onClick={() => setIsOpenMenu(true) }>

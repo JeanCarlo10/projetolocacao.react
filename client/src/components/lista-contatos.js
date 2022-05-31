@@ -28,31 +28,31 @@ export default function ListaContatos(props) {
         },
     }))(TableRow);
     
-    const telefoneMap = {30: 'Celular', 40: 'Fixo'};
+    // const telefoneMap = {30: 'Celular', 40: 'Fixo'};
     const {contatos, addContato, deleteContato } = props;
 
-    const [tipoTelefone, setTipoTelefone] = useState(30);
-    const [telefone, setTelefone] = useState('');
+    const [tipoTelefone, setTipoTelefone] = useState('Celular');
+    const [numero, setNumero] = useState('');
     const [observacao, setObservacao] = useState('');
 
-    const handleChangeTelefone = (event) => {
-      setTelefone(mask(unMask(event.target.value), ['(99) 9999-9999', '(99) 9 9999-9999']));
+    const handleChangeNumero = (e) => {
+      setNumero(mask(unMask(e.target.value), ['(99) 9999-9999', '(99) 9 9999-9999']));
     }
 
-    const handleTipoTelefoneChange = (event) => {
-      setTipoTelefone(event.target.value);
+    const handleTipoTelefoneChange = (e) => {
+      setTipoTelefone(e.target.value);
     };
 
     const handleAddContact = () => {
       addContato({
         id: new Date().getTime(),
-        flTipoTelefone: tipoTelefone,
-        nrTelefone: telefone,
-        dsObservacao: observacao
+        tipoTelefone: tipoTelefone,
+        numero: numero,
+        observacao: observacao
       });
 
-      setTipoTelefone(30);
-      setTelefone('');
+      setTipoTelefone('Celular');
+      setNumero('');
       setObservacao('');
     }
 
@@ -82,8 +82,8 @@ export default function ListaContatos(props) {
                       onChange={handleTipoTelefoneChange}
                       label="Tipo"
                     >
-                    <MenuItem  value={30}>Celular</MenuItem>
-                    <MenuItem  value={40}>Fixo</MenuItem>
+                    <MenuItem  value={'Celular'}>Celular</MenuItem>
+                    <MenuItem  value={'Fixo'}>Fixo</MenuItem>
                   </Select>
                 </FormControl>
 
@@ -91,8 +91,8 @@ export default function ListaContatos(props) {
                   variant="outlined"
                   size="small"
                   label="Número"
-                  value={telefone}
-                  onChange={handleChangeTelefone}
+                  value={numero}
+                  onChange={handleChangeNumero}
                 />
               </div>
               <Box style={{ marginLeft: -7, display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
@@ -124,9 +124,9 @@ export default function ListaContatos(props) {
                 <TableBody>
                   {contatos.map((contact) => ( 
                     <TableRow hover key={contact.id}>
-                        <TableCell align="left"><Chip label={telefoneMap[contact.flTipoTelefone]} /></TableCell>
-                        <TableCell>{contact.nrTelefone}</TableCell>
-                        <TableCell>{contact.dsObservacao}</TableCell>
+                        <TableCell align="left"><Chip label={contact.tipoTelefone} /></TableCell>
+                        <TableCell>{contact.numero}</TableCell>
+                        <TableCell>{contact.observacao}</TableCell>
                         <TableCell component="th" scope="row" align="right">
                           <IconButton onClick={() => deleteContato(contact.id)}>
                               <DeleteIcon />

@@ -1,17 +1,16 @@
 const mongoose = require('mongoose');
 
 const ClientSchema = new mongoose.Schema({
-    nmCliente: String,
-    nmRazaoSocial: String,
-    flSexo: {type: Number, default: 1}, //Masculino ou Feminino
-    flTipo: {type: Number, default: 1}, //Fisica ou Juridica
-    nrCPF: String,
-    nrRG: String,
-    nrIE: String,
-    nrCNPJ: String,
-    dtNascimento: String,
-    dsEmail: String,
-    image: String,
+    nomeCliente: String,
+    razaoSocial: String,
+    sexo: {type: String, default: ""}, //Masculino ou Feminino
+    tipoPessoa: {type: String, default: 'Fisica'}, //Fisica ou Juridica
+    cpf: String,
+    rg: String,
+    ie: String,
+    cnpj: String,
+    dataNascimento: String,
+    email: String,
 
     //DADOS CEP
     numero: String,

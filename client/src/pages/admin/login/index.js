@@ -31,27 +31,14 @@ import Paper from '@mui/material/Paper';
 // import FormControl from '@mui/material/FormControl';
 import FormControl from '@material-ui/core/FormControl';
 
-// function Copyright() {
-//   return (
-//     <Typography variant="body2" color="textSecondary" align="center">
-//       {'Copyright © '}
-//       <Link color="inherit" href="https://material-ui.com/">
-//         Your Website
-//       </Link>{' '}
-//       {new Date().getFullYear()}
-//       {'.'}
-//     </Typography>
-//   );
-// }
-
 export default function SignIn() {
   const classes = useStyles();
 
-  const [ email, setEmail ] = useState('');
-  const [ senha, setSenha ] = useState('');
-  const [ showPassword, setShowPassword ] = useState(false);
-  const [ loading, setLoading ] = useState(false);
-  const [ notify, setNotify ] = useState( { isOpen: false, message: '', type: ''} );
+  const [email, setEmail] = useState('');
+  const [senha, setSenha] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [notify, setNotify] = useState({ isOpen: false, message: '', type: '' });
 
   async function handleSubmit() {
     // setLoading(true);
@@ -70,7 +57,7 @@ export default function SignIn() {
           } else if (res.data.status == 2) {
             setNotify({
               isOpen: true,
-              message: 'Atenção: '+ res.data.error,
+              message: 'Atenção: ' + res.data.error,
               type: 'error'
             });
             //alert('Atenção: ' + res.data.error);
@@ -84,19 +71,19 @@ export default function SignIn() {
   }
 
   function loadSubmit() {
-      setLoading(true);
+    setLoading(true);
 
-      setTimeout(
-        () => handleSubmit(),
-        2000 
-      );
+    setTimeout(
+      () => handleSubmit(),
+      2000
+    );
   }
 
   function FacebookCircularProgress(props) {
     const classes = useStylesFacebook();
-  
+
     return (
-      <div className={classes.root}>
+      <div className={classes.rootProgress}>
         <CircularProgress
           variant="determinate"
           className={classes.bottom}
@@ -120,112 +107,76 @@ export default function SignIn() {
     );
   }
 
-  const handleMouseDownPassword = (event) => {
-    event.preventDefault();
-  };
   return (
-    
-    <Container component="main" maxWidth="xl">
+    <div className={classes.root}>
       <CssBaseline />
 
       <Notification notify={notify} setNotify={setNotify} />
-          {/* <Box
-                component="img"
-                src="src={require('../assets/logo.svg')} style={{marginRight: 130 }} width={40} height={40}"
-                src="../../../assets/Mobile login-bro.svg"
-                sx={{ height: 260, mx: 'auto', my: { xs: 5, sm: 10 } }}
-              /> */}
-          {/* <Grid container>
-            <img src={require('../../../assets/Mobile login-bro.svg')} />
-        </Grid> */}
-      <Grid container spacing={2}>
-        <Grid item xs={6}>
-            <Box>
-              <Paper>
-                <img src={require('../../../assets/Mobile login-bro.svg')} />
-              </Paper>
-            </Box>
-        </Grid>
-        <Grid item xs={6} >
-          <Box p={10} className={classes.inputs}>
-            <Typography style={{ fontSize:24, fontWeight: 700, color: '#212B36' }}>
-              Login
-            </Typography>
-            <Typography style={{ fontSize: 16, fontWeight: 400, color: '#637381' }}>
-              Insira os dados abaixo
-            </Typography>
-
-            <TextField 
-              variant="outlined"
-              margin="normal"
-              required
-              fullWidth
-              id="email"
-              label="Digite seu email"
-              name="email"
-              autoFocus
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-            />
-            <FormControl fullWidth variant="outlined">
-              <InputLabel htmlFor="password">Digite sua senha</InputLabel>
-              <OutlinedInput
-                id="password"
-                type={showPassword ? 'text' : 'password'}
-                value={senha}
-                onChange={e => setSenha(e.target.value)}
-                
-                endAdornment={
-                  <InputAdornment position="end">
-                    <IconButton
-                      onClick={e => setShowPassword(!showPassword)}
-                      edge="end"
-                    >
-                      {showPassword ? <Visibility /> : <VisibilityOff />}
-                    </IconButton>
-                  </InputAdornment>
-                }
-                labelWidth={120}
-              />
-            </FormControl>
-
-            <Button 
-              fullWidth
-              variant="contained"
-              // size='medium'
-              className={classes.btnDefaultGreen}
-              onClick={loadSubmit}
-              disabled={loading}
-            >
-              {loading ? <FacebookCircularProgress /> : 'Entrar'}
-            </Button>
-          </Box>
-        </Grid>
-      </Grid>
-
-      <div className={classes.paper}>
-        {/* <Grid container>
-            <Grid item xs>
-              <Link href="#" variant="body2">
-                Esqueceu sua senha?
-              </Link>
-            </Grid>
-            <Grid item>
-              <Link href="#" variant="body2">
-                {"Don't have an account? Sign Up"}
-              </Link>
-            </Grid>
-          </Grid> */}
+      <div className={classes.columnLeft}>
+        <img className={classes.image} src={require('../../../assets/Mobile login-bro.svg')} />
       </div>
-      <Box mt={8}>
-        {/* <Copyright /> */}
-      </Box>
-    </Container>
+      <div className={classes.columnRight}>
+        <div className={classes.titleLogin}>
+          <Typography style={{ fontSize: 24, fontWeight: 700, color: '#212B36' }}>
+            Login
+          </Typography>
+          <Typography style={{ fontSize: 16, fontWeight: 400, color: '#637381' }}>
+            Insira os dados abaixo
+          </Typography>
+        </div>
+        <form className={classes.form}>
+          <TextField
+            variant="outlined"
+            margin="normal"
+            required
+            fullWidth
+            id="email"
+            label="Digite seu email"
+            name="email"
+            autoFocus
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+          />
+          <FormControl fullWidth variant="outlined">
+            <InputLabel htmlFor="password">Digite sua senha</InputLabel>
+            <OutlinedInput
+              id="password"
+              type={showPassword ? 'text' : 'password'}
+              value={senha}
+              onChange={e => setSenha(e.target.value)}
+
+              endAdornment={
+                <InputAdornment position="end">
+                  <IconButton
+                    onClick={e => setShowPassword(!showPassword)}
+                    edge="end"
+                  >
+                    {showPassword ? <Visibility /> : <VisibilityOff />}
+                  </IconButton>
+                </InputAdornment>
+              }
+              labelWidth={120}
+            />
+          </FormControl>
+
+          <Button
+            fullWidth
+            variant="contained"
+            // size='medium'
+            className={classes.btnDefaultGreen}
+            onClick={loadSubmit}
+            disabled={loading}
+          >
+            {loading ? <FacebookCircularProgress /> : 'Entrar'}
+          </Button>
+        </form>
+      </div>
+    </div>
   );
 }
 
 const useStylesFacebook = makeStyles((theme) => ({
-  root: {
+  rootProgress: {
     position: 'relative',
   },
   bottom: {
@@ -240,29 +191,40 @@ const useStylesFacebook = makeStyles((theme) => ({
   circle: {
     strokeLinecap: 'round',
   },
-  
+
 }));
 
 const useStyles = makeStyles((theme) => ({
-  // paper: {
-  //   marginTop: theme.spacing(8),
-  //   display: 'flex',
-  //   flexDirection: 'column',
-  //   alignItems: 'center',
-  // },
-
-  // avatar: {
-  //   margin: theme.spacing(1),
-  //   backgroundColor: theme.palette.secondary.main,
-  // },
-  form: {
-    width: '100%', // Fix IE 11 issue.
-    marginTop: theme.spacing(1),
-  },
-  inputs: {
+  root: {
     display: 'flex',
-    overflow: 'auto',
+    flexDirection: 'row',
+    height: '100vh',
+  },
+  image: {
+    backgroundPosition: 'center',
+    backgroundSize: 'cover',
+    backgroundRepeat: 'none'
+  },
+  columnLeft: {
+    flexBasis: '60%',
+
+    display: 'flex',
     flexDirection: 'column',
+    justifyContent: 'center',
+  },
+  columnRight: {
+    flexBasis: '40%',
+    alignSelf: 'center'
+  },
+  titleLogin: {
+    flexDirection: 'column',
+    margin: '32px',
+  },
+  form: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    margin: '32px',
 
     '& label.Mui-focused': {
       color: '#00AB55',
@@ -279,6 +241,7 @@ const useStyles = makeStyles((theme) => ({
       },
     },
   },
+
   btnDefaultGreen: {
     background: '#00AB55',
     color: '#FFF',

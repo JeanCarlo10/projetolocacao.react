@@ -31,6 +31,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import MenuAdmin from '../../../components/menu-admin';
 import api from '../../../services/api';
 import lottie from 'lottie-web';
+import Swal from 'sweetalert2';
 
 const StyledTableRow = withStyles((theme) => ({
   root: {
@@ -47,7 +48,7 @@ export default function IndexMaterial() {
 
   const [materials, setMaterials] = useState([]);
   const [filterMaterials, setFilterMaterials] = useState([]);
-  const [search, setSearch] = useState ("");
+  const [search, setSearch] = useState("");
 
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
@@ -76,16 +77,26 @@ export default function IndexMaterial() {
     loadMaterials();
   }, []);
 
-  async function handleDelete(id) {
-    if (window.confirm("Deseja realmente excluir este material?")) {
-      var result = await api.delete('api/materials/' + id);
+  const handleDelete = (id) => {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Exclusão',
+      text: 'Deseja realmente excluir este material?',
+      showCloseButton: true,
+      confirmButtonText: 'Sim, excluir!',
+      confirmButtonColor: '#d33333',
+      showCancelButton: true,
+      cancelButtonText: 'Não',
+      reverseButtons: true,
+    }).then((result) => {
+      if (result.isConfirmed) {
+        api.delete('api/materials/' + id)
 
-      if (result.status = 200) {
-        window.location.href = '/admin/materiais';
-      } else {
-        alert('Ocorreu um erro. Por favor, tente novamente')
+        if (result.status = 200) {
+          window.location.href = '/admin/materiais';
+        }
       }
-    }
+    })
   }
 
   const handleDrawerFilter = () => {
@@ -102,7 +113,7 @@ export default function IndexMaterial() {
   };
 
   //Filtrar Lista
-  const handleChangeSearch = ({target}) => {
+  const handleChangeSearch = ({ target }) => {
     setSearch(target.value);
     filter(target.value);
   }
@@ -110,7 +121,7 @@ export default function IndexMaterial() {
   const filter = (endSearch) => {
     var resultSearch = filterMaterials.filter((result) => {
       if (result.nmMaterial.toString().toLowerCase().includes(endSearch.toLowerCase())
-      ){
+      ) {
         return result;
       }
     });
@@ -119,42 +130,42 @@ export default function IndexMaterial() {
 
   return (
     <div className={classes.root}>
-      <MenuAdmin/>
+      <MenuAdmin />
 
       <main className={classes.content}>
         <div className={classes.appBarSpacer} />
 
         <Container maxWidth="lg" className={classes.container}>
-        
+
           <CardHeader className={classes.cardHeader}
             title="Materiais"
             subheader={
-            <Breadcrumbs style={{ fontSize: 14 }} separator="•" aria-label="breadcrumb">
-              <Link color="inherit" href={'/admin'} >
-                Painel
-              </Link>
-              <Typography color="textPrimary" style={{ fontSize: 14 }}>Lista de materiais</Typography>
-            </Breadcrumbs>
+              <Breadcrumbs style={{ fontSize: 14 }} separator="•" aria-label="breadcrumb">
+                <Link color="inherit" href={'/admin'} >
+                  Painel
+                </Link>
+                <Typography color="textPrimary" style={{ fontSize: 14 }}>Lista de materiais</Typography>
+              </Breadcrumbs>
             }
             action={
-              <div style={{ paddingTop: 10}}>
-                <Button 
-                className={classes.btnDefaultGreen}
-                  variant="contained" 
+              <div style={{ paddingTop: 10 }}>
+                <Button
+                  className={classes.btnDefaultGreen}
+                  variant="contained"
                   size="medium"
-                  color='primary' 
-                  href={'/admin/materiais/create'} 
-                  startIcon={<AddCircleRoundedIcon/>}>
-                    Cadastrar
+                  color='primary'
+                  href={'/admin/materiais/create'}
+                  startIcon={<AddCircleRoundedIcon />}>
+                  Cadastrar
                 </Button>
-                
+
                 <Drawer anchor='right' open={open} onClose={() => setOpen(false)}>
-                  <div style={{ width: "350px"}}>
+                  <div style={{ width: "350px" }}>
                     <div className={classes.drawerFilter}>
                       <Avatar className={classes.avatarFilter}>
                         <FilterListRoundedIcon />
                       </Avatar>
-                      <h3  style={{ color: '#5C5C62', fontSize: 20}}>Filtros</h3>
+                      <h3 style={{ color: '#5C5C62', fontSize: 20 }}>Filtros</h3>
                     </div>
 
                     <div className={classes.drawerContent}>
@@ -171,19 +182,19 @@ export default function IndexMaterial() {
                         />
                       </div>
                       <div className={classes.drawerFooter}>
-                      <Button variant="contained" color='default' startIcon={<SearchIcon />}>Buscar</Button>
+                        <Button variant="contained" color='default' startIcon={<SearchIcon />}>Buscar</Button>
                       </div>
                     </div>
                   </div>
-                  </Drawer>
-                </div>
+                </Drawer>
+              </div>
             }
           />
-          
-          {loading ? (<div style={{width: 300, margin: '0 auto'}} ref={container} />) : (
-          <Card style= {{ borderRadius: 15 }}>
-            <div className={classes.twoElements}>
-              <div className={classes.iconButton}>
+
+          {loading ? (<div style={{ width: 300, margin: '0 auto' }} ref={container} />) : (
+            <Card style={{ borderRadius: 15 }}>
+              <div className={classes.twoElements}>
+                <div className={classes.iconButton}>
                   <IconButton>
                     <SearchIcon />
                   </IconButton>
@@ -192,76 +203,76 @@ export default function IndexMaterial() {
                     onChange={handleChangeSearch}
                     placeholder="Buscar..."
                   />
+                </div>
+
+                <Tooltip title="Filtros">
+                  <IconButton size="large" onClick={handleDrawerFilter}>
+                    <FilterListRoundedIcon />
+                  </IconButton>
+                </Tooltip>
               </div>
 
-              <Tooltip title="Filtros">
-                <IconButton size="large" onClick={handleDrawerFilter}>
-                  <FilterListRoundedIcon />
-                </IconButton>
-              </Tooltip>
-            </div>
+              <TableContainer>
+                <Table className={classes.table} size="small">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Nome</TableCell>
+                      <TableCell align="right">Ações</TableCell>
+                    </TableRow>
+                  </TableHead>
 
-          <TableContainer>
-            <Table className={classes.table} size="small">
-              <TableHead>
-                <TableRow>
-                  <TableCell>Nome</TableCell>
-                  <TableCell align="right">Ações</TableCell>
-                </TableRow>
-              </TableHead>
-
-              <TableBody>
-                {materials.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
-                  <TableRow hover key={row._id}>
-                    <TableCell>{row.nmMaterial}</TableCell>
-                    <TableCell component="th" scope="row" align="right">
-                    {/* <IconButton onClick={() => setIsOpenMenu(true)}>
+                  <TableBody>
+                    {materials.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
+                      <TableRow hover key={row._id}>
+                        <TableCell>{row.nmMaterial}</TableCell>
+                        <TableCell component="th" scope="row" align="right">
+                          {/* <IconButton onClick={() => setIsOpenMenu(true)}>
                         <MoreVertIcon
                           className={classes.buttonTable}
                         />
                     </IconButton> */}
-                    <IconButton onClick={() => handleDelete(row._id)}>
-                      <DeleteIcon />
-                    </IconButton>
-                    <IconButton href={'/admin/materiais/edit/' + row._id}>
-                      <EditIcon />
-                    </IconButton>
-                  </TableCell>
-
-                  <Menu
-                    open={isOpenMenu}
-                    anchorEl={ref.current}
-                    onClose={() => setIsOpenMenu(false)}
-                    PaperProps={{
-                      sx: { width: 200, maxWidth: '100%' }
-                    }}
-                    anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-                    transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-                  >
-                    <MenuItem>
-                      <ListItemIcon>
                           <IconButton onClick={() => handleDelete(row._id)}>
                             <DeleteIcon />
                           </IconButton>
-                      </ListItemIcon>
-                      <ListItemText primary="Excluir" />
-                    </MenuItem>
-
-                    <MenuItem >
-                      <ListItemIcon >
                           <IconButton href={'/admin/materiais/edit/' + row._id}>
                             <EditIcon />
                           </IconButton>
-                      </ListItemIcon>
-                      <ListItemText primary="Editar" />
-                    </MenuItem>
-                  </Menu>
-                  </TableRow>
-                ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-            <TablePagination 
+                        </TableCell>
+
+                        <Menu
+                          open={isOpenMenu}
+                          anchorEl={ref.current}
+                          onClose={() => setIsOpenMenu(false)}
+                          PaperProps={{
+                            sx: { width: 200, maxWidth: '100%' }
+                          }}
+                          anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+                          transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+                        >
+                          <MenuItem>
+                            <ListItemIcon>
+                              <IconButton onClick={() => handleDelete(row._id)}>
+                                <DeleteIcon />
+                              </IconButton>
+                            </ListItemIcon>
+                            <ListItemText primary="Excluir" />
+                          </MenuItem>
+
+                          <MenuItem >
+                            <ListItemIcon >
+                              <IconButton href={'/admin/materiais/edit/' + row._id}>
+                                <EditIcon />
+                              </IconButton>
+                            </ListItemIcon>
+                            <ListItemText primary="Editar" />
+                          </MenuItem>
+                        </Menu>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+              <TablePagination
                 rowsPerPageOptions={[5, 10, 25]}
                 component="div"
                 count={materials.length}
@@ -269,10 +280,10 @@ export default function IndexMaterial() {
                 page={page}
                 onPageChange={handleChangePage}
                 onRowsPerPageChange={handleChangeRowsPerPage}
-            />
-        </Card>
-        )}
-        </Container>     
+              />
+            </Card>
+          )}
+        </Container>
       </main>
     </div>
   );
@@ -283,25 +294,25 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
   },
   iconButton: {
-    borderRadius: 50, 
+    borderRadius: 50,
     borderColor: '#F4F4F4',
     borderStyle: 'solid'
   },
   drawerFilter: {
-    display: 'flex', 
-    padding: '15px', 
+    display: 'flex',
+    padding: '15px',
     alignItems: 'center',
-  }, 
+  },
   avatarFilter: {
     color: '#4DB4C6',
     backgroundColor: '#E7F7F9',
     marginRight: theme.spacing(2),
-  }, 
+  },
   drawerContent: {
-    display: 'flex', 
+    display: 'flex',
     flexDirection: 'column',
-    padding: '15px',    
-  }, 
+    padding: '15px',
+  },
   drawerTitle: {
     color: '#5C5C62',
     fontSize: 18
@@ -319,7 +330,7 @@ const useStyles = makeStyles((theme) => ({
     paddingTop: theme.spacing(4),
     paddingBottom: theme.spacing(4),
   },
-  
+
   table: {
     minWidth: 750,
     '& .MuiTableCell-head': {
@@ -334,7 +345,7 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
     justifyContent: 'space-between',
     margin: theme.spacing(1),
-    
+
     '& .MuiTextField-root': {
       margin: theme.spacing(1),
     },
@@ -352,12 +363,12 @@ const useStyles = makeStyles((theme) => ({
       color: '#FFF',
     },
   },
-  cardHeader: {    
+  cardHeader: {
     "& .MuiCardHeader-title": {
       fontWeight: 700,
       color: '#212B36',
       marginBottom: theme.spacing(1),
     },
-},
+  },
   appBarSpacer: theme.mixins.toolbar,
 }));

@@ -11,6 +11,7 @@ const ClientSchema = new mongoose.Schema({
     nrCNPJ: String,
     dtNascimento: String,
     dsEmail: String,
+    image: String,
 
     //DADOS CEP
     numero: String,
@@ -24,8 +25,6 @@ const ClientSchema = new mongoose.Schema({
 
     //Contatos de telefone do cliente
     contacts: {type: Array, "default":[]} 
-
-    //public byte[] byFoto
 },{
     timestamps: true
 });

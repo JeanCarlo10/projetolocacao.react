@@ -29,7 +29,7 @@ export default function ListaContatos(props) {
     }))(TableRow);
     
     const telefoneMap = {30: 'Celular', 40: 'Fixo'};
-    const {contatos, addContato} = props;
+    const {contatos, addContato, deleteContato } = props;
 
     const [tipoTelefone, setTipoTelefone] = useState(30);
     const [telefone, setTelefone] = useState('');
@@ -128,7 +128,7 @@ export default function ListaContatos(props) {
                         <TableCell>{contact.nrTelefone}</TableCell>
                         <TableCell>{contact.dsObservacao}</TableCell>
                         <TableCell component="th" scope="row" align="right">
-                          <IconButton>
+                          <IconButton onClick={() => deleteContato(contact.id)}>
                               <DeleteIcon />
                           </IconButton>
                         </TableCell>

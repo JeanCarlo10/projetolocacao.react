@@ -1,7 +1,7 @@
-const { Numbers } = require('@mui/icons-material');
 const mongoose = require('mongoose');
 const DataSchema = new mongoose.Schema({
-    status: {type: String, default: 'Pendente'}, //Pedente, Entregue, Devolvido ou Cancelado
+    idRent: Number,
+    status: {type: String, default: 'Pendente'}, //Pendente, Entregue, Devolvido, Atrasado ou Cancelado
     dataPedido: { type: Date, default: Date.now },
     dataEntrega: { type: Date },
     dataDevolucao: { type: Date },

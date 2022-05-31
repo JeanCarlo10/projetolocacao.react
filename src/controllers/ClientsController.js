@@ -1,4 +1,30 @@
 const Client = require('../models/ClientModel');
+const multer = require('multer');
+
+const storage = multer.diskStorage({
+    destination: (req, file, callback) => {
+        callback(null, '../../client/public/images')
+    },
+
+    filename: (req, file, callback) => {
+        callback(null, Date.now() + path.extname(file.originalname));
+    },
+});
+
+const upload = multer({
+    storage: storage,
+    limits: { fieldSize: '5000000' },
+    fileFilter: (req, file, callback) => {
+        const fileTypes = /jpeg|jpg|png/
+        const mimeType = fileTypes.test(file.mimeType)
+        const extname = fileTypes.test(path.extname(file.originalname))
+
+        if (mimeType && extname) {
+            return callback(null, true)
+        }
+        callback('Informe apenas extensão de imagem')
+    }
+}).single('image');
 
 module.exports = {
     async index(req, res){
@@ -10,7 +36,7 @@ module.exports = {
     //ADD CLIENT
     async create(req, res) { 
         try {
-            const model = req.body
+            const model  = req.body
 
             const client = await Client.create(model);
 

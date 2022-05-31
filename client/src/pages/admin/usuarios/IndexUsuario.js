@@ -36,6 +36,7 @@ import lottie from 'lottie-web';
 import api from '../../../services/api';
 import MenuAdmin from '../../../components/menu-admin';
 import { getTypeUser, getTypeUserLabel } from '../../../functions/static_data';
+import Swal from 'sweetalert2';
 
 const StyledTableRow = withStyles((theme) => ({
   root: {
@@ -52,9 +53,9 @@ export default function IndexUsuario() {
 
   const [users, setUsers] = useState([]);
   const [filterUsers, setFilterUsers] = useState([]);
-  const [search, setSearch] = useState ("");
+  const [search, setSearch] = useState("");
 
-  const [loading, setLoading] = useState(true);  
+  const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const [isOpenMenu, setIsOpenMenu] = useState(false);
   const [page, setPage] = useState(0);
@@ -81,16 +82,26 @@ export default function IndexUsuario() {
     loadUsers();
   }, []);
 
-  async function handleDelete(id) {
-    if (window.confirm("Deseja realmente excluir este usuário?")) {
-      var result = await api.delete('api/users/' + id);
+  const handleDelete = (id) => {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Exclusão',
+      text: 'Deseja realmente excluir este usuário?',
+      showCloseButton: true,
+      confirmButtonText: 'Sim, excluir!',
+      confirmButtonColor: '#d33333',
+      showCancelButton: true,
+      cancelButtonText: 'Não',
+      reverseButtons: true,
+    }).then((result) => {
+      if (result.isConfirmed) {
+        api.delete('api/users/' + id)
 
-      if (result.status = 200) {
-        window.location.href = '/admin/usuarios';
-      } else {
-        alert('Ocorreu um erro. Por favor, tente novamente')
+        if (result.status = 200) {
+          window.location.href = '/admin/usuarios';
+        }
       }
-    }
+    })
   }
 
   const [selectTypeUser, setSelectTypeUser] = useState({
@@ -116,7 +127,7 @@ export default function IndexUsuario() {
   };
 
   //Filtrar Lista
-  const handleChangeSearch = ({target}) => {
+  const handleChangeSearch = ({ target }) => {
     setSearch(target.value);
     filter(target.value);
   }
@@ -124,7 +135,7 @@ export default function IndexUsuario() {
   const filter = (endSearch) => {
     var resultSearch = filterUsers.filter((result) => {
       if (result.nmUsuario.toString().toLowerCase().includes(endSearch.toLowerCase())
-      ){
+      ) {
         return result;
       }
     });
@@ -133,7 +144,7 @@ export default function IndexUsuario() {
 
   return (
     <div className={classes.root}>
-      <MenuAdmin/>
+      <MenuAdmin />
 
       <main className={classes.content}>
         <div className={classes.appBarSpacer} />
@@ -142,31 +153,31 @@ export default function IndexUsuario() {
           <CardHeader className={classes.cardHeader}
             title="Usuários"
             subheader={
-            <Breadcrumbs style={{ fontSize: 14 }} separator="•" aria-label="breadcrumb">
-              <Link color="inherit" href={'/admin'} >
-                Painel
-              </Link>
-              <Typography color="textPrimary" style={{ fontSize: 14 }}>Lista de usuários</Typography>
-            </Breadcrumbs>
+              <Breadcrumbs style={{ fontSize: 14 }} separator="•" aria-label="breadcrumb">
+                <Link color="inherit" href={'/admin'} >
+                  Painel
+                </Link>
+                <Typography color="textPrimary" style={{ fontSize: 14 }}>Lista de usuários</Typography>
+              </Breadcrumbs>
             }
             action={
-              <div style={{ paddingTop: 10}}>
-                <Button 
+              <div style={{ paddingTop: 10 }}>
+                <Button
                   className={classes.btnDefaultGreen}
-                  variant="contained" 
+                  variant="contained"
                   size="medium"
-                  href={'/admin/usuarios/create'} 
-                  startIcon={<AddCircleRoundedIcon/>}>
-                    Cadastrar
+                  href={'/admin/usuarios/create'}
+                  startIcon={<AddCircleRoundedIcon />}>
+                  Cadastrar
                 </Button>
-                
+
                 <Drawer anchor='right' open={open} onClose={() => setOpen(false)}>
-                  <div style={{ width: "350px"}}>
+                  <div style={{ width: "350px" }}>
                     <div className={classes.drawerFilter}>
                       <Avatar className={classes.avatarFilter}>
                         <FilterListRoundedIcon />
                       </Avatar>
-                      <h3  style={{ color: '#5C5C62', fontSize: 20}}>Filtros</h3>
+                      <h3 style={{ color: '#5C5C62', fontSize: 20 }}>Filtros</h3>
                     </div>
 
                     <div className={classes.drawerContent}>
@@ -200,27 +211,27 @@ export default function IndexUsuario() {
                       </div>
 
                       <div className={classes.drawerFooter}>
-                      <Button variant="contained" color='default' startIcon={<SearchIcon />}>Buscar</Button>
+                        <Button variant="contained" color='default' startIcon={<SearchIcon />}>Buscar</Button>
                       </div>
                     </div>
                   </div>
-                  </Drawer>
+                </Drawer>
               </div>
             }
           />
-          
-          {loading ? (<div style={{width: 300, margin: '0 auto'}} ref={container} />) : (
-            <Card style= {{ borderRadius: 15 }}>
+
+          {loading ? (<div style={{ width: 300, margin: '0 auto' }} ref={container} />) : (
+            <Card style={{ borderRadius: 15 }}>
               <div className={classes.twoElements}>
                 <div className={classes.iconButton}>
-                    <IconButton>
-                      <SearchIcon />
-                    </IconButton>
-                    <InputBase
-                      value={search}
-                      onChange={handleChangeSearch}
-                      placeholder="Buscar..."
-                    />
+                  <IconButton>
+                    <SearchIcon />
+                  </IconButton>
+                  <InputBase
+                    value={search}
+                    onChange={handleChangeSearch}
+                    placeholder="Buscar..."
+                  />
                 </div>
 
                 <Tooltip title="Filtros">
@@ -229,7 +240,7 @@ export default function IndexUsuario() {
                   </IconButton>
                 </Tooltip>
               </div>
-              
+
               <TableContainer>
                 <Table className={classes.table} size="small" >
                   <TableHead>
@@ -251,12 +262,12 @@ export default function IndexUsuario() {
                         <TableCell align="center"><Chip label={getTypeUser(row.flUsuario)} color={getTypeUserLabel(row.flUsuario)} /></TableCell>
                         <TableCell component="th" scope="row" align="right">
                           <IconButton onClick={() => setIsOpenMenu(true)}>
-                              <MoreVertIcon 
-                                className={classes.buttonTable}
-                              />
+                            <MoreVertIcon
+                              className={classes.buttonTable}
+                            />
                           </IconButton>
                         </TableCell>
-                        
+
                         <Menu
                           open={isOpenMenu}
                           anchorEl={ref.current}
@@ -269,28 +280,28 @@ export default function IndexUsuario() {
                         >
                           <MenuItem>
                             <ListItemIcon>
-                                <IconButton onClick={() => handleDelete(row._id)}>
-                                  <DeleteIcon />
-                                </IconButton>
+                              <IconButton onClick={() => handleDelete(row._id)}>
+                                <DeleteIcon />
+                              </IconButton>
                             </ListItemIcon>
                             <ListItemText primary="Excluir" />
                           </MenuItem>
 
                           <MenuItem >
                             <ListItemIcon >
-                                <IconButton href={'/admin/usuarios/edit/' + row._id}>
-                                  <EditIcon />
-                                </IconButton>
+                              <IconButton href={'/admin/usuarios/edit/' + row._id}>
+                                <EditIcon />
+                              </IconButton>
                             </ListItemIcon>
                             <ListItemText primary="Editar" />
                           </MenuItem>
                         </Menu>
                       </TableRow>
                     ))}
-                    </TableBody>
-                  </Table>
+                  </TableBody>
+                </Table>
               </TableContainer>
-              <TablePagination 
+              <TablePagination
                 rowsPerPageOptions={[5, 10, 25]}
                 component="div"
                 count={users.length}
@@ -298,10 +309,10 @@ export default function IndexUsuario() {
                 page={page}
                 onPageChange={handleChangePage}
                 onRowsPerPageChange={handleChangeRowsPerPage}
-            />
+              />
             </Card>
           )}
-        </Container>     
+        </Container>
       </main>
     </div>
   );
@@ -312,7 +323,7 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
   },
   iconButton: {
-    borderRadius: 50, 
+    borderRadius: 50,
     borderColor: '#F4F4F4',
     borderStyle: 'solid'
   },
@@ -321,22 +332,22 @@ const useStyles = makeStyles((theme) => ({
     height: '100vh',
     overflow: 'auto',
   },
-  
+
   drawerFilter: {
-    display: 'flex', 
-    padding: '15px', 
+    display: 'flex',
+    padding: '15px',
     alignItems: 'center',
-  }, 
+  },
   avatarFilter: {
     color: '#4DB4C6',
     backgroundColor: '#E7F7F9',
     marginRight: theme.spacing(2),
-  }, 
+  },
   drawerContent: {
-    display: 'flex', 
+    display: 'flex',
     flexDirection: 'column',
-    padding: '15px',    
-  }, 
+    padding: '15px',
+  },
   drawerTitle: {
     color: '#5C5C62',
     fontSize: 18
@@ -350,7 +361,7 @@ const useStyles = makeStyles((theme) => ({
     paddingTop: theme.spacing(4),
     paddingBottom: theme.spacing(4),
   },
-  
+
   table: {
     minWidth: 750,
     '& .MuiTableCell-head': {
@@ -358,7 +369,7 @@ const useStyles = makeStyles((theme) => ({
       fontSize: 14
     },
   },
-  
+
   buttonTable: {
     // margin: theme.spacing(0.5)
   },
@@ -379,17 +390,17 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
     justifyContent: 'space-between',
     margin: theme.spacing(1),
-    
+
     '& .MuiTextField-root': {
       margin: theme.spacing(1),
     },
   },
-  cardHeader: {    
-      "& .MuiCardHeader-title": {
-        fontWeight: 700,
-        color: '#212B36',
-        marginBottom: theme.spacing(1),
-      },
+  cardHeader: {
+    "& .MuiCardHeader-title": {
+      fontWeight: 700,
+      color: '#212B36',
+      marginBottom: theme.spacing(1),
+    },
   },
 
   appBarSpacer: theme.mixins.toolbar,

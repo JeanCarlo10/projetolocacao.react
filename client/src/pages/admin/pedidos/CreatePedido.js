@@ -74,6 +74,12 @@ export default function CreatePedido() {
     setProdutos([...produtos, produto]);
   } 
 
+  const handleDeleteProduto = (produto) => {
+    const newProducts = produtos.filter((item) => item.id !== produto);
+
+    setProdutos(newProducts);
+  } 
+
   const handleChangeAddress = (event) => {
     setEnderecoAtual(event.target.value);
   };
@@ -200,7 +206,7 @@ export default function CreatePedido() {
                 </div> : ""
               }
 
-            <ListaProdutos produtos={produtos} addProduto={handleAddProduto}/>
+            <ListaProdutos produtos={produtos} addProduto={handleAddProduto} deleteProduto={handleDeleteProduto} />
 
             <div className={classes.twoInputs}>
               <DatePicker

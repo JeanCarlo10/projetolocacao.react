@@ -35,7 +35,7 @@ import lottie from 'lottie-web';
 import { getStatusRent } from '../../../functions/static_data';
 import MenuAdmin from '../../../components/menu-admin';
 import api from '../../../services/api';
-
+import Swal from 'sweetalert2';
 
 const StyledTableRow = withStyles((theme) => ({
   root: {
@@ -52,11 +52,11 @@ export default function IndexPedido() {
 
   const [rents, setRents] = useState([]);
   const [filterRents, setFilterRents] = useState([]);
-  const [search, setSearch] = useState ("");
+  const [search, setSearch] = useState("");
 
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
-//   const [isOpenMenu, setIsOpenMenu] = useState(false);
+  //   const [isOpenMenu, setIsOpenMenu] = useState(false);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
@@ -82,16 +82,26 @@ export default function IndexPedido() {
     // setTimeout(() => loadRents(), 2000);
   }, []);
 
-  async function handleDelete(id) {
-    if (window.confirm("Deseja realmente excluir este pedido?")) {
-      var result = await api.delete('api/rents/' + id);
+  const handleDelete = (id) => {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Exclusão',
+      text: 'Deseja realmente excluir este pedido?',
+      showCloseButton: true,
+      confirmButtonText: 'Sim, excluir!',
+      confirmButtonColor: '#d33333',
+      showCancelButton: true,
+      cancelButtonText: 'Não',
+      reverseButtons: true,
+    }).then((result) => {
+      if (result.isConfirmed) {
+        api.delete('api/rents/' + id)
 
-      if (result.status = 200) {
-        window.location.href = '/admin/pedidos';
-      } else {
-        alert('Ocorreu um erro. Por favor, tente novamente')
+        if (result.status = 200) {
+          window.location.href = '/admin/pedidos';
+        }
       }
-    }
+    })
   }
 
   const handleDrawerFilter = () => {
@@ -107,18 +117,18 @@ export default function IndexPedido() {
     setPage(0);
   };
   //Filtrar Lista
-  const handleChangeSearch = ({target}) => {
+  const handleChangeSearch = ({ target }) => {
     setSearch(target.value);
     filter(target.value);
   }
 
   const filter = (endSearch) => {
     var resultSearch = filterRents.filter((result) => {
-      if (result.nmCliente.toString().toLowerCase().includes(endSearch.toLowerCase()) 
-      || result.nmRazaoSocial.toString().toLowerCase().includes(endSearch.toLowerCase())
-      || result.nrCPF.toString().toLowerCase().includes(endSearch.toLowerCase())
-      || result.nrCNPJ.toString().toLowerCase().includes(endSearch.toLowerCase())
-      ){
+      if (result.nmCliente.toString().toLowerCase().includes(endSearch.toLowerCase())
+        || result.nmRazaoSocial.toString().toLowerCase().includes(endSearch.toLowerCase())
+        || result.nrCPF.toString().toLowerCase().includes(endSearch.toLowerCase())
+        || result.nrCNPJ.toString().toLowerCase().includes(endSearch.toLowerCase())
+      ) {
         return result;
       }
     });
@@ -126,42 +136,42 @@ export default function IndexPedido() {
   }
   return (
     <div className={classes.root}>
-      <MenuAdmin/>
+      <MenuAdmin />
 
       <main className={classes.content}>
         <div className={classes.appBarSpacer} />
 
         <Container maxWidth="lg" className={classes.container}>
-        
+
           <CardHeader className={classes.cardHeader}
             title="Pedidos"
             subheader={
-            <Breadcrumbs style={{ fontSize: 14 }} separator="•" aria-label="breadcrumb">
-              <Link color="inherit" href={'/admin'} >
-                Painel
-              </Link>
-              <Typography color="textPrimary" style={{ fontSize: 14 }} >Lista de pedidos</Typography>
-            </Breadcrumbs>
+              <Breadcrumbs style={{ fontSize: 14 }} separator="•" aria-label="breadcrumb">
+                <Link color="inherit" href={'/admin'} >
+                  Painel
+                </Link>
+                <Typography color="textPrimary" style={{ fontSize: 14 }} >Lista de pedidos</Typography>
+              </Breadcrumbs>
             }
             action={
-              <div style={{ paddingTop: 10}}>
-                <Button 
+              <div style={{ paddingTop: 10 }}>
+                <Button
                   className={classes.btnDefaultGreen}
-                  variant="contained" 
+                  variant="contained"
                   size="medium"
-                  color='primary' 
-                  href={'/admin/pedidos/create'} 
-                  startIcon={<AddCircleRoundedIcon/>}>
-                    Cadastrar
+                  color='primary'
+                  href={'/admin/pedidos/create'}
+                  startIcon={<AddCircleRoundedIcon />}>
+                  Cadastrar
                 </Button>
-                
+
                 <Drawer anchor='right' open={open} onClose={() => setOpen(false)}>
-                  <div style={{ width: "350px"}}>
+                  <div style={{ width: "350px" }}>
                     <div className={classes.drawerFilter}>
                       <Avatar className={classes.avatarFilter}>
                         <FilterListRoundedIcon />
                       </Avatar>
-                      <h3  style={{ color: '#5C5C62', fontSize: 20}}>Filtros</h3>
+                      <h3 style={{ color: '#5C5C62', fontSize: 20 }}>Filtros</h3>
                     </div>
 
                     <div className={classes.drawerContent}>
@@ -178,72 +188,82 @@ export default function IndexPedido() {
                         />
                       </div>
                       <div className={classes.drawerFooter}>
-                      <Button variant="contained" color='default' startIcon={<SearchIcon />}>Buscar</Button>
+                        <Button variant="contained" color='default' startIcon={<SearchIcon />}>Buscar</Button>
                       </div>
                     </div>
                   </div>
-                  </Drawer>
-                </div>
+                </Drawer>
+              </div>
             }
           />
-          
-          {loading ? (<div style={{width: 300, margin: '0 auto'}} ref={container} />) : (
-          <Card style= {{ borderRadius: 15 }}>
-            <div className={classes.twoElements}>
-              <div className={classes.iconButton}>
-                <IconButton>
-                  <SearchIcon />
-                </IconButton>
-                <InputBase
-                  value={search}
-                  onChange={handleChangeSearch}
-                  placeholder="Buscar..."
-                />
+
+          {loading ? (<div style={{ width: 300, margin: '0 auto' }} ref={container} />) : (
+            <Card style={{ borderRadius: 15 }}>
+              <div className={classes.twoElements}>
+                <div className={classes.iconButton}>
+                  <IconButton>
+                    <SearchIcon />
+                  </IconButton>
+                  <InputBase
+                    value={search}
+                    onChange={handleChangeSearch}
+                    placeholder="Buscar..."
+                  />
+                </div>
+
+                <Tooltip title="Filtros">
+                  <IconButton size="large" onClick={handleDrawerFilter}>
+                    <FilterListRoundedIcon />
+                  </IconButton>
+                </Tooltip>
               </div>
 
-              <Tooltip title="Filtros">
-                <IconButton size="large" onClick={handleDrawerFilter}>
-                  <FilterListRoundedIcon />
-                </IconButton>
-              </Tooltip>
-            </div>
+              <TableContainer >
+                <Table className={classes.table} size="small">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell align="left">Status</TableCell>
+                      <TableCell align="left">Cliente</TableCell>
+                      <TableCell align="center">Data Pedido</TableCell>
+                      <TableCell align="center">Período</TableCell>
+                      <TableCell align="right">Ações</TableCell>
+                    </TableRow>
+                  </TableHead>
 
-          <TableContainer >
-            <Table className={classes.table} size="small">
-              <TableHead>
-                <TableRow>
-                  <TableCell>Status</TableCell>
-                  <TableCell>Cliente</TableCell>
-                  <TableCell align="center">Data Pedido</TableCell>
-                  <TableCell align="center">Período</TableCell>
-                  <TableCell align="right">Ações</TableCell>
-                </TableRow>
-              </TableHead>
-
-            <TableBody>
-              {rents.map((row) => (
-                <TableRow hover key={row._id}>
-                    <TableCell align="left"><Chip label={row.status}/></TableCell>
-                    <TableCell align="left">{row.nomeCliente}</TableCell>
-                    <TableCell align="center">{new Date(row.dataPedido).toLocaleDateString('pt-br')}</TableCell>
-                    <TableCell align="center">
-                     <p><EventAvailableRoundedIcon /> {new Date(row.dataEntrega).toLocaleDateString('pt-br')}</p>
-                     <p><EventBusyRoundedIcon /> {new Date(row.dataDevolucao).toLocaleDateString('pt-br')}</p>
-                    </TableCell>
-                    <TableCell component="th" scope="row" align="right">
-                      <IconButton onClick={() => handleDelete(row._id)}>
-                        <DeleteIcon />
-                      </IconButton>
-                      <IconButton href={'/admin/pedidos/edit/' + row._id}>
-                        <EditIcon />
-                      </IconButton>
-                    </TableCell>
-                </TableRow>
-              ))}
-              </TableBody>
-              </Table>
-            </TableContainer>
-            <TablePagination 
+                  <TableBody>
+                    {rents.map((row) => (
+                      <TableRow hover key={row._id}>
+                        <TableCell align="left"><Chip label={row.status} /></TableCell>
+                        <TableCell align="left">{row.nomeCliente}</TableCell>
+                        <TableCell align="center">{new Date(row.dataPedido).toLocaleDateString('pt-br')}</TableCell>
+                        <TableCell align="center">
+                          <p className={classes.textPeriodo}>
+                            <EventAvailableRoundedIcon />
+                            <div style={{ marginLeft: '5px' }}>
+                              {new Date(row.dataEntrega).toLocaleDateString('pt-br')}
+                            </div>
+                          </p>
+                          <p className={classes.textPeriodo}>
+                            <EventBusyRoundedIcon />
+                            <div style={{ marginLeft: '5px' }}>
+                              {new Date(row.dataDevolucao).toLocaleDateString('pt-br')}
+                            </div>
+                          </p>
+                        </TableCell>
+                        <TableCell component="th" scope="row" align="right">
+                          <IconButton onClick={() => handleDelete(row._id)}>
+                            <DeleteIcon />
+                          </IconButton>
+                          <IconButton href={'/admin/pedidos/edit/' + row._id}>
+                            <EditIcon />
+                          </IconButton>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+              <TablePagination
                 rowsPerPageOptions={[5, 10, 25]}
                 component="div"
                 count={rents.length}
@@ -252,9 +272,9 @@ export default function IndexPedido() {
                 onPageChange={handleChangePage}
                 onRowsPerPageChange={handleChangeRowsPerPage}
               />
-        </Card>
+            </Card>
           )}
-        </Container>     
+        </Container>
       </main>
     </div>
   );
@@ -265,25 +285,25 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
   },
   iconButton: {
-    borderRadius: 50, 
+    borderRadius: 50,
     borderColor: '#F4F4F4',
     borderStyle: 'solid'
   },
   drawerFilter: {
-    display: 'flex', 
-    padding: '15px', 
+    display: 'flex',
+    padding: '15px',
     alignItems: 'center',
-  }, 
+  },
   avatarFilter: {
     color: '#4DB4C6',
     backgroundColor: '#E7F7F9',
     marginRight: theme.spacing(2),
-  }, 
+  },
   drawerContent: {
-    display: 'flex', 
+    display: 'flex',
     flexDirection: 'column',
-    padding: '15px',    
-  }, 
+    padding: '15px',
+  },
   drawerTitle: {
     color: '#5C5C62',
     fontSize: 18
@@ -301,7 +321,11 @@ const useStyles = makeStyles((theme) => ({
     paddingTop: theme.spacing(4),
     paddingBottom: theme.spacing(4),
   },
-  
+  textPeriodo: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
   table: {
     minWidth: 750,
     '& .MuiTableCell-head': {
@@ -329,17 +353,17 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
     justifyContent: 'space-between',
     margin: theme.spacing(1),
-    
+
     '& .MuiTextField-root': {
       margin: theme.spacing(1),
     },
   },
-  cardHeader: {    
+  cardHeader: {
     "& .MuiCardHeader-title": {
       fontWeight: 700,
       color: '#212B36',
       marginBottom: theme.spacing(1),
     },
-},
+  },
   appBarSpacer: theme.mixins.toolbar,
 }));

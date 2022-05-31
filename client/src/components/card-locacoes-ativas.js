@@ -23,7 +23,7 @@ const RootStyle = styled(Card)(({ theme }) => ({
     justifyContent: 'flex-end',
   }));
   
-  const TOTAL = 30;
+  const TOTAL = 10;
   
   export default function CardLocacoesAtivas() {
     return (

@@ -25,6 +25,7 @@ export default function CreateMaterial() {
     const data = {
       nmMaterial: nmMaterial,
     }
+
     if (nmMaterial != '' ) {
       const response = await api.post('/api/materials', data);
 
@@ -67,7 +68,6 @@ export default function CreateMaterial() {
                   variant="outlined"
                   size="small"
                   label="Descrição"
-                  autoFocus
                   value={nmMaterial}
                   onChange={e => setNmMaterial(e.target.value)}
                 />

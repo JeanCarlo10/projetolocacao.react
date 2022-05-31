@@ -33,6 +33,7 @@ import lottie from 'lottie-web';
 import { getTypeClient } from '../../../functions/static_data';
 import MenuAdmin from '../../../components/menu-admin';
 import api from '../../../services/api';
+import Swal from 'sweetalert2';
 
 const StyledTableRow = withStyles((theme) => ({
   root: {
@@ -49,7 +50,7 @@ export default function IndexCliente() {
 
   const [clients, setClients] = useState([]);
   const [filterClients, setFilterClients] = useState([]);
-  const [search, setSearch] = useState ("");
+  const [search, setSearch] = useState("");
 
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
@@ -81,16 +82,26 @@ export default function IndexCliente() {
     // setTimeout(() => loadClients(), 2000);
   }, []);
 
-  async function handleDelete(id) {
-    if (window.confirm("Deseja realmente excluir este cliente?")) {
-      var result = await api.delete('api/clients/' + id);
+  const handleDelete = (id) => {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Exclusão',
+      text: 'Deseja realmente excluir este cliente?',
+      showCloseButton: true,
+      confirmButtonText: 'Sim, excluir!',
+      confirmButtonColor: '#d33333',
+      showCancelButton: true,
+      cancelButtonText: 'Não',
+      reverseButtons: true,
+    }).then((result) => {
+      if (result.isConfirmed) {
+        api.delete('api/clients/' + id)
 
-      if (result.status = 200) {
-        window.location.href = '/admin/clientes';
-      } else {
-        alert('Ocorreu um erro. Por favor, tente novamente')
+        if (result.status = 200) {
+          window.location.href = '/admin/clientes';
+        }
       }
-    }
+    })
   }
 
   const handleDrawerFilter = () => {
@@ -105,9 +116,9 @@ export default function IndexCliente() {
     setRowsPerPage(+event.target.value);
     setPage(0);
   };
-  
+
   //Filtrar Lista
-  const handleChangeSearch = ({target}) => {
+  const handleChangeSearch = ({ target }) => {
     setSearch(target.value);
     filter(target.value);
   }
@@ -115,10 +126,10 @@ export default function IndexCliente() {
   const filter = (endSearch) => {
     var resultSearch = filterClients.filter((result) => {
       if (result.nmCliente.toString().toLowerCase().includes(endSearch.toLowerCase())
-      || result.nmRazaoSocial.toString().toLowerCase().includes(endSearch.toLowerCase())
-      || result.nrCPF.toString().toLowerCase().includes(endSearch.toLowerCase())
-      || result.nrCNPJ.toString().toLowerCase().includes(endSearch.toLowerCase())
-      ){
+        || result.nmRazaoSocial.toString().toLowerCase().includes(endSearch.toLowerCase())
+        || result.nrCPF.toString().toLowerCase().includes(endSearch.toLowerCase())
+        || result.nrCNPJ.toString().toLowerCase().includes(endSearch.toLowerCase())
+      ) {
         return result;
       }
     });
@@ -127,42 +138,42 @@ export default function IndexCliente() {
 
   return (
     <div className={classes.root}>
-      <MenuAdmin/>
+      <MenuAdmin />
 
       <main className={classes.content}>
         <div className={classes.appBarSpacer} />
 
         <Container maxWidth="lg" className={classes.container}>
-        
+
           <CardHeader className={classes.cardHeader}
             title="Clientes"
             subheader={
-            <Breadcrumbs style={{ fontSize: 14 }} separator="•" aria-label="breadcrumb">
-              <Link color="inherit" href={'/admin'} >
-                Painel
-              </Link>
-              <Typography color="textPrimary" style={{ fontSize: 14 }} >Lista de clientes</Typography>
-            </Breadcrumbs>
+              <Breadcrumbs style={{ fontSize: 14 }} separator="•" aria-label="breadcrumb">
+                <Link color="inherit" href={'/admin'} >
+                  Painel
+                </Link>
+                <Typography color="textPrimary" style={{ fontSize: 14 }} >Lista de clientes</Typography>
+              </Breadcrumbs>
             }
             action={
-              <div style={{ paddingTop: 10}}>
-                <Button 
+              <div style={{ paddingTop: 10 }}>
+                <Button
                   className={classes.btnDefaultGreen}
-                  variant="contained" 
+                  variant="contained"
                   size="medium"
-                  color='primary' 
-                  href={'/admin/clientes/create'} 
-                  startIcon={<AddCircleRoundedIcon/>}>
-                    Cadastrar
+                  color='primary'
+                  href={'/admin/clientes/create'}
+                  startIcon={<AddCircleRoundedIcon />}>
+                  Cadastrar
                 </Button>
-                
+
                 <Drawer anchor='right' open={open} onClose={() => setOpen(false)}>
-                  <div style={{ width: "350px"}}>
+                  <div style={{ width: "350px" }}>
                     <div className={classes.drawerFilter}>
                       <Avatar className={classes.avatarFilter}>
                         <FilterListRoundedIcon />
                       </Avatar>
-                      <h3  style={{ color: '#5C5C62', fontSize: 20}}>Filtros</h3>
+                      <h3 style={{ color: '#5C5C62', fontSize: 20 }}>Filtros</h3>
                     </div>
 
                     <div className={classes.drawerContent}>
@@ -170,7 +181,7 @@ export default function IndexCliente() {
                         Buscar por nome
                       </div>
                       <Divider variant="fullWidth" />
-                      <div style={{ borderRadius: 10, borderColor: 'red', borderStyle: 'solid'}}>
+                      <div style={{ borderRadius: 10, borderColor: 'red', borderStyle: 'solid' }}>
                         <IconButton type="submit" className={classes.iconButton} aria-label="search">
                           <SearchIcon />
                         </IconButton>
@@ -179,19 +190,19 @@ export default function IndexCliente() {
                         />
                       </div>
                       <div className={classes.drawerFooter}>
-                      <Button variant="contained" color='default' startIcon={<SearchIcon />}>Buscar</Button>
+                        <Button variant="contained" color='default' startIcon={<SearchIcon />}>Buscar</Button>
                       </div>
                     </div>
                   </div>
-                  </Drawer>
-                </div>
+                </Drawer>
+              </div>
             }
           />
-          
-          {loading ? (<div style={{width: 300, margin: '0 auto'}} ref={container} />) : (
-          <Card style= {{ borderRadius: 15 }}>
-            <div className={classes.twoElements}>
-              <div className={classes.iconButton}>
+
+          {loading ? (<div style={{ width: 300, margin: '0 auto' }} ref={container} />) : (
+            <Card style={{ borderRadius: 15 }}>
+              <div className={classes.twoElements}>
+                <div className={classes.iconButton}>
                   <IconButton >
                     <SearchIcon />
                   </IconButton>
@@ -200,48 +211,48 @@ export default function IndexCliente() {
                     onChange={handleChangeSearch}
                     placeholder="Buscar..."
                   />
-              </div>
+                </div>
                 <Tooltip title="Filtros">
                   <IconButton size="large" onClick={handleDrawerFilter}>
                     <FilterListRoundedIcon />
                   </IconButton>
                 </Tooltip>
-            </div>
+              </div>
 
-          <TableContainer >
-            <Table className={classes.table} size="small">
-              <TableHead>
-                <TableRow>
-                  <TableCell>Tipo</TableCell>
-                  <TableCell>Nome/Razão social</TableCell>
-                  <TableCell>CPF/CNPJ</TableCell>
-                  <TableCell>Endereço</TableCell>
-                  <TableCell align="right">Ações</TableCell>
-                </TableRow>
-              </TableHead>
+              <TableContainer >
+                <Table className={classes.table} size="small">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Tipo</TableCell>
+                      <TableCell>Nome/Razão social</TableCell>
+                      <TableCell>CPF/CNPJ</TableCell>
+                      <TableCell>Endereço</TableCell>
+                      <TableCell align="right">Ações</TableCell>
+                    </TableRow>
+                  </TableHead>
 
-              <TableBody>
-                {clients.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
-                  <TableRow hover key={row._id}>
-                      <TableCell align="left"><Chip label={getTypeClient(row.flTipo)}/></TableCell>
-                      <TableCell> {row.flTipo == 1 ? row.nmCliente : row.nmRazaoSocial}</TableCell> 
-                      <TableCell>{row.flTipo == 1 ? row.nrCPF : row.nrCNPJ}</TableCell>
-                      <TableCell>{row.logradouro == null || undefined ?  " " : row.logradouro + ", " + row.numero + " - " + row.bairro}</TableCell>
-                      <TableCell component="th" scope="row" align="right">
-                        {/* <IconButton onClick={() => setIsOpenMenu(true) }>
+                  <TableBody>
+                    {clients.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
+                      <TableRow hover key={row._id}>
+                        <TableCell align="left"><Chip label={getTypeClient(row.flTipo)} /></TableCell>
+                        <TableCell> {row.flTipo == 1 ? row.nmCliente : row.nmRazaoSocial}</TableCell>
+                        <TableCell>{row.flTipo == 1 ? row.nrCPF : row.nrCNPJ}</TableCell>
+                        <TableCell>{row.logradouro == null || undefined ? " " : row.logradouro + ", " + row.numero + " - " + row.bairro}</TableCell>
+                        <TableCell component="th" scope="row" align="right">
+                          {/* <IconButton onClick={() => setIsOpenMenu(true) }>
                             <MoreVertIcon 
                               className={classes.buttonTable}
                             />
                         </IconButton> */}
-                        <IconButton onClick={() => handleDelete(row._id)}>
-                          <DeleteIcon />
-                        </IconButton>
-                        <IconButton href={'/admin/clientes/edit/' + row._id}>
-                          <EditIcon />
-                        </IconButton>
-                      </TableCell>
+                          <IconButton onClick={() => handleDelete(row._id)}>
+                            <DeleteIcon />
+                          </IconButton>
+                          <IconButton href={'/admin/clientes/edit/' + row._id}>
+                            <EditIcon />
+                          </IconButton>
+                        </TableCell>
 
-                      {/* <Menu
+                        {/* <Menu
                             open={isOpenMenu}
                             anchorEl={ref.current}
                             onClose={() => setIsOpenMenu(false)}
@@ -269,12 +280,12 @@ export default function IndexCliente() {
                               <ListItemText primary="Editar" />
                             </MenuItem>
                           </Menu> */}
-                  </TableRow>
-                ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-            <TablePagination 
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+              <TablePagination
                 rowsPerPageOptions={[5, 10, 25]}
                 component="div"
                 count={clients.length}
@@ -282,10 +293,10 @@ export default function IndexCliente() {
                 page={page}
                 onPageChange={handleChangePage}
                 onRowsPerPageChange={handleChangeRowsPerPage}
-            />
-        </Card>
+              />
+            </Card>
           )}
-        </Container>     
+        </Container>
       </main>
     </div>
   );
@@ -296,25 +307,25 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
   },
   iconButton: {
-    borderRadius: 50, 
+    borderRadius: 50,
     borderColor: '#F4F4F4',
     borderStyle: 'solid'
   },
   drawerFilter: {
-    display: 'flex', 
-    padding: '15px', 
+    display: 'flex',
+    padding: '15px',
     alignItems: 'center',
-  }, 
+  },
   avatarFilter: {
     color: '#4DB4C6',
     backgroundColor: '#E7F7F9',
     marginRight: theme.spacing(2),
-  }, 
+  },
   drawerContent: {
-    display: 'flex', 
+    display: 'flex',
     flexDirection: 'column',
-    padding: '15px',    
-  }, 
+    padding: '15px',
+  },
   drawerTitle: {
     color: '#5C5C62',
     fontSize: 18
@@ -332,7 +343,7 @@ const useStyles = makeStyles((theme) => ({
     paddingTop: theme.spacing(4),
     paddingBottom: theme.spacing(4),
   },
-  
+
   table: {
     minWidth: 750,
     '& .MuiTableCell-head': {
@@ -360,17 +371,17 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
     justifyContent: 'space-between',
     margin: theme.spacing(1),
-    
+
     '& .MuiTextField-root': {
       margin: theme.spacing(1),
     },
   },
-  cardHeader: {    
+  cardHeader: {
     "& .MuiCardHeader-title": {
       fontWeight: 700,
       color: '#212B36',
       marginBottom: theme.spacing(1),
     },
-},
+  },
   appBarSpacer: theme.mixins.toolbar,
 }));

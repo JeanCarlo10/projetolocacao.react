@@ -8,6 +8,8 @@ const routes = require('./src/routes');
 const app = express();
 const port = process.env.PORT || 5000;
 
+// app.use('./client/public/images', express.static('./client/public/images'));
+
 mongoose.connect('mongodb://localhost:27017/LocacaoDB',{
     useUnifiedTopology: true,
     useNewUrlParser: true,

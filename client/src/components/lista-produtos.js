@@ -32,7 +32,7 @@ export default function ListaProdutos(props) {
         },
     }))(TableRow);
     
-    const {produtos, addProduto} = props;
+    const {produtos, addProduto, deleteProduto } = props;
 
     const [selectMaterials, setSelectMaterials] = useState([]);
     const [materialId, setMaterialId] = useState('');
@@ -63,7 +63,7 @@ export default function ListaProdutos(props) {
 
     const handleAddProduct = () => {
         addProduto({
-            _id: new Date().getTime(),
+            id: new Date().getTime(),
             metro: metro,
             qtde: qtde,
             valorItem: valorItem,
@@ -83,7 +83,7 @@ export default function ListaProdutos(props) {
     // const handleDateDevolucaoChange = (date) => {
     //   setDevolucao(date)
     // }
-    
+
     return (
         <Box sx={{
               marginTop: '10px',
@@ -183,12 +183,12 @@ export default function ListaProdutos(props) {
 
                 <TableBody>
                   {produtos.map((prod) => ( 
-                    <TableRow hover key={prod._id}>
+                    <TableRow hover key={prod.id}>
                         <TableCell align="left">{prod.nmMaterial}</TableCell>
                         <TableCell align="center">{prod.nmMaterial == "Andaime" ? prod.metro : prod.qtde }</TableCell>
                         <TableCell align="right">{prod.valorItem}</TableCell>
                         <TableCell component="th" scope="row" align="right">
-                          <IconButton>
+                          <IconButton onClick={() => deleteProduto(prod.id)}>
                               <DeleteIcon />
                           </IconButton>
                         </TableCell>

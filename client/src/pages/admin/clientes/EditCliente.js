@@ -254,7 +254,7 @@ export default function EditCliente() {
                                 onChange={e => setEmail(e.target.value)}
                             />
 
-                            <BuscarCEP getDados={dadosEndereco} onUpdate={handleSearchCEP} /> 
+                            <BuscarCEP onUpdate={handleSearchCEP}/> 
                             <ListaContatos contatos={contatos} addContato={handleAddContato}  /> 
 
                         </CardContent>

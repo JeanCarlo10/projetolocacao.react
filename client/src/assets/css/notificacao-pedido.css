@@ -1,0 +1,90 @@
+.card-info {
+    border-radius: 15px !important;
+    margin-bottom: 10px;
+}
+
+.title {
+    font-family: 'Public Sans';
+}
+
+.subTitleAddress {
+    font-family: 'Public Sans';
+}
+
+/* .animation {
+    animation: pulse 5s infinite;
+    background: #fec6cf !important;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    70% {
+        transform: scale(0.98);
+    }
+    100% {
+        transform: scale(1);
+    }
+} */
+
+.title {
+    font-size: 18px;
+    font-weight: bold;
+    color:#2d2a26;
+    text-transform: uppercase;
+}
+
+.subTitle-Address {
+    font-size: 14px;
+    font-weight: 400;
+    color:#666;
+}
+
+.info p{
+    font-size: 14px;
+    font-weight: bold;
+    color: #2d2a26;
+}
+
+.status p{
+    font-size: 14px;
+    font-weight: 400;
+    color:#666;
+}
+
+.status-pendente{
+    font-size: 18px;
+    font-weight: 600;
+    color: #FF6700;
+}
+
+.status-cancelado{
+    font-size: 18px;
+    font-weight: 600;
+    color: #e71a3b;
+}
+
+.status-entregue{
+    font-size: 18px;
+    font-weight: 600;
+    color:#1c7e2e;
+}
+
+.status-devolvido{
+    font-size: 18px;
+    font-weight: 600;
+    color: #0033c6;
+}
+
+.info-content p{
+    font-size: 18px;
+    font-weight: bold;
+    color: #2d2a26;
+}
+
+.btn-arrow {
+    background-color: #00AB55;
+    color: #06e877;
+    border-radius: 5px;
+}

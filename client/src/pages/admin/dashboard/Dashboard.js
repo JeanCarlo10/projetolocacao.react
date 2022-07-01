@@ -2,25 +2,25 @@ import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import Grid from '@mui/material/Grid';
-import { styled } from '@mui/material/styles';
 import MenuAdmin from '../../../components/menu-admin';
 import CardLocacoesAtivas from '../../../components/card-locacoes-ativas';
 import CardAcoesPendentes from '../../../components/card-acoes-pendentes';
 import CardRetiradas from '../../../components/card-retiradas';
-import { IconButton } from '@mui/material';
-import api from '../../../services/api';
 import NotificacaoPedido from '../../../components/notificacao-pedido';
-import { getCurrentMonth } from '../../../helpers/dateFilter';
 import FilterDashboard from '../../../components/filter-dashboard';
 import FilterStatus from '../../../components/filter-status';
+import CardDashboard from '../../../components/card-dashboard';
+import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNoneOutlined';
+import EmojiFlagsOutlinedIcon from '@mui/icons-material/EmojiFlagsOutlined';
+import GppMaybeOutlinedIcon from '@mui/icons-material/GppMaybeOutlined';
+import api from '../../../services/api';
 
 export default function Dashboard() {
   const classes = useStyles();
 
-  const [expanded, setExpanded] = useState(false);
   const [listaPedidos, setListaPedidos] = useState([]);
   const [filteredList, setFilteredList] = useState([]);
-  const [currentMonth, setCurrentMonth] = useState(getCurrentMonth());
+  const [currentMonth, setCurrentMonth] = useState(new Date());
 
   const [status, setStatus] = useState([
     {
@@ -45,16 +45,8 @@ export default function Dashboard() {
     },
   ]);
 
-  useEffect(() => {
-
-  }, [listaPedidos, currentMonth]);
-
   const handleMonthChange = (newMonth) => {
     setCurrentMonth(newMonth);
-  };
-
-  const handleExpandClick = () => {
-    setExpanded(!expanded);
   };
 
   const handleChangeChecked = (id) => {
@@ -63,7 +55,6 @@ export default function Dashboard() {
       item.id === id ? { ...item, checked: !item.checked } : item
     );
     setStatus(changeCheckedStatus);
-    console.log(setStatus);
   };
 
   const applyFilters = () => {
@@ -85,45 +76,14 @@ export default function Dashboard() {
     applyFilters();
   }, [status]);
 
-  const ExpandMore = styled((props) => {
-    const { expand, ...other } = props;
-    return <IconButton {...other} />;
-  })(({ theme, expand }) => ({
-    transform: !expand ? 'rotate(0deg)' : 'rotate(180deg)',
-    marginLeft: 'auto',
-    transition: theme.transitions.create('transform', {
-      duration: theme.transitions.duration.shortest,
-    }),
-  }));
-
-  function stringToColor(string) {
-    let hash = 0;
-    let i;
-
-    /* eslint-disable no-bitwise */
-    for (i = 0; i < string.length; i += 1) {
-      hash = string.charCodeAt(i) + ((hash << 5) - hash);
+  useEffect(() => {
+    async function getDadosPedido() {
+      const results = await api.get(`http://localhost:5000/api/rents/status`);
+      setListaPedidos(results.data);
     }
 
-    let color = '#';
-
-    for (i = 0; i < 3; i += 1) {
-      const value = (hash >> (i * 8)) & 0xff;
-      color += `00${value.toString(16)}`.substr(-2);
-    }
-    /* eslint-enable no-bitwise */
-
-    return color;
-  }
-
-  function stringAvatar(name) {
-    return {
-      sx: {
-        bgcolor: stringToColor(name),
-      },
-      children: `${name.split(' ')[0][0]}`,
-    };
-  }
+    getDadosPedido();
+  }, []);
 
   return (
     <div className={classes.root}>
@@ -135,13 +95,32 @@ export default function Dashboard() {
 
           <Grid container spacing={3} marginBottom={4}>
             <Grid item xs={12} sm={6} md={4}>
-              <CardLocacoesAtivas />
+              <CardDashboard
+                className="locacao-ativas"
+                number={listaPedidos.totalEntregues}
+                text="Locações ativas"
+                icon={<EmojiFlagsOutlinedIcon className="size-icon" />}
+                color={"#00ab55"}
+              />
             </Grid>
             <Grid item xs={12} sm={6} md={4}>
-              <CardAcoesPendentes />
+              <CardDashboard
+                className="locacoes-pendentes"
+                number={listaPedidos.totalPendentes}
+                text="Locações pendentes"
+                icon={<NotificationsNoneOutlinedIcon className="size-icon" />}
+                color={"#FF6700"}
+              />
             </Grid>
             <Grid item xs={12} sm={6} md={4}>
-              <CardRetiradas />
+              <CardDashboard
+              className="locacoes-nao-devolvidas"
+                number={listaPedidos.totalNaoDevolvido}
+                text="Locações não retiradas"
+                icon={<GppMaybeOutlinedIcon className="size-icon" />}
+                color={"#FF5252"}
+              />
+
             </Grid>
           </Grid>
 
@@ -149,10 +128,8 @@ export default function Dashboard() {
             currentMonth={currentMonth}
             onMonthChange={handleMonthChange}
           />
-          
-          <NotificacaoPedido
-            
-          />
+
+          <NotificacaoPedido currentMonth={currentMonth} />
         </Container>
       </main>
     </div>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
@@ -19,40 +19,44 @@ import { getToken, logout } from '../services/auth';
 
 export const mainListItems = (
   <div>
-    <ListItem >
-      <Button 
-        style={{ background: '#00AB55', color: '#FFF', borderRadius: 10, border: 'none', textTransform: 'none', boxShadow: 'none' }}
-        variant="contained" 
-        size="large"
-        fullWidth
-        href={'/admin/pedidos/create'} 
-        startIcon={<AddCircleRoundedIcon/>}>
-          Novo pedido
-      </Button>
+    <ListItem>
+        <Button 
+          style={{ background: '#00AB55', color: '#FFF', borderRadius: 10, border: 'none', textTransform: 'none', boxShadow: 'none' }}
+          variant="contained" 
+          size="large"
+          fullWidth
+          href={'/admin/pedidos/create'} 
+          startIcon={<AddCircleRoundedIcon/>}>
+            Novo pedido
+        </Button>
+
+      {/* <div className='makeStyles-drawerPaperClose'>
+        <AddCircleRoundedIcon />
+      </div> */}
     </ListItem>
     <ListItem button component="a" href="/admin">
       <ListItemIcon style={{ color: "#7F8F97" }}>
         <HouseIcon />
       </ListItemIcon>
-      <ListItemText style={{ color: "#7F8F97" }} primary="Painel"/>
+      <ListItemText style={{ color: "#7F8F97" }} primary="Painel" />
     </ListItem>
     <ListItem button component="a" href="/admin/clientes">
       <ListItemIcon style={{ color: "#7F8F97" }}>
         <PeopleIcon />
       </ListItemIcon>
-      <ListItemText style={{ color: "#7F8F97" }} primary="Clientes"/>
+      <ListItemText style={{ color: "#7F8F97" }} primary="Clientes" />
     </ListItem>
     <ListItem button component="a" href="/admin/materiais">
       <ListItemIcon style={{ color: "#7F8F97" }}>
         <BuildIcon />
       </ListItemIcon>
-      <ListItemText style={{ color: "#7F8F97" }} primary="Materiais"/>
+      <ListItemText style={{ color: "#7F8F97" }} primary="Materiais" />
     </ListItem>
     <ListItem button component="a" href="/admin/pedidos">
       <ListItemIcon style={{ color: "#7F8F97" }}>
         <ShoppingCartIcon />
       </ListItemIcon>
-      <ListItemText style={{ color: "#7F8F97" }} primary="Pedidos"/>
+      <ListItemText style={{ color: "#7F8F97" }} primary="Pedidos" />
     </ListItem>
   </div>
 );
@@ -65,7 +69,7 @@ export const secondaryListItems = (
       <ListItemIcon style={{ color: "#7F8F97" }}>
         <PersonAddIcon />
       </ListItemIcon>
-      <ListItemText style={{ color: "#7F8F97" }} primary="Usuários"/>
+      <ListItemText style={{ color: "#7F8F97" }} primary="Usuários" />
     </ListItem>
     <ListItem button onClick={confirmSair}>
       <ListItemIcon style={{ color: "#7F8F97" }}>
@@ -77,13 +81,13 @@ export const secondaryListItems = (
 );
 
 async function confirmSair() {
-  if (window.confirm("Deseja realmente sair do sistema?")){
-    const response = await api.get("/api/users/destroytoken", {headers: {token: getToken()}} );
+  if (window.confirm("Deseja realmente sair do sistema?")) {
+    const response = await api.get("/api/users/destroytoken", { headers: { token: getToken() } });
 
-    if (response.status == 200){
+    if (response.status == 200) {
       logout();
       window.location.href = '/admin/login'
-    }else{
+    } else {
       alert("Não foi possível fazer o logout!");
     }
   }

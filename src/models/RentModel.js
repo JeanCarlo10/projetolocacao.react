@@ -1,27 +1,32 @@
 const mongoose = require('mongoose');
 const DataSchema = new mongoose.Schema({
-    idRent: Number,
-    status: {type: String, default: 'Pendente'}, //Pendente, Entregue, Devolvido, Atrasado ou Cancelado
+    status: { type: String, default: 'Pendente' }, //Pendente, Entregue, Devolvido, Não Devolvido ou Cancelado
     dataPedido: { type: Date, default: Date.now },
     dataEntrega: { type: Date },
     dataDevolucao: { type: Date },
+    totalParcial: Number,
     totalGeral: Number,
+    desconto: Number,
     observacao: String,
+    numeroPedido: Number,
 
-    //DADOS CEP
-    nrEndereco: String,
-    dsComplemento: String,
-    dsLogradouro: String,
-    dsBairro: String,
-    dsCidade: String,
-    dsUF: String,
-    nrCEP: String,
-    //DADOS CEP
+    idCliente: { type: mongoose.Schema.ObjectId },
+    nomeCliente: { type: String },
+    tipoEndereco: { type: String },
+    
+    //DADOS NOVO ENDEREÇO
+    numero: String,
+    complemento: String,
+    logradouro: String,
+    bairro: String,
+    cidade: String,
+    uf: String,
+    cep: String,
+    //DADOS NOVO ENDEREÇO
 
-    nomeCliente: { type: String},
     //Pedidos do cliente
-    products: { type: Array, "default":[] } 
-},{
+    products: { type: Array, "default": [] }
+}, {
     timestamps: true
 });
 

@@ -141,7 +141,7 @@ export default function IndexMaterial() {
             title="Materiais"
             subheader={
               <Breadcrumbs style={{ fontSize: 14 }} separator="•" aria-label="breadcrumb">
-                <Link color="inherit" href={'/admin'} >
+                <Link color="inherit" href={'/admin/materiais'} >
                   Painel
                 </Link>
                 <Typography color="textPrimary" style={{ fontSize: 14 }}>Lista de materiais</Typography>
@@ -224,7 +224,7 @@ export default function IndexMaterial() {
                   <TableBody>
                     {materials.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
                       <TableRow hover key={row._id}>
-                        <TableCell>{row.nmMaterial}</TableCell>
+                        <TableCell>{row.nomeMaterial}</TableCell>
                         <TableCell component="th" scope="row" align="right">
                           {/* <IconButton onClick={() => setIsOpenMenu(true)}>
                         <MoreVertIcon

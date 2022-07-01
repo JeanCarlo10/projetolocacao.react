@@ -43,16 +43,16 @@ export default function MenuAdmin(props) {
     <>
       <CssBaseline />
       <AppBar position="absolute" className={clsx(classes.appBar, open && classes.appBarShift)}>
-      
+
         <Toolbar className={classes.toolbar}>
-          <IconButton style={{ color: '#00AB55'}}
+          <IconButton style={{ color: '#00AB55' }}
             edge="start"
             onClick={handleDrawerOpen}
             className={clsx(classes.menuButton, open && classes.menuButtonHidden)}
           >
             <MenuIcon />
           </IconButton>
-          
+
           {/* <div className={classes.search}>
             <div className={classes.searchIcon}>
               <SearchIcon />
@@ -68,13 +68,13 @@ export default function MenuAdmin(props) {
           </div> */}
 
           {/* Nome do usuário logado que está vindo do Auth */}
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-              <Avatar aria-label="Avatar" src={require('../assets/avatar_10.jpg')} />
-              <div style={{ color: '#00AB55', fontWeight: 'bold', marginLeft: 5 }}> 
-                {getNameUser()}
-              </div>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <Avatar aria-label="Avatar" src={require('../assets/avatar_10.jpg')} />
+            <div style={{ color: '#00AB55', fontWeight: 'bold', marginLeft: 5 }}>
+              {getNameUser()}
+            </div>
           </div>
-          
+
         </Toolbar>
       </AppBar>
       <Drawer
@@ -84,7 +84,7 @@ export default function MenuAdmin(props) {
         }}
         open={open}>
         <div className={classes.toolbarIcon}>
-          <img src={require('../assets/logo.svg')} style={{marginRight: 130 }} width={40} height={40}/>
+          <img src={require('../assets/logo.svg')} style={{ marginRight: 130 }} width={40} height={40} />
           <IconButton onClick={handleDrawerClose}>
             <ChevronLeftIcon />
           </IconButton>
@@ -110,7 +110,7 @@ const useStyles = makeStyles((theme) => ({
   },
   toolbarIcon: {
     display: 'flex',
-    backgroundColor: '#FFF',    
+    backgroundColor: '#FFF',
     alignItems: 'center',
     justifyContent: 'flex-end',
     padding: '0 8px',
@@ -136,11 +136,11 @@ const useStyles = makeStyles((theme) => ({
     marginRight: theme.spacing(2),
     color: "#dedede",
   },
-  
+
   menuButtonHidden: {
     display: 'none'
   },
-  
+
   title: {
     flexGrow: 1,
   },
@@ -193,12 +193,12 @@ const useStyles = makeStyles((theme) => ({
     borderColor: '#dedede',
     "& .MuiListItem-button": {
       color: "#00ab55",
-      
+
     },
     "& .MuiListItem-button:hover": {
-      
+
       backgroundColor: "#00ab5514",
-      
+
     },
     width: drawerWidth,
     transition: theme.transitions.create('width', {

@@ -11,7 +11,8 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Tooltip from '@material-ui/core/Tooltip';
 import Button from '@material-ui/core/Button';
-import Chip from '@material-ui/core/Chip';
+import Chip from '@mui/material/Chip';
+import Stack from '@mui/material/Stack';
 import Card from '@material-ui/core/Card';
 import Breadcrumbs from '@material-ui/core/Breadcrumbs';
 import Link from '@material-ui/core/Link';
@@ -28,6 +29,8 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import SearchIcon from '@material-ui/icons/Search';
 import AddCircleRoundedIcon from '@material-ui/icons/AddCircleRounded';
 import FilterListRoundedIcon from '@material-ui/icons/FilterListRounded';
+import PhoneIcon from '@mui/icons-material/Phone';
+import PhoneAndroidIcon from '@mui/icons-material/PhoneAndroid';
 
 import lottie from 'lottie-web';
 import MenuAdmin from '../../../components/menu-admin';
@@ -47,7 +50,7 @@ export default function IndexCliente() {
   const container = useRef(null);
   const ref = useRef(null);
 
-  const tipoPessoaMap = {'Fisica': 'Física', 'Juridica': 'Jurídica'};
+  const tipoPessoaMap = { 'Fisica': 'Física', 'Juridica': 'Jurídica' };
   const [clients, setClients] = useState([]);
   const [filterClients, setFilterClients] = useState([]);
   const [search, setSearch] = useState("");
@@ -235,7 +238,14 @@ export default function IndexCliente() {
                     {clients.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
                       <TableRow hover key={row._id}>
                         <TableCell align="left"><Chip label={tipoPessoaMap[(row.tipoPessoa)]} /></TableCell>
-                        <TableCell> {row.tipoPessoa == 'Fisica' ? row.nomeCliente : row.razaoSocial}</TableCell>
+                        <TableCell>
+                          {row.tipoPessoa == 'Fisica' ? row.nomeCliente : row.razaoSocial}
+                          {row.contacts.map((item) => (
+                            <Stack direction="row" mb={0.5}>
+                              <Chip icon={item.tipoTelefone == "Celular" ? <PhoneAndroidIcon /> : <PhoneIcon />} label={item.numero } />
+                            </Stack>                              
+                          ))}
+                        </TableCell>
                         <TableCell>{row.tipoPessoa == 'Fisica' ? row.cpf : row.cnpj}</TableCell>
                         <TableCell>{row.logradouro == null || undefined ? " " : row.logradouro + ", " + row.numero + " - " + row.bairro}</TableCell>
                         <TableCell component="th" scope="row" align="right">

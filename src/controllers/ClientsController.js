@@ -39,7 +39,7 @@ module.exports = {
             const model  = req.body
 
             const client = await Client.create(model);
-
+            
             await client.save();
 
             return res.send({ client });

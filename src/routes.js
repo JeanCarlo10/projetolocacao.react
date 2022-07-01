@@ -34,9 +34,11 @@ routes.put('/api/materials', Material.update);
 //Rotas de Pedidos
 routes.post('/api/rents', Rent.create);
 routes.get('/api/rents', Rent.index);
+routes.get('/api/rents/search', Rent.search);
 routes.get('/api/rents.details/:_id', Rent.details);
 routes.delete('/api/rents/:_id', Rent.delete);
 routes.put('/api/rents', Rent.update);
-
+routes.get('/api/rents/status', Rent.status);
+routes.post('/api/rents/change-status', Rent.changeStatus);
 
 module.exports = routes;

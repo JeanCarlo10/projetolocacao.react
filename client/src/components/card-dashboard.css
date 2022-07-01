@@ -1,0 +1,34 @@
+.card-container {
+    justify-content: space-between;
+    flex-direction: row;
+    display: flex;
+    padding: 10px;
+    border-radius: 15px !important;
+    background: #FFF;
+    box-shadow: '2px 2px 6px #8888';
+}
+
+.locacao-ativas {
+    border-left-style: solid;
+    border-left-width: 10px;
+    color: #00AB55;
+    border-left-color: #00AB55;
+}
+
+.locacoes-pendentes {
+    border-left-style: solid;
+    border-left-width: 10px;
+    color: #FF6700 !important;
+    border-left-color: #FF6700 !important;
+}
+
+.locacoes-nao-devolvidas {
+    border-left-style: solid;
+    border-left-width: 10px;
+    color: #FF5252;
+    border-left-color: #FF5252;
+}
+
+.size-icon {
+    font-size: 50px !important;
+}

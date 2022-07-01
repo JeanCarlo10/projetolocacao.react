@@ -35,8 +35,10 @@ export default function EditCliente() {
     const [cnpj, setCnpj] = useState('');
     const [nascimento, setNascimento] = useState('');
     const [email, setEmail] = useState('');
+
     const [dadosEndereco, setDadosEndereco] = useState({});
     const [contatos, setContatos] = useState([]);
+
     const { idCliente } = useParams();
 
     useEffect(() => {
@@ -54,6 +56,9 @@ export default function EditCliente() {
             setNascimento(response.data.dataNascimento);
             setEmail(response.data.email);
             setContatos(response.data.contacts);
+
+            setDadosEndereco(response.data);
+            console.log(response.data.bairro);
         }
         getCliente();
     }, [])

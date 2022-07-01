@@ -6,37 +6,45 @@ module.exports = {
 
         res.json(material);
     },
-    async create(req, res){
-        const {nmMaterial} = req.body;
 
-        let data = {};
-        let material = await Material.findOne({nmMaterial});
+    //ADD MATERIAL
+    async create(req, res) { 
+        try {
+            const model  = req.body
 
-        if(!material){
-            data = {nmMaterial};
+            const material = await Material.create(model);
 
-            material = await Material.create(data);
-            return res.status(200).json(material);
-        }else{
-            return res.status(500).json(material);
+            await material.save();
+
+            return res.send({ material });
+
+        } catch (err){
+            return res.status(500).send({
+                 error: 'Por favor, contate o administrador! Erro ao cadastrar o material'
+            })
         }
     },
+    
+    //GET MATERIALS
     async details(req, res){
         const {_id} = req.params;
+
         const material = await Material.findOne({_id});
         res.json(material);
     },
+
+    //DELETE MATERIAL
     async delete(req, res){
         const { _id } = req.params;
         const material = await Material.findByIdAndDelete({_id});
         return res.json(material);
     },
+
+    //UPDATE MATERIAL
     async update(req, res){
-        const {_id, nmMaterial} = req.body;
+        const model = req.body;
 
-        const data = {nmMaterial};
-
-        const material = await Material.findOneAndUpdate({_id}, data, {new:true});
+        const material = await Material.findOneAndUpdate({_id: model._id}, model, {new:true});
 
         return res.json(material);
     }

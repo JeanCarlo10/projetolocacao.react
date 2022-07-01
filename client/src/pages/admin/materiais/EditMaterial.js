@@ -20,31 +20,30 @@ import api from '../../../services/api';
 export default function EditMaterial() {
     const classes = useStyles();
 
-    const [nmMaterial, setNmMaterial] = useState('');
-
+    const [nomeMaterial, setNomeMaterial] = useState('');
     const { idMaterial } = useParams();
 
     useEffect(() => {
         async function getMaterial() {
             var response = await api.get('/api/materials.details/' + idMaterial);
 
-            setNmMaterial(response.data.nmMaterial);
+            setNomeMaterial(response.data.nomeMaterial);
         }
 
         getMaterial();
     }, []);
 
     function handleClear() {
-        setNmMaterial('');
+        setNomeMaterial('');
     }
 
     async function handleSubmit() {
         const data = {
-            nmMaterial: nmMaterial,
+            nomeMaterial: nomeMaterial,
             _id: idMaterial
         }
 
-        if (nmMaterial != '') {
+        if (nomeMaterial != '') {
             const response = await api.put('/api/materials', data);
 
             if (response.status == 200) {
@@ -88,8 +87,8 @@ export default function EditMaterial() {
                                 variant="outlined"
                                 size="small"
                                 label="Descrição"
-                                value={nmMaterial}
-                                onChange={e => setNmMaterial(e.target.value)}
+                                value={nomeMaterial}
+                                onChange={e => setNomeMaterial(e.target.value)}
                             />
                         </CardContent>
                         <CardActions style={{ justifyContent: 'flex-end', marginRight: 15 }}>

@@ -24,24 +24,20 @@ const RootStyle = styled(Card)(({ theme }) => ({
 
 export default function FilterDashboard(props) {
   const classes = useStyles();
-  const { currentMonth, onMonthChange, status, changeChecked } = props;
-
-  // const { checked, label, id } = status;
+  const { currentMonth, onMonthChange } = props;
 
   const handlePrevMonth = () => {
-    let [year, month] = currentMonth.split('-');
-    let currentDate = new Date(parseInt(year), parseInt(month) - 1, 1);
-    currentDate.setMonth(currentDate.getMonth() - 1);
+    var newCurrentMonth = new Date(currentMonth.valueOf());
+    newCurrentMonth.setMonth(newCurrentMonth.getMonth() - 1);
 
-    onMonthChange(`${currentDate.getFullYear()}-${currentDate.getMonth() + 1}`);
+    onMonthChange(newCurrentMonth);
   }
 
   const handleNextMonth = () => {
-    let [year, month] = currentMonth.split('-');
-    let currentDate = new Date(parseInt(year), parseInt(month) - 1, 1);
-    currentDate.setMonth(currentDate.getMonth() + 1);
+    var newCurrentMonth = new Date(currentMonth.valueOf());
+    newCurrentMonth.setMonth(newCurrentMonth.getMonth() + 1);
 
-    onMonthChange(`${currentDate.getFullYear()}-${currentDate.getMonth() + 1}`);
+    onMonthChange(newCurrentMonth);
   }
 
   return (
@@ -55,7 +51,7 @@ export default function FilterDashboard(props) {
               </IconButton>
             </Tooltip>
 
-            <div style={{ fontWeight: 'bold', color: '#2d2a26', fontSize: 20, }}>
+            <div style={{ fontWeight: 'bold', color: '#2d2a26', fontSize: 20 }}>
               {formatCurrentMonth(currentMonth)}
             </div>
             <Tooltip title="Próximo">
@@ -64,6 +60,10 @@ export default function FilterDashboard(props) {
               </IconButton>
             </Tooltip>
           </div>
+        </Grid>
+
+        <Grid item xs={12} sm={6} md={4}>
+          
         </Grid>
 
         {/* <Grid item xs={12} sm={6} md={8}>

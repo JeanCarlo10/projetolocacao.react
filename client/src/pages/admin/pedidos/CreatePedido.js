@@ -27,15 +27,19 @@ import { DatePicker } from '@material-ui/pickers';
 import '../../../assets/css/card-location.css';
 
 export default function CreatePedido() {
-  const classes = useStyles(); 
+  const classes = useStyles();
 
+  const [numeroPedido, setNumeroPedido] = useState();
   const [status, setStatus] = useState('Pendente');
   const [enderecoAtual, setEnderecoAtual] = useState('atual');
-  const [totalGeral, setTotalGeral] = useState(0);
+  const [totalParcial, setTotalParcial] = useState();
+  const [desconto, setDesconto] = useState();
+  const [totalGeral, setTotalGeral] = useState();
   const [observacao, setObservacao] = useState('');
   const [dataPedido, setDataPedido] = useState();
   const [dataEntrega, setDataEntrega] = useState(null);
   const [dataDevolucao, setDataDevolucao] = useState(null);
+  const [dadosEndereco, setDadosEndereco] = useState({});
 
   //Dados Endereço
   const [endereco, setEndereco] = useState('');
@@ -50,61 +54,92 @@ export default function CreatePedido() {
   const [selectClients, setSelectClients] = useState([]);
   const [clientId, setClientId] = useState('');
   const [currentClient, setCurrentClient] = useState({});
-  
+
   //Dados Produto
   const [produtos, setProdutos] = useState([]);
 
   useEffect(() => {
     async function getDadosCliente() {
-      
-        const results = await api.get('http://localhost:5000/api/clients');
-        setSelectClients(results.data);
+
+      const results = await api.get('http://localhost:5000/api/clients');
+      setSelectClients(results.data);
     }
-    
+
     getDadosCliente();
   }, []);
 
   function handleSelectClients(e) {
-      const clientId = e.target.value;
-      setCurrentClient(selectClients.find(e => e._id == clientId));
-      setClientId(clientId);
+    const _id = e.target.value;
+    setCurrentClient(selectClients.find(e => e._id == _id));
+    setClientId(_id);
   }
 
   const handleAddProduto = (produto) => {
     setProdutos([...produtos, produto]);
-  } 
+  }
 
   const handleDeleteProduto = (produto) => {
     const newProducts = produtos.filter((item) => item.id !== produto);
 
     setProdutos(newProducts);
-  } 
+  }
 
   const handleChangeAddress = (event) => {
     setEnderecoAtual(event.target.value);
   };
 
+  const handleSearchCEP = (data) => {
+    setDadosEndereco(data);
+  }
+
+  const handleDateDeliveryChange = (date) => {
+    setDataEntrega(date);
+  }
+
+  const handleDateDevolutionChange = (date) => {
+    setDataDevolucao(date);
+  }
+
   async function handleSubmit() {
-    const data = {
-        nomeCliente: currentClient.nmCliente,
-        status: status,
-        dataPedido: dataPedido,
-        dataEntrega: dataEntrega,
-        dataDevolucao: dataDevolucao,
-        totalGeral: totalGeral,
-        observacao: observacao,
+    let data = {
+      idCliente: currentClient._id,
+      nomeCliente: currentClient.nomeCliente,
 
-        // nrEndereco: endereco,
-        // dsComplemento: complemento,
-        // dsLogradouro: logradouro,
-        // dsBairro: bairro,
-        // dsCidade: cidade,
-        // dsUF: uf,
-        // nrCEP: cep,
+      numeroPedido: numeroPedido,
+      status: status,
+      dataPedido: dataPedido,
+      dataEntrega: dataEntrega,
+      dataDevolucao: dataDevolucao,
+      desconto: desconto,
+      totalGeral: totalGeral,
+      totalParcial: totalParcial,
+      observacao: observacao,
 
-        //Lista de produtos
-        products: produtos,
+      //Lista de produtos
+      products: produtos,
     }
+
+    if (enderecoAtual == "novo" ) {
+      data.tipoEndereco = "Novo";
+      data.numero = dadosEndereco.numero;
+      data.complemento = dadosEndereco.complemento;
+      data.logradouro = dadosEndereco.logradouro;
+      data.bairro = dadosEndereco.bairro;
+      data.cidade = dadosEndereco.cidade;
+      data.uf = dadosEndereco.uf;
+      data.cep = dadosEndereco.cep;
+    }
+    else {
+      data.tipoEndereco = "Cadastro Cliente";
+      data.numero = currentClient.numero;
+      data.complemento = currentClient.complemento;
+      data.logradouro = currentClient.logradouro;
+      data.bairro = currentClient.bairro;
+      data.cidade = currentClient.cidade;
+      data.uf = currentClient.uf;
+      data.cep = currentClient.cep;
+    }
+
     if (selectClients !== '') {
       const response = await api.post('/api/rents', data);
 
@@ -118,39 +153,32 @@ export default function CreatePedido() {
     }
   }
 
-  const handleDateDeliveryChange = (date) => {
-      setDataEntrega(date);
-  }
-
-  const handleDateDevolutionChange = (date) => {
-    setDataDevolucao(date);
-  }
-
   return (
     <div className={classes.root}>
-      <MenuAdmin/>
+      <MenuAdmin />
       <main className={classes.content}>
 
-      <Container maxWidth="lg" component="main" className={classes.container}>
-        
+        <Container maxWidth="lg" component="main" className={classes.container}>
+
           <CardHeader
             title="Cadastrar pedido"
             subheader={
-            <Breadcrumbs style={{ fontSize: 14 }} separator="•" aria-label="breadcrumb">
-              <Link color="inherit" href={'/admin/pedidos'} >
-                Pedidos
-              </Link>
-              <Typography color="textPrimary" style={{ fontSize: 14 }}>Cadastrar pedido</Typography>
-            </Breadcrumbs>
+              <Breadcrumbs style={{ fontSize: 14 }} separator="•" aria-label="breadcrumb">
+                <Link color="inherit" href={'/admin/pedidos'} >
+                  Pedidos
+                </Link>
+                <Typography color="textPrimary" style={{ fontSize: 14 }}>Cadastrar pedido</Typography>
+              </Breadcrumbs>
             }
             titleTypographyProps={{ align: 'left' }}
             subheaderTypographyProps={{ align: 'left' }}
             className={classes.cardHeader}
           />
-          <Card style= {{ borderRadius: 15 }}>
-          <form onSubmit={handleSubmit}>
-            <CardContent className={classes.inputs}>
-              {/* <FormControl>
+          <Card style={{ borderRadius: 15 }}>
+            <form onSubmit={handleSubmit}>
+              <CardContent className={classes.inputs}>
+
+                {/* <FormControl>
                   <FormLabel>Status</FormLabel>
                   <RadioGroup
                       row
@@ -160,90 +188,121 @@ export default function CreatePedido() {
                   </RadioGroup>
               </FormControl> */}
 
-              <FormControl variant="outlined" size="small" className={classes.formControl}>
+                <FormControl variant="outlined" size="small" className={classes.formControl}>
                   <InputLabel>Cliente</InputLabel>
                   <Select
-                      onChange={handleSelectClients}
-                      value={clientId}
-                      label="Cliente"
-                    >
-                      {selectClients.map((clients) => (
-                        <MenuItem value={clients._id} key={clients._id}>{clients.nmCliente}</MenuItem>
-                      ))}
+                    onChange={handleSelectClients}
+                    value={clientId}
+                    label="Cliente"
+                  >
+                    {selectClients.map((clients) => (
+                      <MenuItem value={clients._id} key={clients._id}>{clients.nomeCliente}</MenuItem>
+                    ))}
                   </Select>
-              </FormControl> 
-              
-              <FormControl>
+                </FormControl>
+
+                <FormControl>
                   <FormLabel></FormLabel>
                   <RadioGroup
-                      row
-                      value={enderecoAtual}
-                      onChange={handleChangeAddress}
+                    row
+                    value={enderecoAtual}
+                    onChange={handleChangeAddress}
                   >
-                      <FormControlLabel value="atual" control={<Radio />} label="Endereço atual" />
-                      <FormControlLabel value="novo" control={<Radio />} label="Novo endereço" />
+                    <FormControlLabel value="atual" control={<Radio />} label="Endereço atual" />
+                    <FormControlLabel value="novo" control={<Radio />} label="Novo endereço" />
                   </RadioGroup>
-              </FormControl>
+                </FormControl>
 
-              {enderecoAtual == 'novo' ? <BuscarCEP /> :
-                currentClient.nmCliente != null ? 
-                <div className='container'>
-                  <div className="card">
-                    <div className='left-column'>
-                      <div>
-                        <h4>Endereço de entrega</h4>                    
+                {enderecoAtual == 'novo' ? <BuscarCEP onUpdate={handleSearchCEP} /> :
+                  currentClient.nomeCliente != null ?
+                    <div className='container'>
+                      <div className="card">
+                        <div className='left-column'>
+                          <div>
+                            <h4>Endereço de entrega</h4>
+                          </div>
+
+                          <p>{currentClient.logradouro}, Nº {currentClient.numero}</p>
+                          <p>{currentClient.bairro} - {currentClient.cidade}</p>
+                          <p>CEP: {currentClient.cep}</p>
+                        </div>
+
+                        <div className='right-column'>
+                          <img className="img" src={require('../../../assets/Directions-bro.svg')} width={200} height={160} />
+                        </div>
                       </div>
+                    </div> : ""
+                }
 
-                      <p>{currentClient.logradouro}, Nº {currentClient.numero}</p>
-                      <p>{currentClient.bairro} - {currentClient.cidade}</p>
-                      <p>CEP: {currentClient.cep}</p>
-                    </div>
+                <ListaProdutos produtos={produtos} addProduto={handleAddProduto} deleteProduto={handleDeleteProduto} />
 
-                    <div className='right-column'>
-                        <img className="img" src={require('../../../assets/Directions-bro.svg')} width={200} height={160} />
-                    </div>
-                  </div>
-                </div> : ""
-              }
+                <div className={classes.twoInputs}>
+                  <DatePicker
+                    label='Data entrega'
+                    size='small'
+                    autoOk
+                    inputVariant='outlined'
+                    format="dd/MM/yyyy"
+                    cancelLabel="CANCELAR"
+                    value={dataEntrega}
+                    onChange={handleDateDeliveryChange}
+                  />
 
-            <ListaProdutos produtos={produtos} addProduto={handleAddProduto} deleteProduto={handleDeleteProduto} />
+                  <DatePicker
+                    label='Data devolução'
+                    size='small'
+                    autoOk
+                    inputVariant='outlined'
+                    format="dd/MM/yyyy"
+                    cancelLabel="CANCELAR"
+                    value={dataDevolucao}
+                    onChange={handleDateDevolutionChange}
+                  />
+                </div>
 
-            <div className={classes.twoInputs}>
-              <DatePicker
-                label='Data entrega'
-                size='small'
-                autoOk
-                inputVariant='outlined'
-                format="dd/MM/yyyy"
-                value={dataEntrega}
-                onChange={handleDateDeliveryChange}
-              />
-              
-              <DatePicker
-                label='Data devolução'
-                size='small'
-                autoOk
-                inputVariant='outlined'
-                format="dd/MM/yyyy"
-                value={dataDevolucao}
-                onChange={handleDateDevolutionChange}
-              />
-            </div>
-            <TextField
-              variant="outlined"
-              label="Observação"
-              multiline
-              rows={4}
-              value={observacao}
-              onChange={e => setObservacao(e.target.value)}
-            />
-            </CardContent>
-            <CardActions style={{ justifyContent: 'flex-end', marginRight: 15 }}>
-              <Button variant="contained" size="medium" className={classes.btnDefaultGreen} type="submit" startIcon={<SaveIcon />}>Salvar</Button>
-            </CardActions>
-          </form>
-        </Card>
-      </Container>
+                <div className={classes.twoInputs}>
+                <TextField
+                    variant="outlined"
+                    size="small"
+                    label="Total parcial"
+                    type='decimal'
+                    value={totalParcial}
+                    onChange={(event) => setTotalParcial(event.target.value)}
+                  />
+                  <TextField
+                    variant="outlined"
+                    size="small"
+                    label="Desconto"
+                    type='decimal'
+                    value={desconto}
+                    onChange={(event) => setDesconto(event.target.value)}
+                  />
+                  <TextField
+                    variant="outlined"
+                    size="small"
+                    label="Total"
+                    type='decimal'
+                    value={totalGeral}
+                    onChange={(event) => setTotalGeral(event.target.value)}
+                  />
+                </div>
+
+
+                <TextField
+                  variant="outlined"
+                  label="Observação"
+                  multiline
+                  rows={4}
+                  value={observacao}
+                  onChange={e => setObservacao(e.target.value)}
+                />
+              </CardContent>
+              <CardActions style={{ justifyContent: 'flex-end', marginRight: 15 }}>
+                <Button variant="contained" size="medium" className={classes.btnDefaultGreen} type="submit" startIcon={<SaveIcon />}>Salvar</Button>
+              </CardActions>
+            </form>
+          </Card>
+        </Container>
       </main>
     </div>
   );
@@ -258,7 +317,7 @@ const useStyles = makeStyles((theme) => ({
     height: '100vh',
     overflow: 'auto',
   },
-  cardHeader: {    
+  cardHeader: {
     "& .MuiCardHeader-title": {
       fontWeight: 700,
       color: '#212B36',
@@ -293,7 +352,7 @@ const useStyles = makeStyles((theme) => ({
   },
 
   twoInputs: {
-     display: 'flex',
+    display: 'flex',
     '& .MuiTextField-root': {
       margin: theme.spacing(1),
       width: '50%',
@@ -319,6 +378,6 @@ const useStyles = makeStyles((theme) => ({
       color: '#FFF',
     },
   },
-  
+
   appBarSpacer: theme.mixins.toolbar,
 }));

@@ -63,11 +63,11 @@ export default function ListaProdutos(props) {
 
     const handleAddProduct = () => {
         addProduto({
-            id: new Date().getTime(),
+            id: currentMaterial._id,
             metro: metro,
             qtde: qtde,
             valorItem: valorItem,
-            nmMaterial: currentMaterial.nmMaterial
+            nomeMaterial: currentMaterial.nomeMaterial
         });
 
         setMaterialId('');
@@ -107,7 +107,7 @@ export default function ListaProdutos(props) {
                     label="Material"
                   >
                     {selectMaterials.map((material) => (
-                      <MenuItem value={material._id} key={material._id}>{material.nmMaterial}</MenuItem>
+                      <MenuItem value={material._id} key={material._id}>{material.nomeMaterial}</MenuItem>
                     ))}
                 </Select>
             </FormControl> 
@@ -135,7 +135,7 @@ export default function ListaProdutos(props) {
             </div> */}
 
             <Box style={{ marginLeft: -7, display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
-              {currentMaterial.nmMaterial == 'Andaime' && 
+              {currentMaterial.nomeMaterial == 'Andaime' && 
                 <TextField
                   variant="outlined"
                   size="small"
@@ -145,7 +145,7 @@ export default function ListaProdutos(props) {
                 />
               }
 
-              {currentMaterial.nmMaterial != 'Andaime' && 
+              {currentMaterial.nomeMaterial != 'Andaime' && 
                 <TextField
                     variant="outlined"
                     size="small"
@@ -184,8 +184,8 @@ export default function ListaProdutos(props) {
                 <TableBody>
                   {produtos.map((prod) => ( 
                     <TableRow hover key={prod.id}>
-                        <TableCell align="left">{prod.nmMaterial}</TableCell>
-                        <TableCell align="center">{prod.nmMaterial == "Andaime" ? prod.metro : prod.qtde }</TableCell>
+                        <TableCell align="left">{prod.nomeMaterial}</TableCell>
+                        <TableCell align="center">{prod.nomeMaterial == "Andaime" ? prod.metro : prod.qtde }</TableCell>
                         <TableCell align="right">{prod.valorItem}</TableCell>
                         <TableCell component="th" scope="row" align="right">
                           <IconButton onClick={() => deleteProduto(prod.id)}>

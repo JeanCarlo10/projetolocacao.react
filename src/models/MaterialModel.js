@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const DataSchema = new mongoose.Schema({
-    nmMaterial: String,
+    nomeMaterial: String,
 },{
     timestamps: true
 });

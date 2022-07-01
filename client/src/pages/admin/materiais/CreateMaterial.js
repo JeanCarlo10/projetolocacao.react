@@ -19,14 +19,14 @@ import api from '../../../services/api';
 export default function CreateMaterial() {
   const classes = useStyles();
 
-  const [nmMaterial, setNmMaterial] = useState('');
+  const [nomeMaterial, setNomeMaterial] = useState('');
 
   async function handleSubmit() {
     const data = {
-      nmMaterial: nmMaterial,
+      nomeMaterial: nomeMaterial,
     }
 
-    if (nmMaterial != '' ) {
+    if (nomeMaterial != '' ) {
       const response = await api.post('/api/materials', data);
 
       if (response.status == 200) {
@@ -68,8 +68,8 @@ export default function CreateMaterial() {
                   variant="outlined"
                   size="small"
                   label="Descrição"
-                  value={nmMaterial}
-                  onChange={e => setNmMaterial(e.target.value)}
+                  value={nomeMaterial}
+                  onChange={e => setNomeMaterial(e.target.value)}
                 />
               </CardContent>
               <CardActions style={{ justifyContent: 'flex-end', marginRight: 15 }}>

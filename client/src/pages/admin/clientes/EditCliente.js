@@ -12,12 +12,11 @@ import CardHeader from '@material-ui/core/CardHeader';
 import Button from '@material-ui/core/Button';
 import Breadcrumbs from '@material-ui/core/Breadcrumbs';
 import Link from '@material-ui/core/Link';
-
 import SaveIcon from '@material-ui/icons/Save';
 
+import Notification from '../../../components/notification';
 import MenuAdmin from '../../../components/menu-admin';
 import api from '../../../services/api';
-
 import BuscarCEP from '../../../components/buscar-cep';
 import ListaContatos from '../../../components/lista-contatos';
 import { mask, unMask } from 'remask';
@@ -25,6 +24,7 @@ import { mask, unMask } from 'remask';
 export default function EditCliente() {
     const classes = useStyles();
 
+    const [notify, setNotify] = useState({ isOpen: false, message: '', type: '' });
     const [nome, setNome] = useState('');
     const [razaoSocial, setRazaoSocial] = useState('');
     const [sexo, setSexo] = useState('');
@@ -58,10 +58,23 @@ export default function EditCliente() {
             setContatos(response.data.contacts);
 
             setDadosEndereco(response.data);
-            console.log(response.data.bairro);
         }
         getCliente();
     }, [])
+
+    useEffect(() => {
+        if (tipo == 'Fisica') {
+            setRazaoSocial("");
+            setCnpj("");
+            setIe("");
+        } else {
+            setNome("");
+            setCpf("");
+            setRg("");
+            setSexo("");
+            setNascimento("");
+        }
+    }, [tipo])
 
     const handleSearchCEP = (data) => {
         setDadosEndereco(data);
@@ -97,23 +110,27 @@ export default function EditCliente() {
             dataNascimento: nascimento,
             email: email,
 
-            //Dados Endereço
-            numero: dadosEndereco.numero,
-            complemento: dadosEndereco.complemento,
-            logradouro: dadosEndereco.logradouro,
-            bairro: dadosEndereco.bairro,
-            cidade: dadosEndereco.cidade,
-            uf: dadosEndereco.uf,
-            cep: dadosEndereco.cep,
-
             //Dados Contatos
             contacts: contatos,
         }
+
+        data.numero = dadosEndereco.numero;
+        data.complemento = dadosEndereco.complemento;
+        data.logradouro = dadosEndereco.logradouro;
+        data.bairro = dadosEndereco.bairro;
+        data.cidade = dadosEndereco.cidade;
+        data.uf = dadosEndereco.uf;
+        data.cep = dadosEndereco.cep;
 
         if (nome != '' && tipo != '') {
             const response = await api.put('/api/clients', data);
 
             if (response.status == 200) {
+                setNotify({
+                    isOpen: true,
+                    message: 'Cliente atualizado com sucesso',
+                    type: 'success'
+                });
                 window.location.href = '/admin/clientes'
             } else {
                 alert('Erro ao atualizar o cliente');
@@ -125,9 +142,9 @@ export default function EditCliente() {
 
     return (
         <div className={classes.root}>
+            <Notification notify={notify} setNotify={setNotify} />
             <MenuAdmin />
             <main className={classes.content}>
-
                 <Container maxWidth="lg" component="main" className={classes.container}>
                     <CardHeader
                         title="Editar cliente"
@@ -259,7 +276,12 @@ export default function EditCliente() {
                                     onChange={e => setEmail(e.target.value)}
                                 />
 
-                                <BuscarCEP onUpdate={handleSearchCEP} />
+                                {dadosEndereco._id &&
+                                    <BuscarCEP onUpdate={handleSearchCEP} initialData={dadosEndereco} />
+                                }
+                                {!dadosEndereco._id &&
+                                    <BuscarCEP onUpdate={handleSearchCEP} initialData={dadosEndereco} />
+                                }
                                 <ListaContatos contatos={contatos} addContato={handleAddContato} />
 
                             </CardContent>
@@ -291,7 +313,8 @@ const useStyles = makeStyles((theme) => ({
         },
     },
     container: {
-        marginTop: 90
+        paddingTop: theme.spacing(4),
+        paddingBottom: theme.spacing(4),
     },
     inputs: {
         display: 'flex',
@@ -340,5 +363,5 @@ const useStyles = makeStyles((theme) => ({
             color: '#FFF',
         },
     },
-    appBarSpacer: theme.mixins.toolbar,
+    // appBarSpacer: theme.mixins.toolbar,
 }));

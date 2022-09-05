@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { withStyles, makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
-import Drawer from '@material-ui/core/Drawer';
 import Table from '@material-ui/core/Table';
 import TablePagination from '@mui/material/TablePagination';
 import TableBody from '@material-ui/core/TableBody';
@@ -22,7 +21,6 @@ import Avatar from '@material-ui/core/Avatar';
 import Divider from '@material-ui/core/Divider';
 import InputBase from '@material-ui/core/InputBase';
 import { Menu, MenuItem, IconButton, ListItemIcon, ListItemText } from '@mui/material';
-
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
@@ -56,7 +54,6 @@ export default function IndexCliente() {
   const [search, setSearch] = useState("");
 
   const [loading, setLoading] = useState(true);
-  const [open, setOpen] = useState(false);
   const [isOpenMenu, setIsOpenMenu] = useState(false);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -107,10 +104,6 @@ export default function IndexCliente() {
     })
   }
 
-  const handleDrawerFilter = () => {
-    setOpen(true);
-  };
-
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
@@ -144,7 +137,6 @@ export default function IndexCliente() {
       <MenuAdmin />
 
       <main className={classes.content}>
-        <div className={classes.appBarSpacer} />
 
         <Container maxWidth="lg" className={classes.container}>
 
@@ -163,41 +155,12 @@ export default function IndexCliente() {
                 <Button
                   className={classes.btnDefaultGreen}
                   variant="contained"
-                  size="medium"
+                  size="large"
                   color='primary'
                   href={'/admin/clientes/create'}
                   startIcon={<AddCircleRoundedIcon />}>
                   Cadastrar
                 </Button>
-
-                <Drawer anchor='right' open={open} onClose={() => setOpen(false)}>
-                  <div style={{ width: "350px" }}>
-                    <div className={classes.drawerFilter}>
-                      <Avatar className={classes.avatarFilter}>
-                        <FilterListRoundedIcon />
-                      </Avatar>
-                      <h3 style={{ color: '#5C5C62', fontSize: 20 }}>Filtros</h3>
-                    </div>
-
-                    <div className={classes.drawerContent}>
-                      <div className={classes.drawerTitle}>
-                        Buscar por nome
-                      </div>
-                      <Divider variant="fullWidth" />
-                      <div style={{ borderRadius: 10, borderColor: 'red', borderStyle: 'solid' }}>
-                        <IconButton type="submit" className={classes.iconButton} aria-label="search">
-                          <SearchIcon />
-                        </IconButton>
-                        <InputBase
-                          placeholder="Buscar por nome"
-                        />
-                      </div>
-                      <div className={classes.drawerFooter}>
-                        <Button variant="contained" color='default' startIcon={<SearchIcon />}>Buscar</Button>
-                      </div>
-                    </div>
-                  </div>
-                </Drawer>
               </div>
             }
           />
@@ -215,11 +178,6 @@ export default function IndexCliente() {
                     placeholder="Buscar..."
                   />
                 </div>
-                <Tooltip title="Filtros">
-                  <IconButton size="large" onClick={handleDrawerFilter}>
-                    <FilterListRoundedIcon />
-                  </IconButton>
-                </Tooltip>
               </div>
 
               <TableContainer >
@@ -235,15 +193,16 @@ export default function IndexCliente() {
                   </TableHead>
 
                   <TableBody>
-                    {clients.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
+                    {clients && 
+                    clients.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
                       <TableRow hover key={row._id}>
-                        <TableCell align="left"><Chip label={tipoPessoaMap[(row.tipoPessoa)]} /></TableCell>
+                        <TableCell align="left"><Chip style={{ fontFamily:'Public Sans'}} label={tipoPessoaMap[(row.tipoPessoa)]} /></TableCell>
                         <TableCell>
                           {row.tipoPessoa == 'Fisica' ? row.nomeCliente : row.razaoSocial}
                           {row.contacts.map((item) => (
-                            <Stack direction="row" mb={0.5}>
-                              <Chip icon={item.tipoTelefone == "Celular" ? <PhoneAndroidIcon /> : <PhoneIcon />} label={item.numero } />
-                            </Stack>                              
+                            <Stack direction="row" mt={0.5}>
+                              <Chip style={{ fontFamily:'Public Sans'}} icon={item.tipoTelefone == "Celular" ? <PhoneAndroidIcon /> : <PhoneIcon />} label={item.numero} />
+                            </Stack>
                           ))}
                         </TableCell>
                         <TableCell>{row.tipoPessoa == 'Fisica' ? row.cpf : row.cnpj}</TableCell>
@@ -294,6 +253,7 @@ export default function IndexCliente() {
                     ))}
                   </TableBody>
                 </Table>
+                {clients.length > 0 ? null : <div className={classes.noRegisters}>Nenhum registro encontrado</div>}
               </TableContainer>
               <TablePagination
                 rowsPerPageOptions={[5, 10, 25]}
@@ -317,32 +277,15 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
   },
   iconButton: {
-    borderRadius: 50,
-    borderColor: '#F4F4F4',
-    borderStyle: 'solid'
-  },
-  drawerFilter: {
-    display: 'flex',
-    padding: '15px',
-    alignItems: 'center',
+    borderRadius: 10,
+    borderColor: '#BCBCBC',
+    borderStyle: 'solid',
+    borderWidth: 2
   },
   avatarFilter: {
     color: '#4DB4C6',
     backgroundColor: '#E7F7F9',
     marginRight: theme.spacing(2),
-  },
-  drawerContent: {
-    display: 'flex',
-    flexDirection: 'column',
-    padding: '15px',
-  },
-  drawerTitle: {
-    color: '#5C5C62',
-    fontSize: 18
-  },
-  drawerFooter: {
-    display: 'flex',
-    flexDirection: 'column',
   },
   content: {
     flexGrow: 1,
@@ -360,6 +303,13 @@ const useStyles = makeStyles((theme) => ({
       fontWeight: 'bold',
       fontSize: 14
     }
+  },
+  noRegisters: {
+    textAlign: 'center', 
+    paddingTop: 10, 
+    fontWeight: 700, 
+    fontSize: 16,
+    color: '#595A4A'
   },
   buttonTable: {
     // margin: theme.spacing(0.5)
@@ -393,5 +343,5 @@ const useStyles = makeStyles((theme) => ({
       marginBottom: theme.spacing(1),
     },
   },
-  appBarSpacer: theme.mixins.toolbar,
+  // appBarSpacer: theme.mixins.toolbar,
 }));

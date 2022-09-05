@@ -15,14 +15,34 @@ module.exports = {
         m = date.getMonth();
 
         var firstDay = new Date(y, m, 1);
-        var lastDay = new Date(y, m + 1, 0, 23,59,59);
+        var lastDay = new Date(y, m + 1, 0, 23, 59, 59);
+
+        var query = [
+            {
+                dataDevolucao: {
+                    $gte: firstDay,
+                    $lte: lastDay,
+                }
+            }];
+
+        if (req.query.keyword != null && req.query.keyword != "") {
+            query.push({
+                nomeCliente: { $regex: req.query.keyword, $options: "i" }
+            })
+        }
+
+        if (req.query.statuses != null && req.query.statuses != "") {
+            let st = req.query.statuses.split(",");
+
+            query.push({
+                status: { $in: st }
+            })
+        }
 
         const rent = await Rent.find({
-            dataDevolucao: {
-                $gte: firstDay,
-                $lte: lastDay,
-            }
+            $and: query
         });
+
         res.json(rent);
     },
 
@@ -44,15 +64,14 @@ module.exports = {
     },
 
     //ADD RENT
-    
     async create(req, res) {
         try {
             var model = req.body
-            console.log(model);
+            // console.log(model);
             model.numeroPedido = await Rent.countDocuments() + 1;
 
             const rent = await Rent.create(model);
-            
+
             await rent.save();
 
             return res.send({ rent });

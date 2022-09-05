@@ -1,36 +1,59 @@
 const Client = require('../models/ClientModel');
-const multer = require('multer');
-
-const storage = multer.diskStorage({
-    destination: (req, file, callback) => {
-        callback(null, '../../client/public/images')
-    },
-
-    filename: (req, file, callback) => {
-        callback(null, Date.now() + path.extname(file.originalname));
-    },
-});
-
-const upload = multer({
-    storage: storage,
-    limits: { fieldSize: '5000000' },
-    fileFilter: (req, file, callback) => {
-        const fileTypes = /jpeg|jpg|png/
-        const mimeType = fileTypes.test(file.mimeType)
-        const extname = fileTypes.test(path.extname(file.originalname))
-
-        if (mimeType && extname) {
-            return callback(null, true)
-        }
-        callback('Informe apenas extensão de imagem')
-    }
-}).single('image');
+const Photo = require('../models/PhotoModel');
+const fs = require('fs');
 
 module.exports = {
     async index(req, res){
         const client = await Client.find();
 
         res.json(client);
+    },
+
+    async thumbnailAvatar(req, res) {
+        const {_id} = req.params;
+
+        const photo = await Photo.findOne({_id});
+
+        res.setHeader('Content-disposition', 'attachment; filename=' + photo.name);
+        res.setHeader('Content-type', photo.type);
+        res.write(photo.content, 'binary');
+
+        res.end();
+    },
+
+    //UPLOAD IMAGE
+    async uploadAvatar(req, res) {
+        try {
+            if(!req.files) {
+                res.send({
+                    status: false,
+                    message: 'Imagem não foi carregada'
+                });
+            } else {
+                //Use the name of the input field (i.e. "avatar") to retrieve the uploaded file
+                let avatar = req.files.avatar;
+                
+                //send response
+                const photo = await Photo.create({
+                    content: avatar.data.toString("utf8"),
+                    name: avatar.name,
+                    type: avatar.mimetype,
+                    size: avatar.size,
+                    // preview: URL.createObjectURL(avatar)
+                });
+            
+                await photo.save();
+
+                res.send(photo);
+                
+                // return res.status(200).json({ avatar });
+            }
+            
+        } catch (err) {
+            res.status(500).send(err);
+            console.log(err);
+        }
+        
     },
 
     //ADD CLIENT

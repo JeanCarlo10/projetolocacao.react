@@ -23,6 +23,8 @@ routes.get('/api/clients', Client.index);
 routes.get('/api/clients.details/:_id', Client.details);
 routes.delete('/api/clients/:_id', Client.delete);
 routes.put('/api/clients', Client.update);
+routes.post('/api/clients/upload-avatar', Client.uploadAvatar);
+routes.get('/api/clients/thumbnail-avatar/:_id', Client.thumbnailAvatar);
 
 //Rotas de Materiais
 routes.post('/api/materials', Material.create);

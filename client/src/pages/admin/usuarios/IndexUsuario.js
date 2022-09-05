@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { withStyles, makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import TablePagination from '@mui/material/TablePagination';
-import Drawer from '@material-ui/core/Drawer';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -56,7 +55,6 @@ export default function IndexUsuario() {
   const [search, setSearch] = useState("");
 
   const [loading, setLoading] = useState(true);
-  const [open, setOpen] = useState(false);
   const [isOpenMenu, setIsOpenMenu] = useState(false);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -108,10 +106,6 @@ export default function IndexUsuario() {
     administrador: false,
     funcionario: false,
   });
-
-  const handleDrawerFilter = () => {
-    setOpen(true);
-  };
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -165,57 +159,11 @@ export default function IndexUsuario() {
                 <Button
                   className={classes.btnDefaultGreen}
                   variant="contained"
-                  size="medium"
+                  size="large"
                   href={'/admin/usuarios/create'}
                   startIcon={<AddCircleRoundedIcon />}>
                   Cadastrar
                 </Button>
-
-                <Drawer anchor='right' open={open} onClose={() => setOpen(false)}>
-                  <div style={{ width: "350px" }}>
-                    <div className={classes.drawerFilter}>
-                      <Avatar className={classes.avatarFilter}>
-                        <FilterListRoundedIcon />
-                      </Avatar>
-                      <h3 style={{ color: '#5C5C62', fontSize: 20 }}>Filtros</h3>
-                    </div>
-
-                    <div className={classes.drawerContent}>
-                      <div className={classes.drawerTitle}>
-                        Buscar por nome
-                      </div>
-                      <Divider variant="fullWidth" />
-                      <div>
-                        <IconButton type="submit" className={classes.iconButton} aria-label="search">
-                          <SearchIcon />
-                        </IconButton>
-                        <InputBase
-                          placeholder="Buscar por nome"
-                        />
-                      </div>
-                      <div className={classes.drawerTitle}>
-                        Tipo de usuário
-                      </div>
-                      <Divider variant="fullWidth" />
-                      <div>
-                        <FormGroup>
-                          <FormControlLabel
-                            control={<Checkbox checked={selectTypeUser.administrador} color="primary" onChange={handleChange} name="administrador" />}
-                            label="Administrador"
-                          />
-                          <FormControlLabel
-                            control={<Checkbox checked={selectTypeUser.funcionario} color="primary" onChange={handleChange} name="funcionario" />}
-                            label="Funcionário"
-                          />
-                        </FormGroup>
-                      </div>
-
-                      <div className={classes.drawerFooter}>
-                        <Button variant="contained" color='default' startIcon={<SearchIcon />}>Buscar</Button>
-                      </div>
-                    </div>
-                  </div>
-                </Drawer>
               </div>
             }
           />
@@ -233,12 +181,6 @@ export default function IndexUsuario() {
                     placeholder="Buscar..."
                   />
                 </div>
-
-                <Tooltip title="Filtros">
-                  <IconButton size="large" onClick={handleDrawerFilter}>
-                    <FilterListRoundedIcon />
-                  </IconButton>
-                </Tooltip>
               </div>
 
               <TableContainer>
@@ -323,40 +265,21 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
   },
   iconButton: {
-    borderRadius: 50,
-    borderColor: '#F4F4F4',
-    borderStyle: 'solid'
+    borderRadius: 10,
+    borderColor: '#BCBCBC',
+    borderStyle: 'solid',
+    borderWidth: 2
   },
   content: {
     flexGrow: 1,
     height: '100vh',
     overflow: 'auto',
   },
-
-  drawerFilter: {
-    display: 'flex',
-    padding: '15px',
-    alignItems: 'center',
-  },
   avatarFilter: {
     color: '#4DB4C6',
     backgroundColor: '#E7F7F9',
     marginRight: theme.spacing(2),
   },
-  drawerContent: {
-    display: 'flex',
-    flexDirection: 'column',
-    padding: '15px',
-  },
-  drawerTitle: {
-    color: '#5C5C62',
-    fontSize: 18
-  },
-  drawerFooter: {
-    display: 'flex',
-    flexDirection: 'column',
-  },
-
   container: {
     paddingTop: theme.spacing(4),
     paddingBottom: theme.spacing(4),

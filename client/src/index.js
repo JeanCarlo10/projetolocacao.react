@@ -25,9 +25,9 @@ const theme = createMuiTheme({
 ReactDOM.render(
   <React.StrictMode>
     <ThemeProvider theme={theme}>
-        <MuiPickersUtilsProvider utils={DateFnsUtils} locale={ptBR}>
-          <App />
-        </MuiPickersUtilsProvider>
+      <MuiPickersUtilsProvider utils={DateFnsUtils} locale={ptBR}>
+        <App />
+      </MuiPickersUtilsProvider>
     </ThemeProvider>
   </React.StrictMode>,
   document.getElementById('root')

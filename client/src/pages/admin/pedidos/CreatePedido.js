@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import { TextField } from '@material-ui/core';
+import TextField from '@mui/material/TextField';
 import Select from '@mui/material/Select';
 import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
@@ -19,36 +19,63 @@ import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormLabel from '@mui/material/FormLabel';
 import SaveIcon from '@material-ui/icons/Save';
+
 import MenuAdmin from '../../../components/menu-admin';
 import api from '../../../services/api';
 import BuscarCEP from '../../../components/buscar-cep';
 import ListaProdutos from '../../../components/lista-produtos';
+import NumberFormat from 'react-number-format';
 import { DatePicker } from '@material-ui/pickers';
 import '../../../assets/css/card-location.css';
+import Notification from '../../../components/notification';
+
+export function currencyFormatter(value) {
+  if (!Number(value)) return "";
+
+  const amount = new Intl.NumberFormat("pt-BR", {
+    style: "currency",
+    currency: "BRL"
+  }).format(value / 100).replace('R$', '');
+
+  return `${amount}`;
+}
+
+const NumberFormatCustom = React.forwardRef(function NumberFormatCustom(props, ref) {
+  const { onChange, ...other } = props;
+
+  return (
+    <NumberFormat
+      {...other}
+      getInputRef={ref}
+      onValueChange={(values) => {
+        onChange({
+          target: {
+            name: props.name,
+            value: values.value,
+          },
+        });
+      }}
+      format={currencyFormatter}
+    />
+  );
+});
 
 export default function CreatePedido() {
   const classes = useStyles();
+  const inputRef = React.createRef();
 
+  const [notify, setNotify] = useState({ isOpen: false, message: '', type: '' });
   const [numeroPedido, setNumeroPedido] = useState();
   const [status, setStatus] = useState('Pendente');
   const [enderecoAtual, setEnderecoAtual] = useState('atual');
   const [totalParcial, setTotalParcial] = useState();
-  const [desconto, setDesconto] = useState();
+  const [desconto, setDesconto] = useState(0);
   const [totalGeral, setTotalGeral] = useState();
   const [observacao, setObservacao] = useState('');
   const [dataPedido, setDataPedido] = useState();
   const [dataEntrega, setDataEntrega] = useState(null);
   const [dataDevolucao, setDataDevolucao] = useState(null);
   const [dadosEndereco, setDadosEndereco] = useState({});
-
-  //Dados Endereço
-  const [endereco, setEndereco] = useState('');
-  const [complemento, setComplemento] = useState('');
-  const [logradouro, setLogradouro] = useState('');
-  const [bairro, setBairro] = useState('');
-  const [cidade, setCidade] = useState('');
-  const [uf, setUf] = useState('');
-  const [cep, setCep] = useState('');
 
   //Dados cliente
   const [selectClients, setSelectClients] = useState([]);
@@ -78,11 +105,13 @@ export default function CreatePedido() {
     setProdutos([...produtos, produto]);
   }
 
-  const handleDeleteProduto = (produto) => {
-    const newProducts = produtos.filter((item) => item.id !== produto);
+  const handleDeleteProduto = useCallback((produto) => {
+    let newProducts = [...produtos];
+
+    newProducts.splice(produtos.indexOf(produto), 1);
 
     setProdutos(newProducts);
-  }
+  }, [produtos]);
 
   const handleChangeAddress = (event) => {
     setEnderecoAtual(event.target.value);
@@ -100,11 +129,14 @@ export default function CreatePedido() {
     setDataDevolucao(date);
   }
 
+  useEffect(() => {
+    setTotalGeral(totalParcial - desconto);
+  }, [totalParcial, desconto]);
+
   async function handleSubmit() {
     let data = {
       idCliente: currentClient._id,
-      nomeCliente: currentClient.nomeCliente,
-
+      nomeCliente: currentClient.nomeCliente || currentClient.razaoSocial,
       numeroPedido: numeroPedido,
       status: status,
       dataPedido: dataPedido,
@@ -119,7 +151,7 @@ export default function CreatePedido() {
       products: produtos,
     }
 
-    if (enderecoAtual == "novo" ) {
+    if (enderecoAtual == "novo") {
       data.tipoEndereco = "Novo";
       data.numero = dadosEndereco.numero;
       data.complemento = dadosEndereco.complemento;
@@ -144,6 +176,11 @@ export default function CreatePedido() {
       const response = await api.post('/api/rents', data);
 
       if (response.status == 200) {
+        setNotify({
+          isOpen: true,
+          message: 'Cadastro realizado com sucesso',
+          type: 'success'
+        });
         window.location.href = '/admin/pedidos'
       } else {
         alert('Erro ao cadastrar o pedido');
@@ -155,6 +192,7 @@ export default function CreatePedido() {
 
   return (
     <div className={classes.root}>
+      <Notification notify={notify} setNotify={setNotify} />
       <MenuAdmin />
       <main className={classes.content}>
 
@@ -196,7 +234,7 @@ export default function CreatePedido() {
                     label="Cliente"
                   >
                     {selectClients.map((clients) => (
-                      <MenuItem value={clients._id} key={clients._id}>{clients.nomeCliente}</MenuItem>
+                      <MenuItem value={clients._id} key={clients._id}>{clients.nomeCliente || clients.razaoSocial}</MenuItem>
                     ))}
                   </Select>
                 </FormControl>
@@ -208,12 +246,12 @@ export default function CreatePedido() {
                     value={enderecoAtual}
                     onChange={handleChangeAddress}
                   >
-                    <FormControlLabel value="atual" control={<Radio />} label="Endereço atual" />
-                    <FormControlLabel value="novo" control={<Radio />} label="Novo endereço" />
+                    <FormControlLabel value="atual" control={<Radio style={{ color: '#00AB55'}}/>} label="Endereço atual" />
+                    <FormControlLabel value="novo" control={<Radio style={{ color: '#00AB55'}}/>} label="Novo endereço" />
                   </RadioGroup>
                 </FormControl>
 
-                {enderecoAtual == 'novo' ? <BuscarCEP onUpdate={handleSearchCEP} /> :
+                {enderecoAtual == 'novo' ? <BuscarCEP onUpdate={handleSearchCEP} initialData={dadosEndereco} /> :
                   currentClient.nomeCliente != null ?
                     <div className='container'>
                       <div className="card">
@@ -261,11 +299,14 @@ export default function CreatePedido() {
                 </div>
 
                 <div className={classes.twoInputs}>
-                <TextField
+                  <TextField
                     variant="outlined"
                     size="small"
                     label="Total parcial"
-                    type='decimal'
+                    getInputRef={inputRef}
+                    InputProps={{
+                      inputComponent: NumberFormatCustom,
+                    }}
                     value={totalParcial}
                     onChange={(event) => setTotalParcial(event.target.value)}
                   />
@@ -273,7 +314,10 @@ export default function CreatePedido() {
                     variant="outlined"
                     size="small"
                     label="Desconto"
-                    type='decimal'
+                    getInputRef={inputRef}
+                    InputProps={{
+                      inputComponent: NumberFormatCustom,
+                    }}
                     value={desconto}
                     onChange={(event) => setDesconto(event.target.value)}
                   />
@@ -281,12 +325,14 @@ export default function CreatePedido() {
                     variant="outlined"
                     size="small"
                     label="Total"
-                    type='decimal'
+                    getInputRef={inputRef}
+                    InputProps={{
+                      inputComponent: NumberFormatCustom,
+                    }}
                     value={totalGeral}
                     onChange={(event) => setTotalGeral(event.target.value)}
                   />
                 </div>
-
 
                 <TextField
                   variant="outlined"
@@ -325,7 +371,8 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   container: {
-    marginTop: 90
+    paddingTop: theme.spacing(4),
+    paddingBottom: theme.spacing(4),
   },
   inputs: {
     display: 'flex',
@@ -378,6 +425,4 @@ const useStyles = makeStyles((theme) => ({
       color: '#FFF',
     },
   },
-
-  appBarSpacer: theme.mixins.toolbar,
 }));

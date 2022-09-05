@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { withStyles, makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
-import Drawer from '@material-ui/core/Drawer';
 import Table from '@material-ui/core/Table';
 import TablePagination from '@mui/material/TablePagination';
 import TableBody from '@material-ui/core/TableBody';
@@ -99,10 +98,6 @@ export default function IndexMaterial() {
     })
   }
 
-  const handleDrawerFilter = () => {
-    setOpen(true);
-  };
-
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
@@ -120,7 +115,7 @@ export default function IndexMaterial() {
 
   const filter = (endSearch) => {
     var resultSearch = filterMaterials.filter((result) => {
-      if (result.nmMaterial.toString().toLowerCase().includes(endSearch.toLowerCase())
+      if (result.nomeMaterial.toString().toLowerCase().includes(endSearch.toLowerCase())
       ) {
         return result;
       }
@@ -131,12 +126,8 @@ export default function IndexMaterial() {
   return (
     <div className={classes.root}>
       <MenuAdmin />
-
       <main className={classes.content}>
-        <div className={classes.appBarSpacer} />
-
         <Container maxWidth="lg" className={classes.container}>
-
           <CardHeader className={classes.cardHeader}
             title="Materiais"
             subheader={
@@ -152,48 +143,19 @@ export default function IndexMaterial() {
                 <Button
                   className={classes.btnDefaultGreen}
                   variant="contained"
-                  size="medium"
+                  size="large"
                   color='primary'
                   href={'/admin/materiais/create'}
                   startIcon={<AddCircleRoundedIcon />}>
                   Cadastrar
                 </Button>
-
-                <Drawer anchor='right' open={open} onClose={() => setOpen(false)}>
-                  <div style={{ width: "350px" }}>
-                    <div className={classes.drawerFilter}>
-                      <Avatar className={classes.avatarFilter}>
-                        <FilterListRoundedIcon />
-                      </Avatar>
-                      <h3 style={{ color: '#5C5C62', fontSize: 20 }}>Filtros</h3>
-                    </div>
-
-                    <div className={classes.drawerContent}>
-                      <div className={classes.drawerTitle}>
-                        Buscar por nome
-                      </div>
-                      <Divider variant="fullWidth" />
-                      <div>
-                        <IconButton type="submit" className={classes.iconButton} aria-label="search">
-                          <SearchIcon />
-                        </IconButton>
-                        <InputBase
-                          placeholder="Buscar por nome"
-                        />
-                      </div>
-                      <div className={classes.drawerFooter}>
-                        <Button variant="contained" color='default' startIcon={<SearchIcon />}>Buscar</Button>
-                      </div>
-                    </div>
-                  </div>
-                </Drawer>
               </div>
             }
           />
 
           {loading ? (<div style={{ width: 300, margin: '0 auto' }} ref={container} />) : (
             <Card style={{ borderRadius: 15 }}>
-              <div className={classes.twoElements}>
+              <div style={{ padding: 8}}>
                 <div className={classes.iconButton}>
                   <IconButton>
                     <SearchIcon />
@@ -204,12 +166,6 @@ export default function IndexMaterial() {
                     placeholder="Buscar..."
                   />
                 </div>
-
-                <Tooltip title="Filtros">
-                  <IconButton size="large" onClick={handleDrawerFilter}>
-                    <FilterListRoundedIcon />
-                  </IconButton>
-                </Tooltip>
               </div>
 
               <TableContainer>
@@ -222,55 +178,57 @@ export default function IndexMaterial() {
                   </TableHead>
 
                   <TableBody>
-                    {materials.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
-                      <TableRow hover key={row._id}>
-                        <TableCell>{row.nomeMaterial}</TableCell>
-                        <TableCell component="th" scope="row" align="right">
-                          {/* <IconButton onClick={() => setIsOpenMenu(true)}>
+                    {materials &&
+                      materials.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
+                        <TableRow hover key={row._id}>
+                          <TableCell>{row.nomeMaterial}</TableCell>
+                          <TableCell component="th" scope="row" align="right">
+                            {/* <IconButton onClick={() => setIsOpenMenu(true)}>
                         <MoreVertIcon
                           className={classes.buttonTable}
                         />
                     </IconButton> */}
-                          <IconButton onClick={() => handleDelete(row._id)}>
-                            <DeleteIcon />
-                          </IconButton>
-                          <IconButton href={'/admin/materiais/edit/' + row._id}>
-                            <EditIcon />
-                          </IconButton>
-                        </TableCell>
+                            <IconButton onClick={() => handleDelete(row._id)}>
+                              <DeleteIcon />
+                            </IconButton>
+                            <IconButton href={'/admin/materiais/edit/' + row._id}>
+                              <EditIcon />
+                            </IconButton>
+                          </TableCell>
 
-                        <Menu
-                          open={isOpenMenu}
-                          anchorEl={ref.current}
-                          onClose={() => setIsOpenMenu(false)}
-                          PaperProps={{
-                            sx: { width: 200, maxWidth: '100%' }
-                          }}
-                          anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-                          transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-                        >
-                          <MenuItem>
-                            <ListItemIcon>
-                              <IconButton onClick={() => handleDelete(row._id)}>
-                                <DeleteIcon />
-                              </IconButton>
-                            </ListItemIcon>
-                            <ListItemText primary="Excluir" />
-                          </MenuItem>
+                          <Menu
+                            open={isOpenMenu}
+                            anchorEl={ref.current}
+                            onClose={() => setIsOpenMenu(false)}
+                            PaperProps={{
+                              sx: { width: 200, maxWidth: '100%' }
+                            }}
+                            anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+                            transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+                          >
+                            <MenuItem>
+                              <ListItemIcon>
+                                <IconButton onClick={() => handleDelete(row._id)}>
+                                  <DeleteIcon />
+                                </IconButton>
+                              </ListItemIcon>
+                              <ListItemText primary="Excluir" />
+                            </MenuItem>
 
-                          <MenuItem >
-                            <ListItemIcon >
-                              <IconButton href={'/admin/materiais/edit/' + row._id}>
-                                <EditIcon />
-                              </IconButton>
-                            </ListItemIcon>
-                            <ListItemText primary="Editar" />
-                          </MenuItem>
-                        </Menu>
-                      </TableRow>
-                    ))}
+                            <MenuItem >
+                              <ListItemIcon >
+                                <IconButton href={'/admin/materiais/edit/' + row._id}>
+                                  <EditIcon />
+                                </IconButton>
+                              </ListItemIcon>
+                              <ListItemText primary="Editar" />
+                            </MenuItem>
+                          </Menu>
+                        </TableRow>
+                      ))}
                   </TableBody>
                 </Table>
+                {materials.length > 0 ? null : <div className={classes.noRegisters}>Nenhum registro encontrado</div>}
               </TableContainer>
               <TablePagination
                 rowsPerPageOptions={[5, 10, 25]}
@@ -294,32 +252,15 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
   },
   iconButton: {
-    borderRadius: 50,
-    borderColor: '#F4F4F4',
-    borderStyle: 'solid'
-  },
-  drawerFilter: {
-    display: 'flex',
-    padding: '15px',
-    alignItems: 'center',
+    borderRadius: 10,
+    borderColor: '#BCBCBC',
+    borderStyle: 'solid',
+    borderWidth: 2
   },
   avatarFilter: {
     color: '#4DB4C6',
     backgroundColor: '#E7F7F9',
     marginRight: theme.spacing(2),
-  },
-  drawerContent: {
-    display: 'flex',
-    flexDirection: 'column',
-    padding: '15px',
-  },
-  drawerTitle: {
-    color: '#5C5C62',
-    fontSize: 18
-  },
-  drawerFooter: {
-    display: 'flex',
-    flexDirection: 'column',
   },
   content: {
     flexGrow: 1,
@@ -338,17 +279,12 @@ const useStyles = makeStyles((theme) => ({
       fontSize: 14
     },
   },
-  buttonTable: {
-    // margin: theme.spacing(1)
-  },
-  twoElements: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    margin: theme.spacing(1),
-
-    '& .MuiTextField-root': {
-      margin: theme.spacing(1),
-    },
+  noRegisters: {
+    textAlign: 'center',
+    paddingTop: 10,
+    fontWeight: 700,
+    fontSize: 16,
+    color: '#595A4A'
   },
   btnDefaultGreen: {
     background: '#00AB55',
@@ -370,5 +306,4 @@ const useStyles = makeStyles((theme) => ({
       marginBottom: theme.spacing(1),
     },
   },
-  appBarSpacer: theme.mixins.toolbar,
 }));

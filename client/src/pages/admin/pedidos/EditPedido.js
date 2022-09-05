@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-
-import { TextField } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Container from '@material-ui/core/Container';
@@ -21,36 +19,66 @@ import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import MenuItem from '@mui/material/MenuItem';
 import SaveIcon from '@material-ui/icons/Save';
+import TextField from '@mui/material/TextField';
 
+import NumberFormat from 'react-number-format';
 import MenuAdmin from '../../../components/menu-admin';
 import api from '../../../services/api';
 import BuscarCEP from '../../../components/buscar-cep';
 import ListaProdutos from '../../../components/lista-produtos';
 import { DatePicker } from '@material-ui/pickers';
 import '../../../assets/css/card-location.css';
+import Notification from '../../../components/notification';
+
+export function currencyFormatter(value) {
+    if (!Number(value)) return "";
+
+    const amount = new Intl.NumberFormat("pt-BR", {
+        style: "currency",
+        currency: "BRL"
+    }).format(value / 100).replace('R$', '');
+
+    return `${amount}`;
+}
+
+const NumberFormatCustom = React.forwardRef(function NumberFormatCustom(props, ref) {
+    const { onChange, ...other } = props;
+
+    return (
+        <NumberFormat
+            {...other}
+            getInputRef={ref}
+            onValueChange={(values) => {
+                onChange({
+                    target: {
+                        name: props.name,
+                        value: values.value,
+                    },
+                });
+            }}
+            format={currencyFormatter}
+        />
+    );
+});
 
 export default function EditPedido() {
     const classes = useStyles();
+    const inputRef = React.createRef();
 
+    const [notify, setNotify] = useState({ isOpen: false, message: '', type: '' });
     const [numeroPedido, setNumeroPedido] = useState();
     const [status, setStatus] = useState('Pendente');
     const [enderecoAtual, setEnderecoAtual] = useState('atual');
     const [totalGeral, setTotalGeral] = useState(0);
+    const [totalParcial, setTotalParcial] = useState();
+    const [desconto, setDesconto] = useState(0);
     const [observacao, setObservacao] = useState('');
+    const [dataPedido, setDataPedido] = useState();
     const [dataEntrega, setDataEntrega] = useState(null);
     const [dataDevolucao, setDataDevolucao] = useState(null);
     const [produtos, setProdutos] = useState([]);
     const [dadosEndereco, setDadosEndereco] = useState({});
     const { idPedido } = useParams();
-
-    //Dados Endereço
-    const [endereco, setEndereco] = useState('');
-    const [complemento, setComplemento] = useState('');
-    const [logradouro, setLogradouro] = useState('');
-    const [bairro, setBairro] = useState('');
-    const [cidade, setCidade] = useState('');
-    const [uf, setUf] = useState('');
-    const [cep, setCep] = useState('');
 
     //Dados cliente
     const [selectClients, setSelectClients] = useState([]);
@@ -62,9 +90,12 @@ export default function EditPedido() {
             var response = await api.get('/api/rents.details/' + idPedido);
 
             setClientId(response.data.nomeCliente);
-            setNumeroPedido(response.data.number);
+            setNumeroPedido(response.data.numeroPedido);
+            setDataPedido(response.data.dataPedido);
             setStatus(response.data.status);
             setTotalGeral(response.data.totalGeral);
+            setDesconto(response.data.desconto);
+            setTotalParcial(response.data.totalParcial);
             setObservacao(response.data.observacao);
             setDataEntrega(response.data.dataEntrega);
             setDataDevolucao(response.data.dataDevolucao);
@@ -88,7 +119,7 @@ export default function EditPedido() {
         const clientId = e.target.value;
         setCurrentClient(selectClients.find(e => e._id == clientId));
         setClientId(clientId);
-      }
+    }
 
     const handleChangeAddress = (event) => {
         setEnderecoAtual(event.target.value);
@@ -129,10 +160,36 @@ export default function EditPedido() {
             _id: idPedido
         }
 
+        if (enderecoAtual == "novo") {
+            data.tipoEndereco = "Novo";
+            data.numero = dadosEndereco.numero;
+            data.complemento = dadosEndereco.complemento;
+            data.logradouro = dadosEndereco.logradouro;
+            data.bairro = dadosEndereco.bairro;
+            data.cidade = dadosEndereco.cidade;
+            data.uf = dadosEndereco.uf;
+            data.cep = dadosEndereco.cep;
+        }
+        else {
+            data.tipoEndereco = "Cadastro Cliente";
+            data.numero = currentClient.numero;
+            data.complemento = currentClient.complemento;
+            data.logradouro = currentClient.logradouro;
+            data.bairro = currentClient.bairro;
+            data.cidade = currentClient.cidade;
+            data.uf = currentClient.uf;
+            data.cep = currentClient.cep;
+        }
+
         if (status != '') {
             const response = await api.put('/api/rents', data);
 
             if (response.status == 200) {
+                setNotify({
+                    isOpen: true,
+                    message: 'Pedido atualizado com sucesso',
+                    type: 'success'
+                });
                 window.location.href = '/admin/pedidos'
             } else {
                 alert('Erro ao atualizar o pedido');
@@ -144,11 +201,10 @@ export default function EditPedido() {
 
     return (
         <div className={classes.root}>
+            <Notification notify={notify} setNotify={setNotify} />
             <MenuAdmin />
             <main className={classes.content}>
-
                 <Container maxWidth="lg" component="main" className={classes.container}>
-
                     <CardHeader
                         title="Editar pedido"
                         subheader={
@@ -167,6 +223,28 @@ export default function EditPedido() {
                     <Card style={{ borderRadius: 15 }}>
                         <form onSubmit={handleSubmit}>
                             <CardContent className={classes.inputs}>
+                                <div className={classes.twoInputs}>
+                                    <TextField
+                                        variant='outlined'
+                                        size="small"
+                                        label="Nº Pedido"
+                                        InputLabelProps={{shrink: true}}
+                                        disabled
+                                        value={numeroPedido}
+                                    />
+
+                                    <DatePicker
+                                        label='Data pedido'
+                                        size='small'
+                                        disabled
+                                        inputVariant='outlined'
+                                        format="dd/MM/yyyy"
+                                        cancelLabel="CANCELAR"
+                                        value={dataDevolucao}
+                                    />
+                                </div>
+
+
                                 <FormControl variant="outlined" size="small" className={classes.formControl}>
                                     <InputLabel>Cliente</InputLabel>
                                     <Select
@@ -192,7 +270,7 @@ export default function EditPedido() {
                                     </RadioGroup>
                                 </FormControl>
 
-                                {enderecoAtual == 'novo' ? <BuscarCEP onUpdate={handleSearchCEP} /> :
+                                {enderecoAtual == 'novo' ? <BuscarCEP onUpdate={handleSearchCEP} initialData={dadosEndereco} /> :
                                     currentClient.nomeCliente != null ?
                                         <div className='container'>
                                             <div className="card">
@@ -238,6 +316,43 @@ export default function EditPedido() {
                                         onChange={handleDateDevolutionChange}
                                     />
                                 </div>
+
+                                <div className={classes.twoInputs}>
+                                    <TextField
+                                        variant="outlined"
+                                        size="small"
+                                        label="Total parcial"
+                                        getInputRef={inputRef}
+                                        InputProps={{
+                                            inputComponent: NumberFormatCustom,
+                                        }}
+                                        value={totalParcial}
+                                        onChange={(event) => setTotalParcial(event.target.value)}
+                                    />
+                                    <TextField
+                                        variant="outlined"
+                                        size="small"
+                                        label="Desconto"
+                                        getInputRef={inputRef}
+                                        InputProps={{
+                                            inputComponent: NumberFormatCustom,
+                                        }}
+                                        value={desconto}
+                                        onChange={(event) => setDesconto(event.target.value)}
+                                    />
+                                    <TextField
+                                        variant="outlined"
+                                        size="small"
+                                        label="Total"
+                                        getInputRef={inputRef}
+                                        InputProps={{
+                                            inputComponent: NumberFormatCustom,
+                                        }}
+                                        value={totalGeral}
+                                        onChange={(event) => setTotalGeral(event.target.value)}
+                                    />
+                                </div>
+
                                 <TextField
                                     variant="outlined"
                                     label="Observação"
@@ -275,7 +390,8 @@ const useStyles = makeStyles((theme) => ({
         },
     },
     container: {
-        marginTop: 90
+        paddingTop: theme.spacing(4),
+        paddingBottom: theme.spacing(4),
     },
     inputs: {
         display: 'flex',
@@ -328,5 +444,4 @@ const useStyles = makeStyles((theme) => ({
             color: '#FFF',
         },
     },
-    appBarSpacer: theme.mixins.toolbar,
 }));

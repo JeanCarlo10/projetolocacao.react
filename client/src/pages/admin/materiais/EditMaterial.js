@@ -11,7 +11,7 @@ import CardHeader from '@material-ui/core/CardHeader';
 import Button from '@material-ui/core/Button';
 import Breadcrumbs from '@material-ui/core/Breadcrumbs';
 import Link from '@material-ui/core/Link';
-
+import Notification from '../../../components/notification';
 import SaveIcon from '@material-ui/icons/Save';
 
 import MenuAdmin from '../../../components/menu-admin';
@@ -21,6 +21,7 @@ export default function EditMaterial() {
     const classes = useStyles();
 
     const [nomeMaterial, setNomeMaterial] = useState('');
+    const [notify, setNotify] = useState({ isOpen: false, message: '', type: '' });
     const { idMaterial } = useParams();
 
     useEffect(() => {
@@ -47,6 +48,11 @@ export default function EditMaterial() {
             const response = await api.put('/api/materials', data);
 
             if (response.status == 200) {
+                setNotify({
+                    isOpen: true,
+                    message: 'Material atualizado com sucesso',
+                    type: 'success'
+                });
                 window.location.href = '/admin/materiais'
             } else {
                 alert('Erro ao atualizar o material');
@@ -58,45 +64,45 @@ export default function EditMaterial() {
 
     return (
         <div className={classes.root}>
-            <MenuAdmin/>
+            <MenuAdmin />
             <main className={classes.content}>
-                
-            <Container maxWidth="lg" component="main" className={classes.container}>
-            
-                <CardHeader
-                    title="Editar material"
-                    subheader={
-                    <Breadcrumbs style={{ fontSize: 14 }} separator="•"  aria-label="breadcrumb">
-                        <Link color="inherit" href={'/admin/materiais'} >
-                            Materiais
-                        </Link>
-                        <Typography color="textPrimary" style={{ fontSize: 14 }}>Editar material</Typography>
-                    </Breadcrumbs>
-                    }
-                    titleTypographyProps={{ align: 'left' }}
-                    subheaderTypographyProps={{ align: 'left' }}
-                    className={classes.cardHeader}
-                />
-                
-                <Card style= {{ borderRadius: 15 }}>
-                    <form onSubmit={handleSubmit}>
-                        <CardContent className={classes.inputs}>
-                            <TextField
-                                required
-                                autoFocus
-                                variant="outlined"
-                                size="small"
-                                label="Descrição"
-                                value={nomeMaterial}
-                                onChange={e => setNomeMaterial(e.target.value)}
-                            />
-                        </CardContent>
-                        <CardActions style={{ justifyContent: 'flex-end', marginRight: 15 }}>
-                            <Button variant="contained" size="medium" className={classes.btnDefaultGreen} type="submit" startIcon={<SaveIcon />}>Salvar</Button>
-                        </CardActions>
-                    </form>
-                </Card>   
-            </Container>
+
+                <Container maxWidth="lg" component="main" className={classes.container}>
+
+                    <CardHeader
+                        title="Editar material"
+                        subheader={
+                            <Breadcrumbs style={{ fontSize: 14 }} separator="•" aria-label="breadcrumb">
+                                <Link color="inherit" href={'/admin/materiais'} >
+                                    Materiais
+                                </Link>
+                                <Typography color="textPrimary" style={{ fontSize: 14 }}>Editar material</Typography>
+                            </Breadcrumbs>
+                        }
+                        titleTypographyProps={{ align: 'left' }}
+                        subheaderTypographyProps={{ align: 'left' }}
+                        className={classes.cardHeader}
+                    />
+
+                    <Card style={{ borderRadius: 15 }}>
+                        <form onSubmit={handleSubmit}>
+                            <CardContent className={classes.inputs}>
+                                <TextField
+                                    required
+                                    autoFocus
+                                    variant="outlined"
+                                    size="small"
+                                    label="Descrição"
+                                    value={nomeMaterial}
+                                    onChange={e => setNomeMaterial(e.target.value)}
+                                />
+                            </CardContent>
+                            <CardActions style={{ justifyContent: 'flex-end', marginRight: 15 }}>
+                                <Button variant="contained" size="medium" className={classes.btnDefaultGreen} type="submit" startIcon={<SaveIcon />}>Salvar</Button>
+                            </CardActions>
+                        </form>
+                    </Card>
+                </Container>
             </main>
         </div>
     );
@@ -111,15 +117,16 @@ const useStyles = makeStyles((theme) => ({
         height: '100vh',
         overflow: 'auto',
     },
-    cardHeader: {    
+    cardHeader: {
         "& .MuiCardHeader-title": {
-          fontWeight: 700,
-          color: '#212B36',
-          marginBottom: theme.spacing(1),
+            fontWeight: 700,
+            color: '#212B36',
+            marginBottom: theme.spacing(1),
         },
-      },
+    },
     container: {
-        marginTop: 90
+        paddingTop: theme.spacing(4),
+        paddingBottom: theme.spacing(4),
     },
     inputs: {
         display: 'flex',
@@ -134,13 +141,13 @@ const useStyles = makeStyles((theme) => ({
         },
         '& .MuiOutlinedInput-root': {
             '& fieldset': {
-            borderColor: '#dce0e4',
+                borderColor: '#dce0e4',
             },
             '&:hover fieldset': {
-            borderColor: '#3d3d3d',
+                borderColor: '#3d3d3d',
             },
             '&.Mui-focused fieldset': {
-            borderColor: '#00AB55',
+                borderColor: '#00AB55',
             },
         },
     },
@@ -155,11 +162,10 @@ const useStyles = makeStyles((theme) => ({
         border: 'none',
         textTransform: 'none',
         boxShadow: 'none',
-    
+
         '&:hover': {
-          backgroundColor: '#007B55',
-          color: '#FFF',
+            backgroundColor: '#007B55',
+            color: '#FFF',
         },
-      },
-    appBarSpacer: theme.mixins.toolbar,
+    },
 }));

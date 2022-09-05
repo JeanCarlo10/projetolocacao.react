@@ -1,6 +1,7 @@
 .card-info {
     border-radius: 15px !important;
     margin-bottom: 10px;
+    border: 2px solid #D4D4D4;
 }
 
 .title {
@@ -11,9 +12,10 @@
     font-family: 'Public Sans';
 }
 
-/* .animation {
+.animation {
     animation: pulse 5s infinite;
-    background: #fec6cf !important;
+    background: #FBEAEC !important;
+    border: 2px solid #dc3545 !important;
 }
 
 @keyframes pulse {
@@ -26,65 +28,86 @@
     100% {
         transform: scale(1);
     }
-} */
+}
 
 .title {
     font-size: 18px;
     font-weight: bold;
-    color:#2d2a26;
+    color: #2d2a26;
     text-transform: uppercase;
 }
 
 .subTitle-Address {
     font-size: 14px;
     font-weight: 400;
-    color:#666;
+    color: #666;
 }
 
-.info p{
+.info {
+    flex-direction: row;
+    display: flex;
+    background: #F3F4F6;
+    border-top-right-radius: 5px;
+    border-top-left-radius: 5px;
+    border-bottom: 2px dashed #BCBCBC;
+    margin-bottom: 10px;
+    padding: 6px
+}
+
+.info span{
+    font-size: 14px;
+    font-weight: bold;
+    color: #2d2a26;
+    margin-right: 15px;
+}
+
+.info-content p {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #2d2a26;
+}
+
+.info-data-devolucao {
     font-size: 14px;
     font-weight: bold;
     color: #2d2a26;
 }
 
-.status p{
+.status p {
     font-size: 14px;
     font-weight: 400;
-    color:#666;
+    color: #666;
 }
 
-.status-pendente{
+.status-pendente {
     font-size: 18px;
     font-weight: 600;
     color: #FF6700;
 }
 
-.status-cancelado{
+.status-cancelado {
     font-size: 18px;
     font-weight: 600;
     color: #e71a3b;
 }
 
-.status-entregue{
+.status-entregue {
     font-size: 18px;
     font-weight: 600;
-    color:#1c7e2e;
+    color: #1c7e2e;
 }
 
-.status-devolvido{
+.status-devolvido {
     font-size: 18px;
     font-weight: 600;
-    color: #0033c6;
+    color: #0033c6;   
 }
 
-.info-content p{
-    font-size: 18px;
-    font-weight: bold;
-    color: #2d2a26;
-}
+
 
 .btn-arrow {
-    background-color: #00AB55;
+    background: #00AB55;
     color: #06e877;
     border-radius: 5px;
 }

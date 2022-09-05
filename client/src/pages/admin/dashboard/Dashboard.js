@@ -3,12 +3,8 @@ import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import Grid from '@mui/material/Grid';
 import MenuAdmin from '../../../components/menu-admin';
-import CardLocacoesAtivas from '../../../components/card-locacoes-ativas';
-import CardAcoesPendentes from '../../../components/card-acoes-pendentes';
-import CardRetiradas from '../../../components/card-retiradas';
 import NotificacaoPedido from '../../../components/notificacao-pedido';
 import FilterDashboard from '../../../components/filter-dashboard';
-import FilterStatus from '../../../components/filter-status';
 import CardDashboard from '../../../components/card-dashboard';
 import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNoneOutlined';
 import EmojiFlagsOutlinedIcon from '@mui/icons-material/EmojiFlagsOutlined';
@@ -19,62 +15,13 @@ export default function Dashboard() {
   const classes = useStyles();
 
   const [listaPedidos, setListaPedidos] = useState([]);
-  const [filteredList, setFilteredList] = useState([]);
   const [currentMonth, setCurrentMonth] = useState(new Date());
-
-  const [status, setStatus] = useState([
-    {
-      id: 1,
-      checked: false,
-      label: 'Pendente'
-    },
-    {
-      id: 2,
-      checked: false,
-      label: 'Entregue'
-    },
-    {
-      id: 3,
-      checked: false,
-      label: 'Cancelado'
-    },
-    {
-      id: 4,
-      checked: false,
-      label: 'Devolvido'
-    },
-  ]);
+  const [keyword, setKeyword] = useState("");
+  const [statuses, setStatuses] = useState([]);
 
   const handleMonthChange = (newMonth) => {
     setCurrentMonth(newMonth);
   };
-
-  const handleChangeChecked = (id) => {
-    const statusList = status;
-    const changeCheckedStatus = statusList.map((item) =>
-      item.id === id ? { ...item, checked: !item.checked } : item
-    );
-    setStatus(changeCheckedStatus);
-  };
-
-  const applyFilters = () => {
-    let updatedList = listaPedidos;
-
-    //Filter Status
-    const statusChecked = status.filter(item => item.checked).map((item) => item.label.toLowerCase());
-
-    if (statusChecked.length) {
-      updatedList = updatedList.filter(item =>
-        statusChecked.includes(item.status)
-      );
-    };
-
-    setListaPedidos(updatedList);
-  }
-
-  useEffect(() => {
-    applyFilters();
-  }, [status]);
 
   useEffect(() => {
     async function getDadosPedido() {
@@ -114,9 +61,9 @@ export default function Dashboard() {
             </Grid>
             <Grid item xs={12} sm={6} md={4}>
               <CardDashboard
-              className="locacoes-nao-devolvidas"
+                className="locacoes-nao-devolvidas"
                 number={listaPedidos.totalNaoDevolvido}
-                text="Locações não retiradas"
+                text="Não devolvido"
                 icon={<GppMaybeOutlinedIcon className="size-icon" />}
                 color={"#FF5252"}
               />
@@ -127,9 +74,15 @@ export default function Dashboard() {
           <FilterDashboard
             currentMonth={currentMonth}
             onMonthChange={handleMonthChange}
+            onChecked={setStatuses}
+            onChangeKeyword={setKeyword}
           />
 
-          <NotificacaoPedido currentMonth={currentMonth} />
+          <NotificacaoPedido
+            currentMonth={currentMonth}
+            statuses={statuses}
+            keyword={keyword}
+          />
         </Container>
       </main>
     </div>
@@ -155,5 +108,5 @@ const useStyles = makeStyles((theme) => ({
     // padding: theme.spacing(2),
   },
 
-  appBarSpacer: theme.mixins.toolbar,
+  // appBarSpacer: theme.mixins.toolbar,
 }));

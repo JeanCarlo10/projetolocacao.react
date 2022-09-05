@@ -1,19 +1,18 @@
 import React, { useState } from 'react';
 import { styled } from '@mui/material/styles';
 import { makeStyles } from '@material-ui/core/styles';
-
+import InputBase from '@material-ui/core/InputBase';
 import IconButton from '@material-ui/core/IconButton';
-import { Grid, Card } from '@mui/material';
+import {
+  Grid, Card, Checkbox, Tooltip, FormControl, OutlinedInput,
+  InputLabel, MenuItem, ListItemText, Select
+} from '@mui/material';
 import ArrowBackIosRoundedIcon from '@mui/icons-material/ArrowBackIosRounded';
 import ArrowForwardIosRoundedIcon from '@mui/icons-material/ArrowForwardIosRounded';
+import SearchIcon from '@material-ui/icons/Search';
 import { formatCurrentMonth } from '../helpers/dateFilter';
-import FormGroup from '@mui/material/FormGroup';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
-import Tooltip from '@mui/material/Tooltip';
 
 const RootStyle = styled(Card)(({ theme }) => ({
-  // justifyContent: 'space-between',
   flexDirection: 'row',
   display: 'flex',
   padding: theme.spacing(2),
@@ -22,9 +21,56 @@ const RootStyle = styled(Card)(({ theme }) => ({
   marginBottom: 10,
 }));
 
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+  PaperProps: {
+    style: {
+      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+      width: 250,
+    },
+  },
+};
+
+const nameStatus = [
+  {
+    id: 1,
+    checked: false,
+    label: 'Pendente'
+  },
+  {
+    id: 2,
+    checked: false,
+    label: 'Entregue'
+  },
+  {
+    id: 3,
+    checked: false,
+    label: 'Cancelado'
+  },
+  {
+    id: 4,
+    checked: false,
+    label: 'Devolvido'
+  },
+  {
+    id: 5,
+    checked: false,
+    label: 'Não Devolvido'
+  },
+];
+
 export default function FilterDashboard(props) {
   const classes = useStyles();
-  const { currentMonth, onMonthChange } = props;
+  const { currentMonth, onMonthChange, onChecked, onChangeKeyword } = props;
+
+  const [search, setSearch] = useState("");
+  const [status, setStatus] = useState([]);
+
+  const onChangeSearch = (text) => {
+    setSearch(text);
+    onChangeKeyword(text);
+  }
 
   const handlePrevMonth = () => {
     var newCurrentMonth = new Date(currentMonth.valueOf());
@@ -40,10 +86,19 @@ export default function FilterDashboard(props) {
     onMonthChange(newCurrentMonth);
   }
 
+  const handleChange = (event) => {
+    const {
+      target: { value },
+    } = event;
+
+    setStatus(value);
+    onChecked(value);
+  };
+
   return (
     <RootStyle>
-      <Grid container spacing={4}>
-        <Grid item xs={12} sm={6} md={4}>
+      <Grid container spacing={3}>
+        <Grid item xs={12} sm={4} md={4}>
           <div className={classes.containerFilterDate}>
             <Tooltip title="Anterior">
               <IconButton className={classes.btnPrevMonth} onClick={handlePrevMonth}>
@@ -62,17 +117,40 @@ export default function FilterDashboard(props) {
           </div>
         </Grid>
 
-        <Grid item xs={12} sm={6} md={4}>
-          
+        <Grid item xs={12} sm={4} md={4}>
+          <div className={classes.iconButton}>
+            <IconButton>
+              <SearchIcon />
+            </IconButton>
+            <InputBase
+              value={search}
+              onChange={({target}) => onChangeSearch(target.value)}
+              placeholder="Buscar..."
+            />
+          </div>
         </Grid>
 
-        {/* <Grid item xs={12} sm={6} md={8}>
-          <FormGroup row>
-            <FormControlLabel control={<Checkbox checked={checked} onChange={() => changeChecked(id)} />} label={label}/>
-          </FormGroup>
-        </Grid> */}
+        <Grid item row xs={12} sm={4} md={4} className={classes.input}>
+          <FormControl fullWidth>
+            <InputLabel>Status</InputLabel>
+            <Select
+              multiple
+              value={status}
+              onChange={handleChange}
+              input={<OutlinedInput label="Status" />}
+              renderValue={(selected) => selected.join(', ')}
+              MenuProps={MenuProps}
+            >
+              {nameStatus.map((item) => (
+                <MenuItem key={item.id} value={item.label}>
+                  <Checkbox checked={status.indexOf(item.label) > -1} />
+                  <ListItemText primary={item.label} />
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Grid>
       </Grid>
-
     </RootStyle>
   );
 }
@@ -82,7 +160,33 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: 'row',
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'space-between'
+    justifyContent: 'space-between',
+    marginTop: 6,
+  },
+  iconButton: {
+    borderRadius: 10,
+    borderColor: '#BCBCBC',
+    borderStyle: 'solid',
+    borderWidth: 2
+  },
+  input: {
+    '& label.Mui-focused': {
+      color: '#00AB55',
+    },
+    '& .MuiOutlinedInput-root': {
+      '& fieldset': {
+        borderRadius: 10,
+        borderColor: '#BCBCBC',
+        borderStyle: 'solid',
+        borderWidth: 2,
+      },
+      '&:hover fieldset': {
+        borderColor: '#00AB55',
+      },
+      '&.Mui-focused fieldset': {
+        borderColor: '#00AB55',
+      },
+    },
   },
   btnPrevMonth: {
     padding: 0,

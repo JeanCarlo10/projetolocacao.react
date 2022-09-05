@@ -11,6 +11,7 @@ const ClientSchema = new mongoose.Schema({
     cnpj: String,
     dataNascimento: String,
     email: String,
+    avatar: String,
     
     //DADOS CEP
     numero: String,

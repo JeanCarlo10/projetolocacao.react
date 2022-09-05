@@ -14,15 +14,15 @@ import { mask, unMask } from 'remask';
 export default function BuscarCep(props) {
     const classes = useStyles(); 
     
-    const { onUpdate } = props;
+    const { onUpdate, initialData } = props;
 
-    const [numero, setNumero] = useState('');
-    const [complemento, setComplemento] = useState('');
-    const [logradouro, setLogradouro] = useState('');
-    const [bairro, setBairro] = useState('');
-    const [cidade, setCidade] = useState('');
-    const [uf, setUf] = useState('');
-    const [cep, setCep] = useState('');
+    const [numero, setNumero] = useState(initialData.numero || "");
+    const [complemento, setComplemento] = useState(initialData.complemento || "");
+    const [logradouro, setLogradouro] = useState(initialData.logradouro || "");
+    const [bairro, setBairro] = useState(initialData.bairro || "");
+    const [cidade, setCidade] = useState(initialData.cidade || "");
+    const [uf, setUf] = useState(initialData.uf || "");
+    const [cep, setCep] = useState(initialData.cep || "");
 
     useEffect(() => {
         onUpdate && onUpdate({
@@ -40,7 +40,7 @@ export default function BuscarCep(props) {
         setCep(mask(unMask(event.target.value), ['99999-999']));
     }
 
-    async function handleSearchCEP() {
+    async function handleSearchCEP(res, req) {
         if (cep === '') {
             alert('Por favor, informe o cep!')
             
@@ -56,8 +56,12 @@ export default function BuscarCep(props) {
             setCidade(localidade);
             setUf(uf);
             
-        }catch {
-            alert("CEP inválido!");
+        }catch (error) {
+            if (error) {
+                alert('CEP inválido!');
+            }
+            
+            // alert("CEP inválido!");
         }
     }
 

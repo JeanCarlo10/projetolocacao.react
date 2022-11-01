@@ -50,7 +50,7 @@ export default function MenuAdmin(props) {
             <ChevronLeftIcon />
           </IconButton>
 
-          <IconButton style={{ color: '#00AB55' }}
+          <IconButton style={{ color: '#00AB55', marginRight: 6 }}
             edge="start"
             onClick={handleDrawerOpen}
             className={clsx(classes.menuButton, open && classes.menuButtonHidden)}

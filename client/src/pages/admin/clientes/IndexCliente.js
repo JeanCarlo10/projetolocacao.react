@@ -34,6 +34,7 @@ import lottie from 'lottie-web';
 import MenuAdmin from '../../../components/menu-admin';
 import api from '../../../services/api';
 import Swal from 'sweetalert2';
+import Popover from '@mui/material/Popover';
 
 const StyledTableRow = withStyles((theme) => ({
   root: {
@@ -58,13 +59,26 @@ export default function IndexCliente() {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
+  const [anchorEl, setAnchorEl] = useState(null);
+
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const open = Boolean(anchorEl);
+  const id = open ? 'simple-popover' : undefined;
+
   useEffect(() => {
     lottie.loadAnimation({
       container: container.current,
       renderer: 'svg',
       loop: true,
       autoplay: true,
-      animationData: require('../../../assets/search.json'),
+      animationData: require('../../../assets/search2.json'),
     })
   }, []);
 
@@ -79,14 +93,14 @@ export default function IndexCliente() {
       setLoading(false);
     }
     loadClients();
-    // setTimeout(() => loadClients(), 2000);
+    //setTimeout(() => loadClients(), 2000);
   }, []);
 
   const handleDelete = (id) => {
     Swal.fire({
       icon: 'warning',
       title: 'Exclusão',
-      text: 'Deseja realmente excluir este cliente?',
+      text: `Deseja realmente excluir este cliente?`,
       showCloseButton: true,
       confirmButtonText: 'Sim, excluir!',
       confirmButtonColor: '#d33333',
@@ -122,7 +136,6 @@ export default function IndexCliente() {
   const filter = (endSearch) => {
     var resultSearch = filterClients.filter((result) => {
       if (result.nomeCliente.toString().toLowerCase().includes(endSearch.toLowerCase())
-        || result.razaoSocial.toString().toLowerCase().includes(endSearch.toLowerCase())
         || result.cpf.toString().toLowerCase().includes(endSearch.toLowerCase())
         || result.cnpj.toString().toLowerCase().includes(endSearch.toLowerCase())
       ) {
@@ -165,7 +178,7 @@ export default function IndexCliente() {
             }
           />
 
-          {loading ? (<div style={{ width: 300, margin: '0 auto' }} ref={container} />) : (
+          {loading ? (<div style={{ width: 450, margin: '0 auto' }} ref={container} />) : (
             <Card style={{ borderRadius: 15 }}>
               <div className={classes.twoElements}>
                 <div className={classes.iconButton}>
@@ -185,7 +198,7 @@ export default function IndexCliente() {
                   <TableHead>
                     <TableRow>
                       <TableCell>Tipo pessoa</TableCell>
-                      <TableCell>Nome/Razão social</TableCell>
+                      <TableCell>Nome/Nome Fantasia</TableCell>
                       <TableCell>CPF/CNPJ</TableCell>
                       <TableCell>Endereço</TableCell>
                       <TableCell align="right">Ações</TableCell>
@@ -193,62 +206,63 @@ export default function IndexCliente() {
                   </TableHead>
 
                   <TableBody>
-                    {clients && 
-                    clients.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
+                    {clients && clients.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
                       <TableRow hover key={row._id}>
-                        <TableCell align="left"><Chip style={{ fontFamily:'Public Sans'}} label={tipoPessoaMap[(row.tipoPessoa)]} /></TableCell>
+                        <TableCell align="left"><Chip style={{ fontFamily: 'Public Sans' }} label={tipoPessoaMap[(row.tipoPessoa)]} /></TableCell>
                         <TableCell>
-                          {row.tipoPessoa == 'Fisica' ? row.nomeCliente : row.razaoSocial}
+                          {row.nomeCliente}
                           {row.contacts.map((item) => (
                             <Stack direction="row" mt={0.5}>
-                              <Chip style={{ fontFamily:'Public Sans'}} icon={item.tipoTelefone == "Celular" ? <PhoneAndroidIcon /> : <PhoneIcon />} label={item.numero} />
+                              <Chip style={{ fontFamily: 'Public Sans' }} icon={item.tipoTelefone == "Celular" ? <PhoneAndroidIcon /> : <PhoneIcon />} label={item.numero} />
                             </Stack>
                           ))}
                         </TableCell>
                         <TableCell>{row.tipoPessoa == 'Fisica' ? row.cpf : row.cnpj}</TableCell>
                         <TableCell>{row.logradouro == null || undefined ? " " : row.logradouro + ", " + row.numero + " - " + row.bairro}</TableCell>
                         <TableCell component="th" scope="row" align="right">
-                          {/* <IconButton onClick={() => setIsOpenMenu(true) }>
-                            <MoreVertIcon 
-                              className={classes.buttonTable}
-                            />
-                        </IconButton> */}
-                          <IconButton onClick={() => handleDelete(row._id)}>
+                          <IconButton onClick={handleClick}>
+                            <MoreVertIcon />
+                          </IconButton>
+                          {/* <IconButton onClick={() => handleDelete(row._id)}>
                             <DeleteIcon />
                           </IconButton>
                           <IconButton href={'/admin/clientes/edit/' + row._id}>
                             <EditIcon />
-                          </IconButton>
+                          </IconButton> */}
                         </TableCell>
 
-                        {/* <Menu
-                            open={isOpenMenu}
-                            anchorEl={ref.current}
-                            onClose={() => setIsOpenMenu(false)}
-                            PaperProps={{
-                              sx: { width: 200, maxWidth: '100%' }
-                            }}
-                            anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-                            transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-                          >
-                            <MenuItem>
-                              <ListItemIcon>
-                                  <IconButton onClick={() => handleDelete(row._id)}>
-                                    <DeleteIcon />
-                                  </IconButton>
-                              </ListItemIcon>
-                              <ListItemText primary="Excluir" />
-                            </MenuItem>
+                        <Popover
+                          open={open}
+                          anchorEl={anchorEl}
+                          onClose={handleClose}
+                          anchorOrigin={{
+                            vertical: 'top',
+                            horizontal: 'right'
+                          }}
+                          transformOrigin=
+                          {{
+                            vertical: 'top',
+                            horizontal: 'right'
+                          }}
+                        >
+                          <MenuItem onClick={() => handleDelete(row._id)}>
+                            <ListItemIcon>
+                              <IconButton >
+                                <DeleteIcon />
+                              </IconButton>
+                            </ListItemIcon>
+                            <ListItemText primary="Excluir" />
+                          </MenuItem>
 
-                            <MenuItem >
-                              <ListItemIcon >
-                                  <IconButton href={'/admin/clientes/edit/' + row._id}>
-                                    <EditIcon />
-                                  </IconButton>
-                              </ListItemIcon>
-                              <ListItemText primary="Editar" />
-                            </MenuItem>
-                          </Menu> */}
+                          <MenuItem >
+                            <ListItemIcon >
+                              <IconButton href={'/admin/clientes/edit/' + row._id}>
+                                <EditIcon />
+                              </IconButton>
+                            </ListItemIcon>
+                            <ListItemText primary="Editar" />
+                          </MenuItem>
+                        </Popover>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -261,6 +275,12 @@ export default function IndexCliente() {
                 count={clients.length}
                 rowsPerPage={rowsPerPage}
                 page={page}
+                labelRowsPerPage={'Linhas por página'}
+                labelDisplayedRows={
+                  ({ from, to, count }) => {
+                    return '' + from + '-' + to + ' de ' + count
+                  }
+                }
                 onPageChange={handleChangePage}
                 onRowsPerPageChange={handleChangeRowsPerPage}
               />
@@ -305,9 +325,9 @@ const useStyles = makeStyles((theme) => ({
     }
   },
   noRegisters: {
-    textAlign: 'center', 
-    paddingTop: 10, 
-    fontWeight: 700, 
+    textAlign: 'center',
+    paddingTop: 10,
+    fontWeight: 700,
     fontSize: 16,
     color: '#595A4A'
   },

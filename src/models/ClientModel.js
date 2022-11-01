@@ -2,7 +2,6 @@ const mongoose = require('mongoose');
 
 const ClientSchema = new mongoose.Schema({
     nomeCliente: String,
-    razaoSocial: String,
     sexo: {type: String, default: ""}, //Masculino ou Feminino
     tipoPessoa: {type: String, default: 'Fisica'}, //Fisica ou Juridica
     cpf: String,

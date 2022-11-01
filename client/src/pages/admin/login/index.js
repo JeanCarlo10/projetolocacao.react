@@ -162,7 +162,7 @@ export default function SignIn() {
           <Button
             fullWidth
             variant="contained"
-            // size='medium'
+            size='large'
             className={classes.btnDefaultGreen}
             onClick={loadSubmit}
             disabled={loading}

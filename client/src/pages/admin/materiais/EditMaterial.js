@@ -64,6 +64,7 @@ export default function EditMaterial() {
 
     return (
         <div className={classes.root}>
+            <Notification notify={notify} setNotify={setNotify} />
             <MenuAdmin />
             <main className={classes.content}>
 

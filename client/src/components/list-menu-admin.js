@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import ListSubheader from '@material-ui/core/ListSubheader';
 import Button from '@material-ui/core/Button';
 import ShoppingCartIcon from '@material-ui/icons/ShoppingCart';
-
 import PeopleIcon from '@material-ui/icons/People';
 import ExitToApp from '@material-ui/icons/ExitToApp';
 import HouseIcon from '@material-ui/icons/House';
@@ -93,19 +92,3 @@ async function confirmSair() {
     }
   }
 }
-
-// const useStyles = makeStyles((theme) => ({
-//   btnDefaultGreen: {
-//     background: '#00AB55',
-//     color: '#FFF',
-//     borderRadius: 10,
-//     border: 'none',
-//     textTransform: 'none',
-//     boxShadow: 'none',
-
-//     '&:hover': {
-//       backgroundColor: '#007B55',
-//       color: '#FFF',
-//     },
-//   },
-// }));

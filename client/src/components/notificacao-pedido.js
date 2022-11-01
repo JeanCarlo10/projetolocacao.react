@@ -69,6 +69,7 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 export default function NotificacaoPedido(props) {
     const { currentMonth, statuses, keyword } = props;
     const classes = useStyles();
+    const unidadeMedidaMap = { 'Unidade': 'Unidade(s)', 'Metro': 'Metros' };
 
     const [listaPedidos, setListaPedidos] = useState([]);
     const [dataDevolucao, setDataDevolucao] = useState();
@@ -155,7 +156,7 @@ export default function NotificacaoPedido(props) {
 
                 var hours = differenceInHours(dataDevolucao, new Date());
 
-                if (info.status == "Não Devolvido" || (hours < 24 && info.status == "Pendente") ) {
+                if (info.status == "Não Devolvido" || (hours < 24 && info.status == "Pendente")) {
                     classname += " animation"
                 }
 
@@ -180,7 +181,7 @@ export default function NotificacaoPedido(props) {
                                         </IconButton>
                                     </Tooltip>
                                 }
-                                {info.status == "Entregue" && 
+                                {info.status == "Entregue" &&
                                     <Tooltip title="Devolvido">
                                         <IconButton style={{ color: '#0033c6' }} onClick={() => handleChangeStatusDevolvido(info._id, "Devolvido")}>
                                             <ReplayCircleFilledRoundedIcon fontSize='large' />
@@ -197,15 +198,18 @@ export default function NotificacaoPedido(props) {
                             </div>
                         }
                         title={
-                            <div className='title'>
-                                {info.nomeCliente}
-                            </div>
-
-                            // {info.contacts.map((item) => (
-                            //     <Stack direction="row" mb={0.5}>
-                            //       <Chip icon={item.tipoTelefone == "Celular" ? <PhoneAndroidIcon /> : <PhoneIcon />} label={item.numero } />
-                            //     </Stack>                              
-                            //   ))}
+                            <>
+                                <div className='title'>
+                                    {info.nomeCliente}
+                                </div>
+                                {/* <div>
+                                    {info.contacts.map((item) => (
+                                        <Stack direction="row" mb={0.5}>
+                                            <Chip icon={item.tipoTelefone == "Celular" ? <PhoneAndroidIcon /> : <PhoneIcon />} label={item.numero} />
+                                        </Stack>
+                                    ))}
+                                </div> */}
+                            </>
                         }
                         subheader={
                             <div className="subTitleAddress">
@@ -278,14 +282,14 @@ export default function NotificacaoPedido(props) {
                                             <TableHead>
                                                 <TableRow>
                                                     <StyledTableCell align="left">Material</StyledTableCell>
-                                                    <StyledTableCell align="center">Qtde/Metro</StyledTableCell>
+                                                    <StyledTableCell align="center">Quantidade</StyledTableCell>
                                                 </TableRow>
                                             </TableHead>
                                             <TableBody>
                                                 {info.products.map((item) => (
                                                     <StyledTableRow key={item._id}>
                                                         <StyledTableCell align="left">{item.nomeMaterial}</StyledTableCell>
-                                                        <StyledTableCell align="center">{item.qtde}</StyledTableCell>
+                                                        <StyledTableCell align="center">{item.qtde + " " + unidadeMedidaMap[(item.unidadeMedida)]} </StyledTableCell>
                                                     </StyledTableRow>
                                                 ))}
                                             </TableBody>

@@ -35,25 +35,23 @@ module.exports = {
                 
                 //send response
                 const photo = await Photo.create({
-                    content: avatar.data.toString("utf8"),
+                    content: avatar.data.toString("base64"),
                     name: avatar.name,
                     type: avatar.mimetype,
                     size: avatar.size,
-                    // preview: URL.createObjectURL(avatar)
                 });
             
                 await photo.save();
 
-                res.send(photo);
-                
-                // return res.status(200).json({ avatar });
+                return res.send(photo);
+                //return res.status(200).json({ photo });
             }
             
         } catch (err) {
-            res.status(500).send(err);
-            console.log(err);
+            return res.status(500).send({
+                error: 'Por favor, contate o administrador! Erro ao cadastrar a imagem'
+            })
         }
-        
     },
 
     //ADD CLIENT

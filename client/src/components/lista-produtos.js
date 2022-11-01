@@ -84,14 +84,20 @@ export default function ListaProdutos(props) {
   const inputRef = React.createRef();
 
   const { produtos, addProduto, deleteProduto } = props;
+  
 
   const [selectMaterials, setSelectMaterials] = useState([]);
   const [materialId, setMaterialId] = useState('');
   const [currentMaterial, setCurrentMaterial] = useState({});
 
-  const [metro, setMetro] = useState('');
+  const [unidadeMedida, setUnidadeMedida] = useState('Unidade');
   const [qtde, setQtde] = useState('');
   const [valorItem, setValorItem] = useState('');
+
+  const unidadeMedidaMap = { 'Unidade': 'unidade(s)', 'Metro': 'metros' };
+  const handleChangeUnidadeMedida = (event) => {
+    setUnidadeMedida(event.target.value);
+  };
 
   useEffect(() => {
     async function getDadosMaterial() {
@@ -110,18 +116,20 @@ export default function ListaProdutos(props) {
   }
 
   const handleAddProduct = () => {
-    addProduto({
-      id: currentMaterial._id,
-      metro: metro,
-      qtde: qtde,
-      valorItem: valorItem,
-      nomeMaterial: currentMaterial.nomeMaterial
-    });
+    if (materialId != '') {
+      addProduto({
+        id: currentMaterial._id,
+        unidadeMedida: unidadeMedida,
+        qtde: qtde,
+        valorItem: valorItem,
+        nomeMaterial: currentMaterial.nomeMaterial
+      });
 
-    setMaterialId('');
-    setMetro('');
-    setQtde('');
-    setValorItem('');
+      setMaterialId('');
+      setUnidadeMedida('');
+      setQtde('');
+      setValorItem('');
+    }
   }
 
   return (
@@ -131,12 +139,11 @@ export default function ListaProdutos(props) {
       borderLeft: "5px solid #009DE0",
       borderRadius: "5px",
       padding: '16px'
-    }}
-    >
-      <Typography style={{ color: '#009DE0', fontWeight: 'bold' }}>
+    }}>
+      <Typography style={{ marginBottom: 15, color: '#009DE0', fontWeight: 'bold' }}>
         Itens do pedido
+        <Divider variant="fullWidth" />
       </Typography>
-      <Divider variant="fullWidth" style={{ marginBottom: 15 }} />
 
       <form>
         <FormControl variant="outlined" size="small" style={{ minWidth: '100%' }}>
@@ -153,28 +160,30 @@ export default function ListaProdutos(props) {
         </FormControl>
 
         <Box style={{ marginLeft: -7, display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-          {currentMaterial.nomeMaterial == 'Andaime' &&
-            <TextField
-              variant="outlined"
-              size="small"
-              label="Metros"
-              value={metro}
-              onChange={(event) => setMetro(event.target.value)}
-            />
-          }
+          <TextField
+            fullWidth
+            variant="outlined"
+            size="small"
+            type='number'
+            label="Quantidade"
+            value={qtde}
+            onChange={(event) => setQtde(event.target.value)}
+          />
 
-          {currentMaterial.nomeMaterial != 'Andaime' &&
-            <TextField
-              variant="outlined"
-              size="small"
-              type='number'
-              label="Quantidade"
-              value={qtde}
-              onChange={(event) => setQtde(event.target.value)}
-            />
-          }
+          <FormControl variant="outlined" size="small" fullWidth>
+            <InputLabel>Unidade Medida</InputLabel>
+            <Select
+              value={unidadeMedida}
+              onChange={handleChangeUnidadeMedida}
+              label="Unidade Medida"
+            >
+              <MenuItem value={'Unidade'}>Unidade</MenuItem>
+              <MenuItem value={'Metro'}>Metro</MenuItem>
+            </Select>
+          </FormControl>
 
           <TextField
+            fullWidth
             variant="outlined"
             size="small"
             label="Valor"
@@ -196,21 +205,18 @@ export default function ListaProdutos(props) {
           <TableHead>
             <TableRow>
               <StyledTableCell align="left">Produto</StyledTableCell>
-              <StyledTableCell align="center">Qtde/Metros</StyledTableCell>
+              <StyledTableCell align="center">Quantidade</StyledTableCell>
               <StyledTableCell align="right">Valor</StyledTableCell>
-              <StyledTableCell align="right">Ações</StyledTableCell>
+              <StyledTableCell align="right">Ação</StyledTableCell>
             </TableRow>
           </TableHead>
 
           <TableBody>
-          {produtos &&
-            produtos.map((prod) => (
+            {produtos && produtos.map((prod) => (
               <StyledTableRow key={prod.id}>
                 <StyledTableCell align="left">{prod.nomeMaterial}</StyledTableCell>
-                <StyledTableCell align="center">{prod.nomeMaterial == "Andaime" ? prod.metro : prod.qtde}</StyledTableCell>
+                <StyledTableCell align="center">{prod.qtde + " " + unidadeMedidaMap[(prod.unidadeMedida)]}</StyledTableCell>
                 <StyledTableCell align="right">{currencyFormatter(prod.valorItem)}</StyledTableCell>
-
-
                 <StyledTableCell component="th" scope="row" align="right">
                   <IconButton onClick={() => deleteProduto(prod.id)}>
                     <DeleteIcon />
@@ -227,14 +233,6 @@ export default function ListaProdutos(props) {
 }
 
 const useStyles = makeStyles((theme) => ({
-  twoInputs: {
-    display: 'flex',
-    marginLeft: -7,
-    '& .MuiTextField-root': {
-      // margin: theme.spacing(1),
-      width: '50%',
-    },
-  },
   noRegisters: {
     textAlign: 'center',
     paddingTop: 10,
@@ -251,7 +249,6 @@ const useStyles = makeStyles((theme) => ({
     borderRadius: 5,
     background: '#F3F4F6'
   },
-
   btnAddBlue: {
     background: '#009DE0',
     color: '#FFF',
@@ -259,6 +256,7 @@ const useStyles = makeStyles((theme) => ({
     border: 'none',
     textTransform: 'none',
     boxShadow: 'none',
+    fontWeight: 'bold',
 
     '&:hover': {
       backgroundColor: '#052F5F',

@@ -13,8 +13,9 @@
 }
 
 .animation {
-    animation: pulse 5s infinite;
-    background: #FBEAEC !important;
+    animation: pulse 4s infinite;
+    background: #f500560d !important; 
+    /* background: #FBEAEC  !important; */
     border: 2px solid #dc3545 !important;
 }
 
@@ -103,8 +104,6 @@
     font-weight: 600;
     color: #0033c6;   
 }
-
-
 
 .btn-arrow {
     background: #00AB55;

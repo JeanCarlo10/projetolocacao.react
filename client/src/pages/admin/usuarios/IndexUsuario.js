@@ -65,7 +65,7 @@ export default function IndexUsuario() {
       renderer: 'svg',
       loop: true,
       autoplay: true,
-      animationData: require('../../../assets/search.json'),
+      animationData: require('../../../assets/search2.json'),
     })
   }, []);
 
@@ -168,7 +168,7 @@ export default function IndexUsuario() {
             }
           />
 
-          {loading ? (<div style={{ width: 300, margin: '0 auto' }} ref={container} />) : (
+          {loading ? (<div style={{ width: 450, margin: '0 auto' }} ref={container} />) : (
             <Card style={{ borderRadius: 15 }}>
               <div className={classes.twoElements}>
                 <div className={classes.iconButton}>
@@ -249,6 +249,12 @@ export default function IndexUsuario() {
                 count={users.length}
                 rowsPerPage={rowsPerPage}
                 page={page}
+                labelRowsPerPage={'Linhas por página'}
+                labelDisplayedRows={
+                  ({ from, to, count }) => {
+                    return '' + from + '-' + to + ' de ' + count
+                  }
+                }
                 onPageChange={handleChangePage}
                 onRowsPerPageChange={handleChangeRowsPerPage}
               />

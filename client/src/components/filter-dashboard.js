@@ -133,7 +133,7 @@ export default function FilterDashboard(props) {
         <Grid item row xs={12} sm={4} md={4} className={classes.input}>
           <FormControl fullWidth>
             <InputLabel>Status</InputLabel>
-            <Select
+            <Select className={classes.select}
               multiple
               value={status}
               onChange={handleChange}
@@ -168,6 +168,11 @@ const useStyles = makeStyles((theme) => ({
     borderColor: '#BCBCBC',
     borderStyle: 'solid',
     borderWidth: 2
+  },
+  select: {
+    '& .MuiSelect-select': {
+      padding: '14.5px !important'
+    },
   },
   input: {
     '& label.Mui-focused': {

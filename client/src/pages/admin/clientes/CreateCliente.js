@@ -36,7 +36,6 @@ export default function CreateCliente() {
 
   const [notify, setNotify] = useState({ isOpen: false, message: '', type: '' });
   const [nome, setNome] = useState('');
-  const [razaoSocial, setRazaoSocial] = useState('');
   const [sexo, setSexo] = useState('');
   const [tipo, setTipo] = useState('Fisica');
   const [cpf, setCpf] = useState('');
@@ -50,10 +49,10 @@ export default function CreateCliente() {
   const [file, setFile] = useState(null);
   const [photoId, setPhotoId] = useState(null);
   const [hasPhoto, setHasPhoto] = useState(false);
+  const [preview, setPreview] = useState('');
 
   useEffect(() => {
     if (tipo == 'Fisica') {
-      setRazaoSocial("");
       setCnpj("");
       setIe("");
     } else {
@@ -63,7 +62,13 @@ export default function CreateCliente() {
       setSexo("");
       setNascimento("");
     }
-  },[tipo]) 
+  }, [tipo])
+
+  const previewAvatar = (e) => {
+    if (e.target.files.length !== 0) {
+      setFile({ image: URL.createObjectURL(e.target.files[0]) })
+    }
+  }
 
   const getVideo = () => {
     navigator.mediaDevices
@@ -141,12 +146,6 @@ export default function CreateCliente() {
     setNascimento(mask(unMask(event.target.value), ['99/99/9999']));
   }
 
-  const previewPhoto = (e) => {
-    setFile(e.target.files[0]);
-    // var reader = new FileReader();
-    // var url = reader.readAsDataURL(file)
-  }
-
   const onUploadImage = async () => {
     const formdata = new FormData();
     formdata.append("avatar", file);
@@ -159,12 +158,17 @@ export default function CreateCliente() {
     console.log(results);
   }
 
+  const deleteImage = (e) => {
+    e.preventDefault();
+    //Criar codigo para excluir do banco 
+    setPhotoId(null);
+  }
+
   async function handleSubmit(event) {
     event.preventDefault();
 
     const data = {
       nomeCliente: nome,
-      razaoSocial: razaoSocial,
       sexo: sexo,
       tipoPessoa: tipo,
       cpf: cpf,
@@ -243,15 +247,16 @@ export default function CreateCliente() {
                         }
                         {photoId != null &&
                           <Avatar
-                            src={'http://localhost:5000/api/clients/thumbnail-avatar/' + photoId}
-                            sx={{ width: 126, height: 126 }}
+                            // src={'http://localhost:5000/api/clients/thumbnail-avatar/' + photoId}
+                            src={file === '' ? '' : URL.createObjectURL(file)}
+                            sx={{ width: 126, height: 126, objectFit: 'cover' }}
                           />
                         }
 
                       </div>
                       <Typography className={classes.textAvatar}>
                         Permitido *.jpeg, *.jpg, *.png
-                        máximo 4MB
+                        máximo 4 MB
                       </Typography>
                     </Grid>
 
@@ -263,6 +268,7 @@ export default function CreateCliente() {
                             <input hidden accept="image/jpeg, image/png" name="avatar" type="file" onChange={e => setFile(e.target.files[0])} />
                           </Button>
                         </div>
+
                         <div style={{ marginBottom: 10 }}>
                           <Button onClick={getVideo} size="large" variant="contained" component="label" startIcon={<PhotoCameraIcon className={classes.colorIcon} />}>
                             Abrir câmera
@@ -272,6 +278,12 @@ export default function CreateCliente() {
                           <Button size="small" variant="outlined" onClick={onUploadImage} >
                             Enviar
                           </Button>
+                          {photoId != null && 
+                            <Button size="small" variant="outlined" onClick={deleteImage} >
+                              Excluir imagem
+                            </Button>
+                          }
+
                         </div>
                       </div>
                     </Grid>
@@ -317,11 +329,11 @@ export default function CreateCliente() {
                 {tipo == 'Juridica' &&
                   <TextField
                     variant="outlined"
-                    label="Razão Social"
+                    label="Nome fantasia"
                     size="small"
                     autoFocus
-                    value={razaoSocial}
-                    onChange={e => setRazaoSocial(e.target.value)}
+                    value={nome}
+                    onChange={e => setNome(e.target.value)}
                   />
                 }
 
@@ -403,7 +415,7 @@ export default function CreateCliente() {
                   onChange={e => setEmail(e.target.value)}
                 />
 
-                <BuscarCEP onUpdate={handleSearchCEP} initialData={dadosEndereco}/>
+                <BuscarCEP onUpdate={handleSearchCEP} initialData={dadosEndereco} />
                 <ListaContatos contatos={contatos} addContato={handleAddContato} deleteContato={handleDeleteContato} />
               </CardContent>
               <CardActions style={{ justifyContent: 'flex-end', marginRight: 15 }}>
@@ -453,7 +465,7 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: 'column',
   },
   btnOption: {
-    marginTop: 45
+    marginTop: 45,
   },
   content: {
     flexGrow: 1,

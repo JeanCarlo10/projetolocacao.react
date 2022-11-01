@@ -61,13 +61,42 @@ const NumberFormatCustom = React.forwardRef(function NumberFormatCustom(props, r
     );
 });
 
+const nameStatus = [
+    {
+        id: 1,
+        checked: false,
+        label: 'Pendente'
+    },
+    {
+        id: 2,
+        checked: false,
+        label: 'Entregue'
+    },
+    {
+        id: 3,
+        checked: false,
+        label: 'Cancelado'
+    },
+    {
+        id: 4,
+        checked: false,
+        label: 'Devolvido'
+    },
+    {
+        id: 5,
+        checked: false,
+        label: 'Não Devolvido'
+    },
+];
+
 export default function EditPedido() {
     const classes = useStyles();
     const inputRef = React.createRef();
 
     const [notify, setNotify] = useState({ isOpen: false, message: '', type: '' });
     const [numeroPedido, setNumeroPedido] = useState();
-    const [status, setStatus] = useState('Pendente');
+    const [nomeCliente, setNomeCliente] = useState();
+    const [status, setStatus] = useState();
     const [enderecoAtual, setEnderecoAtual] = useState('atual');
     const [totalGeral, setTotalGeral] = useState(0);
     const [totalParcial, setTotalParcial] = useState();
@@ -81,15 +110,13 @@ export default function EditPedido() {
     const { idPedido } = useParams();
 
     //Dados cliente
-    const [selectClients, setSelectClients] = useState([]);
-    const [clientId, setClientId] = useState('');
     const [currentClient, setCurrentClient] = useState({});
 
     useEffect(() => {
         async function getPedido() {
             var response = await api.get('/api/rents.details/' + idPedido);
 
-            setClientId(response.data.nomeCliente);
+            setNomeCliente(response.data.nomeCliente);
             setNumeroPedido(response.data.numeroPedido);
             setDataPedido(response.data.dataPedido);
             setStatus(response.data.status);
@@ -100,29 +127,20 @@ export default function EditPedido() {
             setDataEntrega(response.data.dataEntrega);
             setDataDevolucao(response.data.dataDevolucao);
             setProdutos(response.data.products);
+            setDadosEndereco(response.data.dadosEndereco);
         }
 
         getPedido();
     }, []);
 
-    useEffect(() => {
-        async function getDadosCliente() {
-
-            const results = await api.get('http://localhost:5000/api/clients');
-            setSelectClients(results.data);
-        }
-
-        getDadosCliente();
-    }, []);
-
-    function handleSelectClients(e) {
-        const clientId = e.target.value;
-        setCurrentClient(selectClients.find(e => e._id == clientId));
-        setClientId(clientId);
-    }
-
     const handleChangeAddress = (event) => {
         setEnderecoAtual(event.target.value);
+    };
+
+    const handleChangeStatus = (event) => {
+
+        
+        setStatus(event.target.value);
     };
 
     const handleDateDeliveryChange = (date) => {
@@ -224,11 +242,26 @@ export default function EditPedido() {
                         <form onSubmit={handleSubmit}>
                             <CardContent className={classes.inputs}>
                                 <div className={classes.twoInputs}>
+                                    <FormControl variant="outlined" size="small" fullWidth>
+                                        <InputLabel>Status</InputLabel>
+                                        <Select
+                                            value={status}
+                                            onChange={handleChangeStatus}
+                                            label="Status"
+                                        >
+                                            <MenuItem value={'Pendente'}>Pendente</MenuItem>
+                                            <MenuItem value={'Entregue'}>Entregue</MenuItem>
+                                            <MenuItem value={'Cancelado'}>Cancelado</MenuItem>
+                                            <MenuItem value={'Devolvido'}>Devolvido</MenuItem>
+                                            <MenuItem value={'Não Devolvido'}>Não Devolvido</MenuItem>
+                                        </Select>
+                                    </FormControl>
+
                                     <TextField
                                         variant='outlined'
                                         size="small"
                                         label="Nº Pedido"
-                                        InputLabelProps={{shrink: true}}
+                                        InputLabelProps={{ shrink: true }}
                                         disabled
                                         value={numeroPedido}
                                     />
@@ -239,24 +272,18 @@ export default function EditPedido() {
                                         disabled
                                         inputVariant='outlined'
                                         format="dd/MM/yyyy"
-                                        cancelLabel="CANCELAR"
-                                        value={dataDevolucao}
+                                        value={dataPedido}
                                     />
                                 </div>
 
-
-                                <FormControl variant="outlined" size="small" className={classes.formControl}>
-                                    <InputLabel>Cliente</InputLabel>
-                                    <Select
-                                        onChange={handleSelectClients}
-                                        value={selectClients}
-                                        label="Cliente"
-                                    >
-                                        {selectClients.map((clients) => (
-                                            <MenuItem value={clients._id} key={clients._id}>{clients.nomeCliente}</MenuItem>
-                                        ))}
-                                    </Select>
-                                </FormControl>
+                                <TextField
+                                    variant='outlined'
+                                    size="small"
+                                    label="Cliente"
+                                    InputLabelProps={{ shrink: true }}
+                                    disabled
+                                    value={nomeCliente}
+                                />
 
                                 <FormControl>
                                     <FormLabel></FormLabel>
@@ -271,7 +298,7 @@ export default function EditPedido() {
                                 </FormControl>
 
                                 {enderecoAtual == 'novo' ? <BuscarCEP onUpdate={handleSearchCEP} initialData={dadosEndereco} /> :
-                                    currentClient.nomeCliente != null ?
+                                    nomeCliente != null ?
                                         <div className='container'>
                                             <div className="card">
                                                 <div className='left-column'>
@@ -343,7 +370,7 @@ export default function EditPedido() {
                                     <TextField
                                         variant="outlined"
                                         size="small"
-                                        label="Total"
+                                        label="Total geral"
                                         getInputRef={inputRef}
                                         InputProps={{
                                             inputComponent: NumberFormatCustom,

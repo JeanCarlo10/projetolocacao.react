@@ -26,7 +26,6 @@ export default function EditCliente() {
 
     const [notify, setNotify] = useState({ isOpen: false, message: '', type: '' });
     const [nome, setNome] = useState('');
-    const [razaoSocial, setRazaoSocial] = useState('');
     const [sexo, setSexo] = useState('');
     const [tipo, setTipo] = useState('');
     const [cpf, setCpf] = useState('');
@@ -46,7 +45,6 @@ export default function EditCliente() {
             var response = await api.get('/api/clients.details/' + idCliente);
 
             setNome(response.data.nomeCliente);
-            setRazaoSocial(response.data.razaoSocial);
             setSexo(response.data.sexo);
             setTipo(response.data.tipoPessoa);
             setCpf(response.data.cpf);
@@ -64,7 +62,6 @@ export default function EditCliente() {
 
     useEffect(() => {
         if (tipo == 'Fisica') {
-            setRazaoSocial("");
             setCnpj("");
             setIe("");
         } else {
@@ -100,7 +97,6 @@ export default function EditCliente() {
         const data = {
             _id: idCliente,
             nomeCliente: nome,
-            razaoSocial: razaoSocial,
             sexo: sexo,
             tipoPessoa: tipo,
             cpf: cpf,
@@ -122,7 +118,7 @@ export default function EditCliente() {
         data.uf = dadosEndereco.uf;
         data.cep = dadosEndereco.cep;
 
-        if (nome != '' && tipo != '') {
+        //if (nome != '' ) {
             const response = await api.put('/api/clients', data);
 
             if (response.status == 200) {
@@ -135,9 +131,9 @@ export default function EditCliente() {
             } else {
                 alert('Erro ao atualizar o cliente');
             }
-        } else {
-            alert('Campos obrigatórios');
-        }
+        // } else {
+        //     alert('Campos obrigatórios');
+        // }
     }
 
     return (
@@ -190,11 +186,11 @@ export default function EditCliente() {
                                 {tipo == 'Juridica' &&
                                     <TextField
                                         variant="outlined"
-                                        label="Razão Social"
+                                        label="Nome fantasia"
                                         size="small"
                                         autoFocus
-                                        value={razaoSocial}
-                                        onChange={e => setRazaoSocial(e.target.value)}
+                                        value={nome}
+                                        onChange={e => setNome(e.target.value)}
                                     />
                                 }
 

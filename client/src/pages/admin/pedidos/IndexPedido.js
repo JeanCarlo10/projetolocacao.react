@@ -59,7 +59,7 @@ export default function IndexPedido() {
       renderer: 'svg',
       loop: true,
       autoplay: true,
-      animationData: require('../../../assets/search.json'),
+      animationData: require('../../../assets/search2.json'),
     })
   }, []);
 
@@ -114,7 +114,6 @@ export default function IndexPedido() {
   const filter = (endSearch) => {
     var resultSearch = filterRents.filter((result) => {
       if (result.nomeCliente.toString().toLowerCase().includes(endSearch.toLowerCase())
-        || result.razaoSocial.toString().toLowerCase().includes(endSearch.toLowerCase())
         || result.cpf.toString().toLowerCase().includes(endSearch.toLowerCase())
         || result.cnpj.toString().toLowerCase().includes(endSearch.toLowerCase())
       ) {
@@ -154,7 +153,7 @@ export default function IndexPedido() {
             }
           />
 
-          {loading ? (<div style={{ width: 300, margin: '0 auto' }} ref={container} />) : (
+          {loading ? (<div style={{ width: 450, margin: '0 auto' }} ref={container} />) : (
             <Card style={{ borderRadius: 15 }}>
               <div className={classes.twoElements}>
                 <div className={classes.iconButton}>
@@ -186,7 +185,10 @@ export default function IndexPedido() {
                     {rents &&
                       rents.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
                         <TableRow hover key={row._id}>
-                          <TableCell align="left" style={{ width: "15%" }}><Chip label={row.status} /></TableCell>
+                          <TableCell align="left" style={{ width: "15%" }}>
+                            <Chip label={row.status} />                         
+                          </TableCell> 
+
                           <TableCell align="center" style={{ width: "10%" }}>{row.numeroPedido}</TableCell>
                           <TableCell align="center">{new Date(row.dataPedido).toLocaleDateString('pt-br')}</TableCell>
                           <TableCell align="left" style={{ width: "35%" }}>{row.nomeCliente}</TableCell>
@@ -224,6 +226,12 @@ export default function IndexPedido() {
                 count={rents.length}
                 rowsPerPage={rowsPerPage}
                 page={page}
+                labelRowsPerPage={'Linhas por página'}
+                labelDisplayedRows={
+                  ({ from, to, count }) => {
+                    return '' + from + '-' + to + ' de ' + count
+                  }
+                }
                 onPageChange={handleChangePage}
                 onRowsPerPageChange={handleChangeRowsPerPage}
               />
@@ -245,6 +253,16 @@ const useStyles = makeStyles((theme) => ({
     borderStyle: 'solid',
     borderWidth: 2
   },
+  chipOne: {
+    color: '#4DB4C6',
+    background: '#E7F7F9',
+  },
+
+  chipTwo: {
+    color: 'orange',
+    background: 'black',
+  },
+
   avatarFilter: {
     color: '#4DB4C6',
     backgroundColor: '#E7F7F9',

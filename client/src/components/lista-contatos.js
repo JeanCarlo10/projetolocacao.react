@@ -2,8 +2,11 @@ import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { styled } from '@mui/material/styles';
 import Box from '@mui/material/Box';
-import Paper from '@mui/material/Paper';
-import { TextField, InputLabel, FormControl, Divider, Select } from '@material-ui/core';
+import TextField from '@mui/material/TextField';
+import Divider from '@mui/material/Divider';
+import Select from '@mui/material/Select';
+import InputLabel from '@mui/material/InputLabel';
+import FormControl from '@mui/material/FormControl';
 import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
 import Table from '@mui/material/Table';
@@ -64,13 +67,14 @@ export default function ListaContatos(props) {
   };
 
   const handleAddContact = () => {
-    addContato({
-      id: new Date().getTime(),
-      tipoTelefone: tipoTelefone,
-      numero: numero,
-      observacao: observacao
-    });
-
+    if (numero != '') {
+      addContato({
+        id: new Date().getTime(),
+        tipoTelefone: tipoTelefone,
+        numero: numero,
+        observacao: observacao
+      });
+    }
     setTipoTelefone('Celular');
     setNumero('');
     setObservacao('');
@@ -81,37 +85,32 @@ export default function ListaContatos(props) {
       marginTop: '10px',
       border: "1px solid #E0E1E0",
       borderLeft: "5px solid #009DE0",
-      borderTopLeftRadius: "5px",
-      borderBottomLeftRadius: "5px",
-      borderTopRightRadius: "5px",
-      borderBottomRightRadius: "5px"
-    }}
-    >
-      <Paper elevation={0} sx={{ p: 2 }}>
-        <Typography style={{ marginBottom: 15, color: '#009DE0', fontWeight: 'bold' }}>
-          Contato(s)
-          <Divider variant="fullWidth" />
-        </Typography>
-        <form>
-          <Grid container spacing={1}>
-            <Grid item xs={6}>
-              <div>
-
-                <FormControl variant="outlined" size="small" fullWidth>
-                  <InputLabel>Tipo</InputLabel>
-                  <Select
-                    value={tipoTelefone}
-                    onChange={handleTipoTelefoneChange}
-                    label="Tipo"
-                  >
-                    <MenuItem value={'Celular'}>Celular</MenuItem>
-                    <MenuItem value={'Fixo'}>Fixo</MenuItem>
-                  </Select>
-                </FormControl>
-              </div>
+      borderRadius: "5px",
+      padding: '16px',
+      
+    }}>
+      <Typography style={{ marginBottom: 15, color: '#009DE0', fontWeight: 'bold' }}>
+        Contato(s)
+        <Divider variant="fullWidth" />
+      </Typography>
+      <form>
+        <Grid container className={classes.inputs}>
+          <Grid container flexDirection='row' alignItems='center' columnSpacing={2}>
+            <Grid item xs={12} sm={6} md={6}>
+              <FormControl variant="outlined" size="small" fullWidth>
+                <InputLabel>Tipo</InputLabel>
+                <Select
+                  value={tipoTelefone}
+                  onChange={handleTipoTelefoneChange}
+                  label="Tipo"
+                >
+                  <MenuItem value={'Celular'}>Celular</MenuItem>
+                  <MenuItem value={'Fixo'}>Fixo</MenuItem>
+                </Select>
+              </FormControl>
             </Grid>
-            <Grid item xs={6}>
 
+            <Grid item xs={12} sm={6} md={6}>
               <TextField
                 variant="outlined"
                 fullWidth
@@ -121,9 +120,11 @@ export default function ListaContatos(props) {
                 onChange={handleChangeNumero}
               />
             </Grid>
+          </Grid>
 
-            <Box style={{ marginLeft: -7, display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-              <TextField
+          <Grid container flexDirection='row' alignItems='center' columnSpacing={1} pt={1} pb={2}>
+            <Grid item xs={12} sm={8} md={9}>
+              <TextField                
                 variant="outlined"
                 label="Observação"
                 size="small"
@@ -131,54 +132,50 @@ export default function ListaContatos(props) {
                 value={observacao}
                 onChange={(event) => setObservacao(event.target.value)}
               />
-              <div style={{ marginLeft: 10 }}>
-                <Button onClick={handleAddContact} variant="contained" size="medium" className={classes.btnAddBlue} startIcon={<AddCircleOutlinedIcon />}>Adicionar</Button>
-              </div>
-            </Box>
+            </Grid>
+            <Grid item sm={4} md={3}>
+              <Button onClick={handleAddContact} variant="contained" size="medium" className={classes.btnAddBlue} startIcon={<AddCircleOutlinedIcon />}>Adicionar</Button>
+            </Grid>
           </Grid>
-        </form>
+        </Grid>
+      </form>
 
-        <TableContainer>
-          <Table className={classes.table} size="small">
-            <TableHead>
-              <TableRow>
-                <StyledTableCell>Tipo</StyledTableCell>
-                <StyledTableCell>Número</StyledTableCell>
-                <StyledTableCell>Observação</StyledTableCell>
-                <StyledTableCell align="right">Ações</StyledTableCell>
-              </TableRow>
-            </TableHead>
+      <TableContainer>
+        <Table className={classes.table} size="small">
+          <TableHead>
+            <TableRow>
+              <StyledTableCell>Tipo</StyledTableCell>
+              <StyledTableCell>Número</StyledTableCell>
+              <StyledTableCell>Observação</StyledTableCell>
+              <StyledTableCell align="right">Ações</StyledTableCell>
+            </TableRow>
+          </TableHead>
 
-            <TableBody>
-              {contatos &&
-                contatos.map((contact) => (
-                  <StyledTableRow key={contact.id}>
-                    <StyledTableCell align="left"><Chip label={contact.tipoTelefone} /></StyledTableCell>
-                    <StyledTableCell>{contact.numero}</StyledTableCell>
-                    <StyledTableCell>{contact.observacao}</StyledTableCell>
-                    <StyledTableCell component="th" scope="row" align="right">
-                      <IconButton onClick={() => deleteContato(contact.id)}>
-                        <DeleteIcon />
-                      </IconButton>
-                    </StyledTableCell>
-                  </StyledTableRow>
-                ))}
-            </TableBody>
-          </Table>
-          {contatos.length > 0 ? null : <div className={classes.noRegisters}>Nenhum registro</div>}
-        </TableContainer>
-      </Paper>
+          <TableBody>
+            {contatos && contatos.map((contact) => (
+              <StyledTableRow key={contact.id}>
+                <StyledTableCell align="left"><Chip label={contact.tipoTelefone} /></StyledTableCell>
+                <StyledTableCell>{contact.numero}</StyledTableCell>
+                <StyledTableCell>{contact.observacao}</StyledTableCell>
+                <StyledTableCell component="th" scope="row" align="right">
+                  <IconButton onClick={() => deleteContato(contact.id)}>
+                    <DeleteIcon />
+                  </IconButton>
+                </StyledTableCell>
+              </StyledTableRow>
+            ))}
+          </TableBody>
+        </Table>
+        {contatos.length > 0 ? null : <div className={classes.noRegisters}>Nenhum registro</div>}
+      </TableContainer>
     </Box>
   );
 }
 
 const useStyles = makeStyles((theme) => ({
-  twoInputs: {
-    display: 'flex',
-    marginLeft: -7,
+  inputs: {
     '& .MuiTextField-root': {
-      // margin: theme.spacing(1),
-      width: '50%',
+      margin: '0 !important',
     },
   },
   noRegisters: {
@@ -187,9 +184,6 @@ const useStyles = makeStyles((theme) => ({
     fontWeight: 700,
     fontSize: 16,
     color: '#595A4A'
-  },
-  button: {
-    margin: theme.spacing(0.5),
   },
   table: {
     minWidth: 700,
@@ -203,6 +197,7 @@ const useStyles = makeStyles((theme) => ({
     border: 'none',
     textTransform: 'none',
     boxShadow: 'none',
+    fontWeight: 'bold',
 
     '&:hover': {
       backgroundColor: '#052F5F',

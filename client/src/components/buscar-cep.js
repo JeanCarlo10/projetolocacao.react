@@ -9,11 +9,12 @@ import Typography from '@material-ui/core/Typography';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import apiCEP from '../services/apiCEP';
+import Notification from '../components/notification';
 import { mask, unMask } from 'remask';
 
 export default function BuscarCep(props) {
-    const classes = useStyles(); 
-    
+    const classes = useStyles();
+
     const { onUpdate, initialData } = props;
 
     const [numero, setNumero] = useState(initialData.numero || "");
@@ -23,15 +24,16 @@ export default function BuscarCep(props) {
     const [cidade, setCidade] = useState(initialData.cidade || "");
     const [uf, setUf] = useState(initialData.uf || "");
     const [cep, setCep] = useState(initialData.cep || "");
+    const [notify, setNotify] = useState({ isOpen: false, message: '', type: '' });
 
     useEffect(() => {
         onUpdate && onUpdate({
-            numero, 
-            complemento, 
-            logradouro, 
-            bairro, 
-            cidade, 
-            uf, 
+            numero,
+            complemento,
+            logradouro,
+            bairro,
+            cidade,
+            uf,
             cep
         });
     }, [numero, complemento, logradouro, bairro, cidade, uf, cep]);
@@ -42,8 +44,12 @@ export default function BuscarCep(props) {
 
     async function handleSearchCEP(res, req) {
         if (cep === '') {
-            alert('Por favor, informe o cep!')
-            
+            setNotify({
+                isOpen: true,
+                message: 'Por favor, informe o cep!',
+                type: 'warning'
+            });
+
             return;
         }
         try {
@@ -55,14 +61,15 @@ export default function BuscarCep(props) {
             setBairro(bairro);
             setCidade(localidade);
             setUf(uf);
-            
-        }catch (error) {
-            if (error) {
-                alert('CEP inválido!');
-            }
-            
-            // alert("CEP inválido!");
-        }
+
+        } catch {
+            setNotify({
+                isOpen: true,
+                message: 'CEP inválido!',
+                type: 'error'
+            });
+            setCep("");
+        } 
     }
 
     return (
@@ -73,90 +80,89 @@ export default function BuscarCep(props) {
             borderBottomLeftRadius: "5px",
             borderTopRightRadius: "5px",
             borderBottomRightRadius: "5px"
-            }}    
+        }}
         >
-        <Paper elevation={0} sx={{ p:2 }}>
-            <Typography  style={{ marginBottom: 15, color: '#00AB55', fontWeight: 'bold' }}>
-                Endereço 
-                <Divider variant="fullWidth" />
-            </Typography>
+            <Paper elevation={0} sx={{ p: 2 }}>
+                <Notification notify={notify} setNotify={setNotify} />
+                <Typography style={{ marginBottom: 15, color: '#00AB55', fontWeight: 'bold' }}>
+                    Endereço
+                    <Divider variant="fullWidth" />
+                </Typography>
 
-            <form>
-                <FormControl size="small" variant="outlined">
-                    <InputLabel htmlFor="cep">CEP</InputLabel>
-                    <OutlinedInput
-                    value={cep}
-                    onChange={handleChangeCEP}
-                    labelWidth={120}
-                    endAdornment={
-                        <InputAdornment position="end">
-                        <IconButton
-                            onClick={handleSearchCEP}
-                            edge="end"
-                        >
-                            <SearchOutlinedIcon color="success"/> 
-                        </IconButton>
-                        </InputAdornment>
-                    }                
-                    />
-                </FormControl>
+                <form>
+                    <FormControl size="small" variant="outlined">
+                        <InputLabel htmlFor="cep">CEP</InputLabel>
+                        <OutlinedInput
+                            value={cep}
+                            onChange={handleChangeCEP}
+                            labelWidth={120}
+                            endAdornment={
+                                <InputAdornment position="end">
+                                    <IconButton
+                                        onClick={handleSearchCEP}
+                                        edge="end"
+                                    >
+                                        <SearchOutlinedIcon color="success" />
+                                    </IconButton>
+                                </InputAdornment>
+                            }
+                        />
+                    </FormControl>
 
-                <Box className={classes.twoInputs}>
-                    <TextField
-                        variant="outlined"
-                        size="small"
-                        label="Bairro"
-                        value={bairro}
-                        onChange={e => setBairro(e.target.value)}
-                    />
-                    <TextField
-                        variant="outlined"
-                        size="small"
-                        label="Logradouro"
-                        value={logradouro}
-                        onChange={e => setLogradouro(e.target.value)}
-                    />
-                </Box>
+                    <Box className={classes.twoInputs}>
+                        <TextField
+                            variant="outlined"
+                            size="small"
+                            label="Bairro"
+                            value={bairro}
+                            onChange={e => setBairro(e.target.value)}
+                        />
+                        <TextField
+                            variant="outlined"
+                            size="small"
+                            label="Logradouro"
+                            value={logradouro}
+                            onChange={e => setLogradouro(e.target.value)}
+                        />
+                    </Box>
 
-                <Box style={{ marginLeft: -7}}>
-                    <TextField style={{ minWidth: '74%'}}
-                        variant="outlined"
-                        size="small"
-                        label="Cidade"
-                        value={cidade}
-                        onChange={e => setCidade(e.target.value)}
-                    />
-                    <TextField
-                        variant="outlined"
-                        size="small"
-                        label="Estado"
-                        value={uf}
-                        onChange={e => setUf(e.target.value)}
-                    />
-                </Box>
+                    <Box style={{ marginLeft: -7 }}>
+                        <TextField style={{ minWidth: '74%' }}
+                            variant="outlined"
+                            size="small"
+                            label="Cidade"
+                            value={cidade}
+                            onChange={e => setCidade(e.target.value)}
+                        />
+                        <TextField
+                            variant="outlined"
+                            size="small"
+                            label="Estado"
+                            value={uf}
+                            onChange={e => setUf(e.target.value)}
+                        />
+                    </Box>
 
-                <Box style={{ marginLeft: -7}}>
-                    <TextField
-                        variant="outlined"
-                        size="small"
-                        label="Número"
-                        value={numero}
-                        onChange={e => {
-                            setNumero(e.target.value);
-                            onUpdate();
-                        }}
-                    />
-                    <TextField style={{ minWidth: '74%'}}
-                        variant="outlined"
-                        size="small"
-                        label="Complemento"
-                        value={complemento}
-                        onChange={e => setComplemento(e.target.value)}
-                    />
-                </Box> 
-          </form>
-        </Paper> 
-      </Box>
+                    <Box style={{ marginLeft: -7 }}>
+                        <TextField
+                            variant="outlined"
+                            size="small"
+                            label="Número"
+                            value={numero}
+                            onChange={e => {setNumero(e.target.value); onUpdate() }}
+                        />
+                        
+                        <TextField style={{ minWidth: '74%' }}
+                            variant="outlined"
+                            size="small"
+                            label="Complemento"
+                            value={complemento}
+                            onChange={e => setComplemento(e.target.value)}
+                        />
+                    </Box>
+                </form>
+            </Paper>
+        </Box>
     );
 }
 
@@ -165,7 +171,7 @@ const useStyles = makeStyles((theme) => ({
         display: 'flex',
         marginLeft: -7,
         '& .MuiTextField-root': {
-        // margin: theme.spacing(1),
+            // margin: theme.spacing(1),
             width: '50%',
         },
     },

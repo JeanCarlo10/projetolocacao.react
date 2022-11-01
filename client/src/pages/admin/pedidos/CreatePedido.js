@@ -133,10 +133,21 @@ export default function CreatePedido() {
     setTotalGeral(totalParcial - desconto);
   }, [totalParcial, desconto]);
 
+  //Esse é meu codigo q eu tava tentando 
+  // const handleSubTotal = () => {
+  //   let total = 0;
+
+  //   produtos.forEach(item => {
+  //     total += item.valorItem;
+  //   });
+
+  //   console.log("Total: " + total);
+  // }
+
   async function handleSubmit() {
     let data = {
       idCliente: currentClient._id,
-      nomeCliente: currentClient.nomeCliente || currentClient.razaoSocial,
+      nomeCliente: currentClient.nomeCliente,
       numeroPedido: numeroPedido,
       status: status,
       dataPedido: dataPedido,
@@ -215,17 +226,6 @@ export default function CreatePedido() {
           <Card style={{ borderRadius: 15 }}>
             <form onSubmit={handleSubmit}>
               <CardContent className={classes.inputs}>
-
-                {/* <FormControl>
-                  <FormLabel>Status</FormLabel>
-                  <RadioGroup
-                      row
-                      value={status}
-                  >
-                      <FormControlLabel value="pendente" disabled control={<Radio />} label="Pendente" />
-                  </RadioGroup>
-              </FormControl> */}
-
                 <FormControl variant="outlined" size="small" className={classes.formControl}>
                   <InputLabel>Cliente</InputLabel>
                   <Select
@@ -234,7 +234,7 @@ export default function CreatePedido() {
                     label="Cliente"
                   >
                     {selectClients.map((clients) => (
-                      <MenuItem value={clients._id} key={clients._id}>{clients.nomeCliente || clients.razaoSocial}</MenuItem>
+                      <MenuItem value={clients._id} key={clients._id}>{clients.nomeCliente}</MenuItem>
                     ))}
                   </Select>
                 </FormControl>
@@ -246,8 +246,8 @@ export default function CreatePedido() {
                     value={enderecoAtual}
                     onChange={handleChangeAddress}
                   >
-                    <FormControlLabel value="atual" control={<Radio style={{ color: '#00AB55'}}/>} label="Endereço atual" />
-                    <FormControlLabel value="novo" control={<Radio style={{ color: '#00AB55'}}/>} label="Novo endereço" />
+                    <FormControlLabel value="atual" control={<Radio style={{ color: '#00AB55' }} />} label="Endereço atual" />
+                    <FormControlLabel value="novo" control={<Radio style={{ color: '#00AB55' }} />} label="Novo endereço" />
                   </RadioGroup>
                 </FormControl>
 
@@ -324,7 +324,7 @@ export default function CreatePedido() {
                   <TextField
                     variant="outlined"
                     size="small"
-                    label="Total"
+                    label="Total geral"
                     getInputRef={inputRef}
                     InputProps={{
                       inputComponent: NumberFormatCustom,

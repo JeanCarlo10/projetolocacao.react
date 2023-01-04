@@ -3,8 +3,13 @@ const Rent = require('../models/RentModel');
 
 module.exports = {
     async index(req, res) {
-        const rent = await Rent.find();
+        // if (req.query.keyword != null && req.query.keyword != "") {
+        //     query.push({
+        //         nomeCliente: { $regex: req.query.keyword, $options: "i" }
+        //     })
+        // }
 
+        const rent = await Rent.find({ nomeCliente: { $regex: req.query.keyword, $options: "i" } })
         res.json(rent);
     },
 
@@ -22,13 +27,14 @@ module.exports = {
                 dataDevolucao: {
                     $gte: firstDay,
                     $lte: lastDay,
-                }
-            }];
-
+                },
+            }
+        ];
+        
         if (req.query.keyword != null && req.query.keyword != "") {
             query.push({
                 nomeCliente: { $regex: req.query.keyword, $options: "i" }
-            })
+            }) 
         }
 
         if (req.query.statuses != null && req.query.statuses != "") {
@@ -39,11 +45,23 @@ module.exports = {
             })
         }
 
-        const rent = await Rent.find({
-            $and: query
+        const pipeline = [];
+        const rent = pipeline.push({ $match: { $and: query } });
+
+        pipeline.push({
+            $lookup:
+            {
+                from: "clients",
+                localField: "idCliente",
+                foreignField: "_id",
+                as: "pedido_cliente"
+            }
         });
 
-        res.json(rent);
+        const result = await Rent.aggregate(pipeline);
+        
+        res.json(result);
+        // console.log(result);
     },
 
     async changeStatus(req, res) {

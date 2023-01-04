@@ -84,7 +84,6 @@ export default function ListaProdutos(props) {
   const inputRef = React.createRef();
 
   const { produtos, addProduto, deleteProduto } = props;
-  
 
   const [selectMaterials, setSelectMaterials] = useState([]);
   const [materialId, setMaterialId] = useState('');
@@ -94,7 +93,7 @@ export default function ListaProdutos(props) {
   const [qtde, setQtde] = useState('');
   const [valorItem, setValorItem] = useState('');
 
-  const unidadeMedidaMap = { 'Unidade': 'unidade(s)', 'Metro': 'metros' };
+  const unidadeMedidaMap = { 'Unidade': 'unidade(s)', 'Metro': 'metro(s)' };
   const handleChangeUnidadeMedida = (event) => {
     setUnidadeMedida(event.target.value);
   };
@@ -121,12 +120,11 @@ export default function ListaProdutos(props) {
         id: currentMaterial._id,
         unidadeMedida: unidadeMedida,
         qtde: qtde,
-        valorItem: valorItem,
+        valorItem: parseFloat(valorItem),
         nomeMaterial: currentMaterial.nomeMaterial
       });
 
       setMaterialId('');
-      setUnidadeMedida('');
       setQtde('');
       setValorItem('');
     }

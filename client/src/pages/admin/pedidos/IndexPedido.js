@@ -8,7 +8,7 @@ import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
-import Tooltip from '@material-ui/core/Tooltip';
+import Tooltip from '@mui/material/Tooltip';
 import Button from '@material-ui/core/Button';
 import Chip from '@material-ui/core/Chip';
 import Card from '@material-ui/core/Card';
@@ -47,7 +47,7 @@ export default function IndexPedido() {
 
   const [rents, setRents] = useState([]);
   const [filterRents, setFilterRents] = useState([]);
-  const [search, setSearch] = useState("");
+  const [keyword, setKeyword] = useState("");
   const [loading, setLoading] = useState(true);
   //   const [isOpenMenu, setIsOpenMenu] = useState(false);
   const [page, setPage] = useState(0);
@@ -63,17 +63,30 @@ export default function IndexPedido() {
     })
   }, []);
 
+  //   useEffect(() => {
+  //     async function getDadosPedido() {
+  //         var filter = `&keyword=${keyword}`;
+  //         filter += `&statuses=${statuses.join(",")}`;
+  //         const results = await api.get(`http://localhost:5000/api/rents/search?${filter}`);
+  //         setRents(results.data);
+  //     }
+
+  //     getDadosPedido();
+  // }, [currentMonth, statuses, keyword]);
+
   useEffect(() => {
     async function loadRents() {
-      const response = await api.get("/api/rents");
+      var filter = `keyword=${keyword}`;
+      const results = await api.get(`http://localhost:5000/api/rents/index?${filter}`);
 
-      setRents(response.data);
-      setFilterRents(response.data);
+      setRents(results.data);
+      console.log(results.data);
+      // setFilterRents(results.data);
       setLoading(false);
     }
     loadRents();
     // setTimeout(() => loadRents(), 2000);
-  }, []);
+  }, [keyword]);
 
   const handleDelete = (id) => {
     Swal.fire({
@@ -105,23 +118,25 @@ export default function IndexPedido() {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
-  //Filtrar Lista
-  const handleChangeSearch = ({ target }) => {
-    setSearch(target.value);
-    filter(target.value);
-  }
 
-  const filter = (endSearch) => {
-    var resultSearch = filterRents.filter((result) => {
-      if (result.nomeCliente.toString().toLowerCase().includes(endSearch.toLowerCase())
-        || result.cpf.toString().toLowerCase().includes(endSearch.toLowerCase())
-        || result.cnpj.toString().toLowerCase().includes(endSearch.toLowerCase())
-      ) {
-        return result;
-      }
-    });
-    setRents(resultSearch);
-  }
+  //Filtrar Lista
+  //const handleChangeSearch = (text) => {
+  //setSearch(text);
+  // setSearch(target.value);
+  //filter(target.value);
+  //}
+
+  // const filter = (endSearch) => {
+  //   var resultSearch = filterRents.filter((result) => {
+  //     if (result.nomeCliente.toString().toLowerCase().includes(endSearch.toLowerCase())
+  //       || result.cpf.toString().toLowerCase().includes(endSearch.toLowerCase())
+  //       || result.cnpj.toString().toLowerCase().includes(endSearch.toLowerCase())
+  //     ) {
+  //       return result;
+  //     }
+  //   });
+  //   setRents(resultSearch);
+  // }
   return (
     <div className={classes.root}>
       <MenuAdmin />
@@ -161,8 +176,8 @@ export default function IndexPedido() {
                     <SearchIcon />
                   </IconButton>
                   <InputBase
-                    value={search}
-                    onChange={handleChangeSearch}
+                    value={keyword}
+                    onChange={e => setKeyword(e.target.value)}
                     placeholder="Buscar..."
                   />
                 </div>
@@ -186,8 +201,8 @@ export default function IndexPedido() {
                       rents.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
                         <TableRow hover key={row._id}>
                           <TableCell align="left" style={{ width: "15%" }}>
-                            <Chip label={row.status} />                         
-                          </TableCell> 
+                            <Chip label={row.status} />
+                          </TableCell>
 
                           <TableCell align="center" style={{ width: "10%" }}>{row.numeroPedido}</TableCell>
                           <TableCell align="center">{new Date(row.dataPedido).toLocaleDateString('pt-br')}</TableCell>
@@ -207,12 +222,16 @@ export default function IndexPedido() {
                             </p>
                           </TableCell>
                           <TableCell component="th" scope="row" align="right">
-                            <IconButton onClick={() => handleDelete(row._id)}>
-                              <DeleteIcon />
-                            </IconButton>
-                            <IconButton href={'/admin/pedidos/edit/' + row._id}>
-                              <EditIcon />
-                            </IconButton>
+                            <Tooltip title="Excluir">
+                              <IconButton onClick={() => handleDelete(row._id)}>
+                                <DeleteIcon />
+                              </IconButton>
+                            </Tooltip>
+                            <Tooltip title="Editar">
+                              <IconButton href={'/admin/pedidos/edit/' + row._id}>
+                                <EditIcon />
+                              </IconButton>
+                            </Tooltip>
                           </TableCell>
                         </TableRow>
                       ))}

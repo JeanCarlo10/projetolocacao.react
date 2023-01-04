@@ -8,7 +8,6 @@ import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
-import Tooltip from '@material-ui/core/Tooltip';
 import Button from '@material-ui/core/Button';
 import Chip from '@mui/material/Chip';
 import Stack from '@mui/material/Stack';
@@ -17,10 +16,13 @@ import Breadcrumbs from '@material-ui/core/Breadcrumbs';
 import Link from '@material-ui/core/Link';
 import Typography from '@material-ui/core/Typography';
 import CardHeader from '@material-ui/core/CardHeader';
+import Tooltip from '@mui/material/Tooltip';
 import Avatar from '@material-ui/core/Avatar';
 import Divider from '@material-ui/core/Divider';
 import InputBase from '@material-ui/core/InputBase';
-import { Menu, MenuItem, IconButton, ListItemIcon, ListItemText } from '@mui/material';
+import MenuItem from '@mui/material/MenuItem';
+import Menu from '@mui/material/Menu';
+import { IconButton, ListItemIcon, ListItemText } from '@mui/material';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
@@ -34,7 +36,6 @@ import lottie from 'lottie-web';
 import MenuAdmin from '../../../components/menu-admin';
 import api from '../../../services/api';
 import Swal from 'sweetalert2';
-import Popover from '@mui/material/Popover';
 
 const StyledTableRow = withStyles((theme) => ({
   root: {
@@ -220,18 +221,22 @@ export default function IndexCliente() {
                         <TableCell>{row.tipoPessoa == 'Fisica' ? row.cpf : row.cnpj}</TableCell>
                         <TableCell>{row.logradouro == null || undefined ? " " : row.logradouro + ", " + row.numero + " - " + row.bairro}</TableCell>
                         <TableCell component="th" scope="row" align="right">
-                          <IconButton onClick={handleClick}>
+                          {/* <IconButton onClick={handleClick}>
                             <MoreVertIcon />
-                          </IconButton>
-                          {/* <IconButton onClick={() => handleDelete(row._id)}>
-                            <DeleteIcon />
-                          </IconButton>
-                          <IconButton href={'/admin/clientes/edit/' + row._id}>
-                            <EditIcon />
                           </IconButton> */}
+                          <Tooltip title="Excluir">
+                            <IconButton onClick={() => handleDelete(row._id)}>
+                              <DeleteIcon />
+                            </IconButton>
+                          </Tooltip>
+                          <Tooltip title="Editar">
+                            <IconButton href={'/admin/clientes/edit/' + row._id}>
+                              <EditIcon />
+                            </IconButton>
+                          </Tooltip>
                         </TableCell>
 
-                        <Popover
+                        {/* <Popover
                           open={open}
                           anchorEl={anchorEl}
                           onClose={handleClose}
@@ -262,7 +267,7 @@ export default function IndexCliente() {
                             </ListItemIcon>
                             <ListItemText primary="Editar" />
                           </MenuItem>
-                        </Popover>
+                        </Popover> */}
                       </TableRow>
                     ))}
                   </TableBody>

@@ -11,6 +11,7 @@ import ArrowBackIosRoundedIcon from '@mui/icons-material/ArrowBackIosRounded';
 import ArrowForwardIosRoundedIcon from '@mui/icons-material/ArrowForwardIosRounded';
 import SearchIcon from '@material-ui/icons/Search';
 import { formatCurrentMonth } from '../helpers/dateFilter';
+import { nameStatus } from '../../src/functions/static_data';
 
 const RootStyle = styled(Card)(({ theme }) => ({
   flexDirection: 'row',
@@ -31,34 +32,6 @@ const MenuProps = {
     },
   },
 };
-
-const nameStatus = [
-  {
-    id: 1,
-    checked: false,
-    label: 'Pendente'
-  },
-  {
-    id: 2,
-    checked: false,
-    label: 'Entregue'
-  },
-  {
-    id: 3,
-    checked: false,
-    label: 'Cancelado'
-  },
-  {
-    id: 4,
-    checked: false,
-    label: 'Devolvido'
-  },
-  {
-    id: 5,
-    checked: false,
-    label: 'Não Devolvido'
-  },
-];
 
 export default function FilterDashboard(props) {
   const classes = useStyles();

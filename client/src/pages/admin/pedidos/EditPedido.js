@@ -139,7 +139,7 @@ export default function EditPedido() {
 
     const handleChangeStatus = (event) => {
 
-        
+
         setStatus(event.target.value);
     };
 
@@ -164,6 +164,10 @@ export default function EditPedido() {
 
         setProdutos(newProducts);
     }
+
+    useEffect(() => {
+        setTotalGeral(totalParcial - desconto);
+    }, [totalParcial, desconto]);
 
     async function handleSubmit() {
         const data = {
@@ -242,6 +246,22 @@ export default function EditPedido() {
                         <form onSubmit={handleSubmit}>
                             <CardContent className={classes.inputs}>
                                 <div className={classes.twoInputs}>
+                                    <TextField
+                                        variant='outlined'
+                                        size="small"
+                                        label="Nº Pedido"
+                                        InputLabelProps={{ shrink: true }}
+                                        disabled
+                                        value={numeroPedido}
+                                    />
+                                    <DatePicker
+                                        label='Data pedido'
+                                        size='small'
+                                        disabled
+                                        inputVariant='outlined'
+                                        format="dd/MM/yyyy"
+                                        value={dataPedido}
+                                    />
                                     <FormControl variant="outlined" size="small" fullWidth>
                                         <InputLabel>Status</InputLabel>
                                         <Select
@@ -256,24 +276,6 @@ export default function EditPedido() {
                                             <MenuItem value={'Não Devolvido'}>Não Devolvido</MenuItem>
                                         </Select>
                                     </FormControl>
-
-                                    <TextField
-                                        variant='outlined'
-                                        size="small"
-                                        label="Nº Pedido"
-                                        InputLabelProps={{ shrink: true }}
-                                        disabled
-                                        value={numeroPedido}
-                                    />
-
-                                    <DatePicker
-                                        label='Data pedido'
-                                        size='small'
-                                        disabled
-                                        inputVariant='outlined'
-                                        format="dd/MM/yyyy"
-                                        value={dataPedido}
-                                    />
                                 </div>
 
                                 <TextField
@@ -347,6 +349,7 @@ export default function EditPedido() {
                                 <div className={classes.twoInputs}>
                                     <TextField
                                         variant="outlined"
+                                        disabled
                                         size="small"
                                         label="Total parcial"
                                         getInputRef={inputRef}

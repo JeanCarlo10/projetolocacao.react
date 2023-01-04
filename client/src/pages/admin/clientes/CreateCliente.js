@@ -49,7 +49,6 @@ export default function CreateCliente() {
   const [file, setFile] = useState(null);
   const [photoId, setPhotoId] = useState(null);
   const [hasPhoto, setHasPhoto] = useState(false);
-  const [preview, setPreview] = useState('');
 
   useEffect(() => {
     if (tipo == 'Fisica') {
@@ -63,12 +62,6 @@ export default function CreateCliente() {
       setNascimento("");
     }
   }, [tipo])
-
-  const previewAvatar = (e) => {
-    if (e.target.files.length !== 0) {
-      setFile({ image: URL.createObjectURL(e.target.files[0]) })
-    }
-  }
 
   const getVideo = () => {
     navigator.mediaDevices
@@ -177,6 +170,7 @@ export default function CreateCliente() {
       cnpj: cnpj,
       dataNascimento: nascimento,
       email: email,
+      avatar: photoId,
 
       //Dados Endereço
       numero: dadosEndereco.numero,
@@ -269,18 +263,18 @@ export default function CreateCliente() {
                           </Button>
                         </div>
 
-                        <div style={{ marginBottom: 10 }}>
+                        {/* <div style={{ marginBottom: 10 }}>
                           <Button onClick={getVideo} size="large" variant="contained" component="label" startIcon={<PhotoCameraIcon className={classes.colorIcon} />}>
                             Abrir câmera
                           </Button>
-                        </div>
+                        </div> */}
                         <div className={classes.btnOption}>
                           <Button size="small" variant="outlined" onClick={onUploadImage} >
-                            Enviar
+                            Carregar foto
                           </Button>
-                          {photoId != null && 
+                          {photoId != null &&
                             <Button size="small" variant="outlined" onClick={deleteImage} >
-                              Excluir imagem
+                              Excluir foto
                             </Button>
                           }
 
@@ -317,6 +311,7 @@ export default function CreateCliente() {
 
                 {tipo == 'Fisica' &&
                   <TextField
+                    required
                     variant="outlined"
                     label="Nome cliente"
                     size="small"
@@ -328,6 +323,7 @@ export default function CreateCliente() {
 
                 {tipo == 'Juridica' &&
                   <TextField
+                    required
                     variant="outlined"
                     label="Nome fantasia"
                     size="small"
@@ -340,7 +336,6 @@ export default function CreateCliente() {
                 {tipo == 'Fisica' &&
                   <div className={classes.twoInputs}>
                     <TextField
-                      required
                       variant="outlined"
                       size="small"
                       label="Data de nascimento"

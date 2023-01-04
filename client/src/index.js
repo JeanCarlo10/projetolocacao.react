@@ -12,6 +12,44 @@ const theme = createMuiTheme({
   typography: {
     fontFamily: 'Public Sans, sans-serif',
   },
+
+  overrides: {
+    MuiPickersToolbar: {
+      toolbar: {
+        backgroundColor: '#00AB55',
+      },
+    },
+    MuiPickersDay: {
+      day: {
+        color: 'black',
+      },
+      daySelected: {
+        backgroundColor: '#00AB55',
+        '&:hover': {
+          backgroundColor: '#007B55'
+        },
+      },
+      dayDisabled: {
+        color: '#ccc',
+      },
+      current: {
+        color: '#00AB55',
+      },
+    },
+    MuiTypography: {
+      colorPrimary: {
+        color: '#00AB55',
+      }
+    },
+    MuiButton: {
+      textPrimary: {
+        color: '#00AB55',
+        '&:hover': {
+          backgroundColor: '#00ab5514'
+        },
+      }
+    },
+  }
   // palette: {
   //   primary: {
   //     main: '#DCF1D7',

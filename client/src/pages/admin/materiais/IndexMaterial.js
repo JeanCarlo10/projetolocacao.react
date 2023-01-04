@@ -8,8 +8,7 @@ import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
-import Tooltip from '@material-ui/core/Tooltip';
-import FilterListRoundedIcon from '@material-ui/icons/FilterListRounded';
+import Tooltip from '@mui/material/Tooltip';
 import Button from '@material-ui/core/Button';
 import AddCircleRoundedIcon from '@material-ui/icons/AddCircleRounded';
 import Card from '@material-ui/core/Card';
@@ -155,7 +154,7 @@ export default function IndexMaterial() {
 
           {loading ? (<div style={{ width: 450, margin: '0 auto' }} ref={container} />) : (
             <Card style={{ borderRadius: 15 }}>
-              <div style={{ padding: 8}}>
+              <div style={{ padding: 8 }}>
                 <div className={classes.iconButton}>
                   <IconButton>
                     <SearchIcon />
@@ -188,15 +187,18 @@ export default function IndexMaterial() {
                           className={classes.buttonTable}
                         />
                     </IconButton> */}
-                            <IconButton onClick={() => handleDelete(row._id)}>
-                              <DeleteIcon />
-                            </IconButton>
-                            <IconButton href={'/admin/materiais/edit/' + row._id}>
-                              <EditIcon />
-                            </IconButton>
+                            <Tooltip title="Excluir">
+                              <IconButton onClick={() => handleDelete(row._id)}>
+                                <DeleteIcon />
+                              </IconButton>
+                            </Tooltip>
+                            <Tooltip title="Editar">
+                              <IconButton href={'/admin/materiais/edit/' + row._id}>
+                                <EditIcon />
+                              </IconButton>
+                            </Tooltip>
                           </TableCell>
-
-                          <Menu
+                          {/* <Menu
                             open={isOpenMenu}
                             anchorEl={ref.current}
                             onClose={() => setIsOpenMenu(false)}
@@ -223,7 +225,7 @@ export default function IndexMaterial() {
                               </ListItemIcon>
                               <ListItemText primary="Editar" />
                             </MenuItem>
-                          </Menu>
+                          </Menu> */}
                         </TableRow>
                       ))}
                   </TableBody>

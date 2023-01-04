@@ -133,16 +133,12 @@ export default function CreatePedido() {
     setTotalGeral(totalParcial - desconto);
   }, [totalParcial, desconto]);
 
-  //Esse é meu codigo q eu tava tentando 
-  // const handleSubTotal = () => {
-  //   let total = 0;
+  useEffect(() => {
+    const total = produtos.reduce((count, item) => count + item.valorItem, 0)
+    setTotalParcial(total);
 
-  //   produtos.forEach(item => {
-  //     total += item.valorItem;
-  //   });
-
-  //   console.log("Total: " + total);
-  // }
+    console.log(total)
+  }, [produtos])
 
   async function handleSubmit() {
     let data = {
@@ -279,6 +275,7 @@ export default function CreatePedido() {
                     label='Data entrega'
                     size='small'
                     autoOk
+                    className={classes.colorButtonDatePicker}
                     inputVariant='outlined'
                     format="dd/MM/yyyy"
                     cancelLabel="CANCELAR"
@@ -302,7 +299,9 @@ export default function CreatePedido() {
                   <TextField
                     variant="outlined"
                     size="small"
+                    disabled
                     label="Total parcial"
+                    className={classes.bold}
                     getInputRef={inputRef}
                     InputProps={{
                       inputComponent: NumberFormatCustom,
@@ -325,6 +324,7 @@ export default function CreatePedido() {
                     variant="outlined"
                     size="small"
                     label="Total geral"
+                    className={classes.bold}
                     getInputRef={inputRef}
                     InputProps={{
                       inputComponent: NumberFormatCustom,
@@ -374,6 +374,7 @@ const useStyles = makeStyles((theme) => ({
     paddingTop: theme.spacing(4),
     paddingBottom: theme.spacing(4),
   },
+
   inputs: {
     display: 'flex',
     overflow: 'auto',
@@ -424,5 +425,10 @@ const useStyles = makeStyles((theme) => ({
       backgroundColor: '#007B55',
       color: '#FFF',
     },
+  },
+  bold: {
+    '& .MuiInputBase-input': {
+      fontWeight: 700
+    }
   },
 }));

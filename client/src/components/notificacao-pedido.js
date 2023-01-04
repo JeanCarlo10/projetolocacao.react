@@ -29,6 +29,7 @@ import { set, differenceInHours } from 'date-fns';
 import api from '../services/api';
 import Avatar from '@mui/material/Avatar';
 import '../assets/css/notificacao-pedido.css';
+import { nameStatus } from '../functions/static_data';
 
 const ExpandMore = styled((props) => {
     const { expand, ...other } = props;
@@ -69,10 +70,9 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 export default function NotificacaoPedido(props) {
     const { currentMonth, statuses, keyword } = props;
     const classes = useStyles();
-    const unidadeMedidaMap = { 'Unidade': 'Unidade(s)', 'Metro': 'Metros' };
+    const unidadeMedidaMap = { 'Unidade': 'unidade(s)', 'Metro': 'metro(s)' };
 
     const [listaPedidos, setListaPedidos] = useState([]);
-    const [dataDevolucao, setDataDevolucao] = useState();
 
     useEffect(() => {
         async function getDadosPedido() {
@@ -199,16 +199,14 @@ export default function NotificacaoPedido(props) {
                         }
                         title={
                             <>
-                                <div className='title'>
+                                <div>
                                     {info.nomeCliente}
                                 </div>
-                                {/* <div>
-                                    {info.contacts.map((item) => (
-                                        <Stack direction="row" mb={0.5}>
-                                            <Chip icon={item.tipoTelefone == "Celular" ? <PhoneAndroidIcon /> : <PhoneIcon />} label={item.numero} />
-                                        </Stack>
-                                    ))}
-                                </div> */}
+                                {/* {info.pedido_cliente.contacts.map((item) => (
+                                    <Stack direction="row" mb={0.5}>
+                                        <Chip icon={`${item.tipoTelefone}` == "Celular" ? <PhoneAndroidIcon /> : <PhoneIcon />} label={`${item.numero}`} />
+                                    </Stack>
+                                ))} */}
                             </>
                         }
                         subheader={

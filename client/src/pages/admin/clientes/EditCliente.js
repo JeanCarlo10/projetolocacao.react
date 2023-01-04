@@ -13,7 +13,10 @@ import Button from '@material-ui/core/Button';
 import Breadcrumbs from '@material-ui/core/Breadcrumbs';
 import Link from '@material-ui/core/Link';
 import SaveIcon from '@material-ui/icons/Save';
-
+import Box from '@mui/material/Box';
+import Grid from '@mui/material/Grid';
+import Avatar from '@mui/material/Avatar';
+import InsertPhotoIcon from '@mui/icons-material/InsertPhoto';
 import Notification from '../../../components/notification';
 import MenuAdmin from '../../../components/menu-admin';
 import api from '../../../services/api';
@@ -35,6 +38,9 @@ export default function EditCliente() {
     const [nascimento, setNascimento] = useState('');
     const [email, setEmail] = useState('');
 
+    const [file, setFile] = useState(null);
+    const [photoId, setPhotoId] = useState(null);
+
     const [dadosEndereco, setDadosEndereco] = useState({});
     const [contatos, setContatos] = useState([]);
 
@@ -54,6 +60,7 @@ export default function EditCliente() {
             setNascimento(response.data.dataNascimento);
             setEmail(response.data.email);
             setContatos(response.data.contacts);
+            setPhotoId(response.data.avatar);
 
             setDadosEndereco(response.data);
         }
@@ -93,6 +100,24 @@ export default function EditCliente() {
         setNascimento(mask(unMask(event.target.value), ['99/99/9999']));
     }
 
+    const onUploadImage = async () => {
+        const formdata = new FormData();
+        formdata.append("avatar", file);
+
+        const results = await api.put('http://localhost:5000/api/clients/upload-avatar', formdata, {
+            method: "PUT",
+            body: formdata,
+        });
+        setPhotoId(results.data._id);
+        console.log(results);
+    }
+
+    const deleteImage = (e) => {
+        e.preventDefault();
+        //Criar codigo para excluir do banco 
+        setPhotoId(null);
+    }
+
     async function handleSubmit() {
         const data = {
             _id: idCliente,
@@ -105,6 +130,7 @@ export default function EditCliente() {
             cnpj: cnpj,
             dataNascimento: nascimento,
             email: email,
+            avatar: photoId,
 
             //Dados Contatos
             contacts: contatos,
@@ -119,18 +145,18 @@ export default function EditCliente() {
         data.cep = dadosEndereco.cep;
 
         //if (nome != '' ) {
-            const response = await api.put('/api/clients', data);
+        const response = await api.put('/api/clients', data);
 
-            if (response.status == 200) {
-                setNotify({
-                    isOpen: true,
-                    message: 'Cliente atualizado com sucesso',
-                    type: 'success'
-                });
-                window.location.href = '/admin/clientes'
-            } else {
-                alert('Erro ao atualizar o cliente');
-            }
+        if (response.status == 200) {
+            setNotify({
+                isOpen: true,
+                message: 'Cliente atualizado com sucesso',
+                type: 'success'
+            });
+            window.location.href = '/admin/clientes'
+        } else {
+            alert('Erro ao atualizar o cliente');
+        }
         // } else {
         //     alert('Campos obrigatórios');
         // }
@@ -160,6 +186,55 @@ export default function EditCliente() {
                     <Card style={{ borderRadius: 15 }}>
                         <form onSubmit={handleSubmit}>
                             <CardContent className={classes.inputs}>
+                                <Box className={classes.containerAvatar}>
+
+                                    <Grid container spacing={4}>
+                                        <Grid item xs={12} sm={6} md={2}>
+                                            <div className={classes.customAvatar}>
+                                                {photoId == null &&
+                                                    <Avatar
+                                                        sx={{ width: 126, height: 126 }}
+                                                    />
+                                                }
+                                                {photoId != null &&
+                                                    <Avatar
+                                                        // src={'http://localhost:5000/api/clients/thumbnail-avatar/' + photoId}
+                                                        //src={file === '' ? '' : URL.createObjectURL(file)}
+                                                        sx={{ width: 126, height: 126, objectFit: 'cover' }}
+                                                    />
+                                                }
+
+                                            </div>
+                                            <Typography className={classes.textAvatar}>
+                                                Permitido *.jpeg, *.jpg, *.png
+                                                máximo 4 MB
+                                            </Typography>
+                                        </Grid>
+
+                                        <Grid item xs={12} sm={6} md={4}>
+                                            <div className={classes.containerOptions}>
+                                                <div style={{ marginBottom: 10 }}>
+                                                    <Button size="large" variant="contained" component="label" startIcon={<InsertPhotoIcon className={classes.colorIcon} />}>
+                                                        Selecionar foto
+                                                        <input hidden accept="image/jpeg, image/png" name="avatar" type="file" onChange={e => setFile(e.target.files[0])} />
+                                                    </Button>
+                                                </div>
+
+                                                <div className={classes.btnOption}>
+                                                    <Button size="small" variant="outlined" onClick={onUploadImage} >
+                                                        Carregar foto
+                                                    </Button>
+                                                    {photoId != null &&
+                                                        <Button size="small" variant="outlined" onClick={deleteImage} >
+                                                            Excluir foto
+                                                        </Button>
+                                                    }
+
+                                                </div>
+                                            </div>
+                                        </Grid>
+                                    </Grid>
+                                </Box>
                                 <FormControl disabled variant="outlined" size="small" className={classes.formControl}>
                                     <InputLabel>Tipo</InputLabel>
                                     <Select
@@ -174,6 +249,7 @@ export default function EditCliente() {
 
                                 {tipo == 'Fisica' &&
                                     <TextField
+                                        required
                                         variant="outlined"
                                         label="Nome cliente"
                                         size="small"
@@ -185,6 +261,7 @@ export default function EditCliente() {
 
                                 {tipo == 'Juridica' &&
                                     <TextField
+                                        required
                                         variant="outlined"
                                         label="Nome fantasia"
                                         size="small"
@@ -197,7 +274,6 @@ export default function EditCliente() {
                                 {tipo == 'Fisica' &&
                                     <div className={classes.twoInputs}>
                                         <TextField
-                                            required
                                             variant="outlined"
                                             size="small"
                                             label="Data de nascimento"
@@ -358,6 +434,40 @@ const useStyles = makeStyles((theme) => ({
             backgroundColor: '#007B55',
             color: '#FFF',
         },
+    },
+    containerAvatar: {
+        width: "100%",
+        padding: 16,
+        marginBottom: 10,
+        borderRadius: 10,
+        borderStyle: "solid",
+        borderWidth: 1,
+        borderColor: '#919eab52'
+    },
+    customAvatar: {
+        width: 144,
+        height: 144,
+        borderRadius: '50%',
+        padding: 8,
+        borderStyle: "dashed",
+        borderWidth: 2,
+        borderColor: '#919eab52'
+    },
+    textAvatar: {
+        textAlign: 'center',
+        fontSize: 12,
+        marginTop: 5,
+        color: '#595A4A'
+    },
+    colorIcon: {
+        color: '#595A4A',
+    },
+    containerOptions: {
+        display: 'flex',
+        flexDirection: 'column',
+    },
+    btnOption: {
+        marginTop: 45,
     },
     // appBarSpacer: theme.mixins.toolbar,
 }));

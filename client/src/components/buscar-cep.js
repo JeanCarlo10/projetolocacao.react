@@ -2,11 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
-import { TextField, InputLabel, FormControl, Divider } from '@material-ui/core';
-import OutlinedInput from '@material-ui/core/OutlinedInput';
-import IconButton from '@material-ui/core/IconButton';
-import Typography from '@material-ui/core/Typography';
-import InputAdornment from '@material-ui/core/InputAdornment';
+import Grid from '@mui/material/Grid';
+import TextField from '@mui/material/TextField';
+import InputLabel from '@mui/material/InputLabel';
+import FormControl from '@mui/material/FormControl';
+import Divider from '@mui/material/Divider';
+import OutlinedInput from '@mui/material/OutlinedInput';
+import IconButton from '@mui/material/IconButton';
+import Typography from '@mui/material/Typography';
+import InputAdornment from '@mui/material/InputAdornment';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import apiCEP from '../services/apiCEP';
 import Notification from '../components/notification';
@@ -69,111 +73,137 @@ export default function BuscarCep(props) {
                 type: 'error'
             });
             setCep("");
-        } 
+        }
     }
 
     return (
-        <Box sx={{
-            border: "1px solid #E0E1E0",
-            borderLeft: "5px solid #00AB55",
-            borderTopLeftRadius: "5px",
-            borderBottomLeftRadius: "5px",
-            borderTopRightRadius: "5px",
-            borderBottomRightRadius: "5px"
-        }}
-        >
-            <Paper elevation={0} sx={{ p: 2 }}>
-                <Notification notify={notify} setNotify={setNotify} />
-                <Typography style={{ marginBottom: 15, color: '#00AB55', fontWeight: 'bold' }}>
-                    Endereço
-                    <Divider variant="fullWidth" />
-                </Typography>
+        <div className={classes.boxCustom}>
+            <form>
+                <Box display="flex" flexDirection="column">
+                    <Notification notify={notify} setNotify={setNotify} />
+                    <Typography style={{ padding: '15px', color: '#00AB55', fontWeight: 'bold' }}>
+                        Endereço
+                        <Divider variant="fullWidth" />
+                    </Typography>
 
-                <form>
-                    <FormControl size="small" variant="outlined">
-                        <InputLabel htmlFor="cep">CEP</InputLabel>
-                        <OutlinedInput
-                            value={cep}
-                            onChange={handleChangeCEP}
-                            labelWidth={120}
-                            endAdornment={
-                                <InputAdornment position="end">
-                                    <IconButton
-                                        onClick={handleSearchCEP}
-                                        edge="end"
-                                    >
-                                        <SearchOutlinedIcon color="success" />
-                                    </IconButton>
-                                </InputAdornment>
-                            }
-                        />
-                    </FormControl>
+                    <Grid container direction="column" padding={2} spacing={2}>
+                        <Grid container item direction="row">
+                            <Grid item xs={12} sm={6} md={3}>
+                                <FormControl size="small" variant="outlined">
+                                    <InputLabel htmlFor="cep">CEP</InputLabel>
+                                    <OutlinedInput
+                                        value={cep}
+                                        fullWidth
+                                        onChange={handleChangeCEP}
+                                        labelWidth={120}
+                                        endAdornment={
+                                            <InputAdornment position="end">
+                                                <IconButton
+                                                    onClick={handleSearchCEP}
+                                                    edge="end"
+                                                >
+                                                    <SearchOutlinedIcon color="success" />
+                                                </IconButton>
+                                            </InputAdornment>
+                                        }
+                                        label="CEP"
+                                    />
+                                </FormControl>
 
-                    <Box className={classes.twoInputs}>
-                        <TextField
-                            variant="outlined"
-                            size="small"
-                            label="Bairro"
-                            value={bairro}
-                            onChange={e => setBairro(e.target.value)}
-                        />
-                        <TextField
-                            variant="outlined"
-                            size="small"
-                            label="Logradouro"
-                            value={logradouro}
-                            onChange={e => setLogradouro(e.target.value)}
-                        />
-                    </Box>
+                            </Grid>
+                        </Grid>
 
-                    <Box style={{ marginLeft: -7 }}>
-                        <TextField style={{ minWidth: '74%' }}
-                            variant="outlined"
-                            size="small"
-                            label="Cidade"
-                            value={cidade}
-                            onChange={e => setCidade(e.target.value)}
-                        />
-                        <TextField
-                            variant="outlined"
-                            size="small"
-                            label="Estado"
-                            value={uf}
-                            onChange={e => setUf(e.target.value)}
-                        />
-                    </Box>
+                        <Grid container item direction="row" spacing={2} className={classes.aligns}>
+                            <Grid item xs={12} sm={6} md={6} >
+                                <TextField
+                                    fullWidth
+                                    variant="outlined"
+                                    size="small"
+                                    label="Bairro"
+                                    value={bairro}
+                                    onChange={e => setBairro(e.target.value)}
+                                />
+                            </Grid>
 
-                    <Box style={{ marginLeft: -7 }}>
-                        <TextField
-                            variant="outlined"
-                            size="small"
-                            label="Número"
-                            value={numero}
-                            onChange={e => {setNumero(e.target.value); onUpdate() }}
-                        />
-                        
-                        <TextField style={{ minWidth: '74%' }}
-                            variant="outlined"
-                            size="small"
-                            label="Complemento"
-                            value={complemento}
-                            onChange={e => setComplemento(e.target.value)}
-                        />
-                    </Box>
-                </form>
-            </Paper>
-        </Box>
+                            <Grid item xs={12} sm={6} md={6}>
+                                <TextField
+                                    fullWidth
+                                    variant="outlined"
+                                    size="small"
+                                    label="Logradouro"
+                                    value={logradouro}
+                                    onChange={e => setLogradouro(e.target.value)}
+                                />
+                            </Grid>
+                        </Grid>
+
+                        <Grid container item direction="row" spacing={2} className={classes.aligns}>
+                            <Grid item xs={12} sm={8} md={10}>
+                                <TextField
+                                    variant="outlined"
+                                    fullWidth
+                                    size="small"
+                                    label="Cidade"
+                                    value={cidade}
+                                    onChange={e => setCidade(e.target.value)}
+                                />
+                            </Grid>
+
+                            <Grid item xs={12} sm={4} md={2}>
+                                <TextField
+                                    variant="outlined"
+                                    fullWidth
+                                    size="small"
+                                    label="Estado"
+                                    value={uf}
+                                    onChange={e => setUf(e.target.value)}
+                                />
+                            </Grid>
+                        </Grid>
+
+                        <Grid container item direction="row" spacing={2} className={classes.aligns}>
+                            <Grid item xs={12} sm={4} md={3}>
+                                <TextField
+                                    variant="outlined"
+                                    fullWidth
+                                    size="small"
+                                    label="Número"
+                                    value={numero}
+                                    onChange={e => { setNumero(e.target.value) }}
+                                />
+                            </Grid>
+                            <Grid item xs={12} sm={8} md={9}>
+                                <TextField
+                                    variant="outlined"
+                                    fullWidth
+                                    size="small"
+                                    label="Complemento"
+                                    value={complemento}
+                                    onChange={e => setComplemento(e.target.value)}
+                                />
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                </Box>
+            </form>
+        </div >
     );
 }
 
 const useStyles = makeStyles((theme) => ({
-    twoInputs: {
-        display: 'flex',
-        marginLeft: -7,
-        '& .MuiTextField-root': {
-            // margin: theme.spacing(1),
-            width: '50%',
-        },
+    boxCustom: {
+        border: "1px solid #E0E1E0",
+        borderLeft: "5px solid #00AB55",
+        borderTopLeftRadius: "5px",
+        borderBottomLeftRadius: "5px",
+        borderTopRightRadius: "5px",
+        borderBottomRightRadius: "5px",
     },
+    aligns: {
+        paddingLeft: "8px !important",
+        paddingRight: "8px !important",
+        paddingTop: "0px !important",
+        paddingBottom: "0px !important"
+    }
 }));
 

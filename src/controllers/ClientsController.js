@@ -58,7 +58,7 @@ module.exports = {
     async create(req, res) { 
         try {
             const model  = req.body
-
+             console.log(model);
             const client = await Client.create(model);
             
             await client.save();

@@ -9,6 +9,7 @@ import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
 import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
+import Tooltip from '@mui/material/Tooltip';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell, { tableCellClasses } from '@mui/material/TableCell';
@@ -87,7 +88,7 @@ export default function ListaContatos(props) {
       borderLeft: "5px solid #009DE0",
       borderRadius: "5px",
       padding: '16px',
-      
+
     }}>
       <Typography style={{ marginBottom: 15, color: '#009DE0', fontWeight: 'bold' }}>
         Contato(s)
@@ -124,7 +125,7 @@ export default function ListaContatos(props) {
 
           <Grid container flexDirection='row' alignItems='center' columnSpacing={1} pt={1} pb={2}>
             <Grid item xs={12} sm={8} md={9}>
-              <TextField                
+              <TextField
                 variant="outlined"
                 label="Observação"
                 size="small"
@@ -158,9 +159,11 @@ export default function ListaContatos(props) {
                 <StyledTableCell>{contact.numero}</StyledTableCell>
                 <StyledTableCell>{contact.observacao}</StyledTableCell>
                 <StyledTableCell component="th" scope="row" align="right">
-                  <IconButton onClick={() => deleteContato(contact.id)}>
-                    <DeleteIcon />
-                  </IconButton>
+                  <Tooltip title="Excluir">
+                    <IconButton onClick={() => deleteContato(contact.id)}>
+                      <DeleteIcon />
+                    </IconButton>
+                  </Tooltip>
                 </StyledTableCell>
               </StyledTableRow>
             ))}

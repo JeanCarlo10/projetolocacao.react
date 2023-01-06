@@ -110,3 +110,10 @@
     color: #06e877;
     border-radius: 5px;
 }
+
+.containerTitle {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 15px;
+}

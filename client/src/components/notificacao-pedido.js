@@ -7,7 +7,7 @@ import CardContent from '@mui/material/CardContent';
 import CardActions from '@mui/material/CardActions';
 import Collapse from '@mui/material/Collapse';
 import IconButton from '@material-ui/core/IconButton';
-import Typography from '@material-ui/core/Typography';
+import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ReplayCircleFilledRoundedIcon from '@mui/icons-material/ReplayCircleFilledRounded';
 import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
@@ -29,7 +29,6 @@ import { set, differenceInHours } from 'date-fns';
 import api from '../services/api';
 import Avatar from '@mui/material/Avatar';
 import '../assets/css/notificacao-pedido.css';
-import { nameStatus } from '../functions/static_data';
 
 const ExpandMore = styled((props) => {
     const { expand, ...other } = props;
@@ -198,16 +197,17 @@ export default function NotificacaoPedido(props) {
                             </div>
                         }
                         title={
-                            <>
-                                <div>
-                                    {info.nomeCliente}
+                                <div className="containerTitle">
+                                    <Typography style={{ color: '#2d2a26', fontWeight: 'bold', fontFamily: 'Public Sans' }}>
+                                        {info.nomeCliente}
+                                    </Typography>
+
+                                    {info.pedido_cliente[0].contacts.map((item) => (
+                                        <Stack mb={0.5}>
+                                            <Chip style={{ fontFamily: 'Public Sans' }} icon={item.tipoTelefone == "Celular" ? <PhoneAndroidIcon /> : <PhoneIcon />} label={item.numero} />
+                                        </Stack>
+                                    ))}
                                 </div>
-                                {/* {info.pedido_cliente.contacts.map((item) => (
-                                    <Stack direction="row" mb={0.5}>
-                                        <Chip icon={`${item.tipoTelefone}` == "Celular" ? <PhoneAndroidIcon /> : <PhoneIcon />} label={`${item.numero}`} />
-                                    </Stack>
-                                ))} */}
-                            </>
                         }
                         subheader={
                             <div className="subTitleAddress">

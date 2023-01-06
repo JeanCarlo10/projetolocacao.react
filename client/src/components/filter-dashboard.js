@@ -11,7 +11,7 @@ import ArrowBackIosRoundedIcon from '@mui/icons-material/ArrowBackIosRounded';
 import ArrowForwardIosRoundedIcon from '@mui/icons-material/ArrowForwardIosRounded';
 import SearchIcon from '@material-ui/icons/Search';
 import { formatCurrentMonth } from '../helpers/dateFilter';
-import { nameStatus } from '../../src/functions/static_data';
+import { statusFilterDashboard } from '../../src/functions/static_data';
 
 const RootStyle = styled(Card)(({ theme }) => ({
   flexDirection: 'row',
@@ -98,7 +98,7 @@ export default function FilterDashboard(props) {
             <InputBase
               value={search}
               onChange={({target}) => onChangeSearch(target.value)}
-              placeholder="Buscar..."
+              placeholder="Buscar por cliente..."
             />
           </div>
         </Grid>
@@ -114,9 +114,9 @@ export default function FilterDashboard(props) {
               renderValue={(selected) => selected.join(', ')}
               MenuProps={MenuProps}
             >
-              {nameStatus.map((item) => (
+              {statusFilterDashboard.map((item) => (
                 <MenuItem key={item.id} value={item.label}>
-                  <Checkbox checked={status.indexOf(item.label) > -1} />
+                  <Checkbox success checked={status.indexOf(item.label) > -1} />
                   <ListItemText primary={item.label} />
                 </MenuItem>
               ))}

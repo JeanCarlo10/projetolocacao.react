@@ -136,8 +136,6 @@ export default function CreatePedido() {
   useEffect(() => {
     const total = produtos.reduce((count, item) => count + item.valorItem, 0)
     setTotalParcial(total);
-
-    console.log(total)
   }, [produtos])
 
   async function handleSubmit() {

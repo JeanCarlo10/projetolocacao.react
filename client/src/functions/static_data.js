@@ -10,7 +10,7 @@ export const getTypeUserLabel = (value) => {
     return array[value - 1];
 };
 
-export const nameStatus = [
+export const statusFilterDashboard = [
     {
         id: 1,
         checked: false,
@@ -37,6 +37,30 @@ export const nameStatus = [
         label: 'Não Devolvido'
     },
 ];
+
+export const allStatus = [
+    {
+        id: 1,
+        label: 'Pendente'
+    },
+    {
+        id: 2,
+        label: 'Entregue'
+    },
+    {
+        id: 3,
+        label: 'Cancelado'
+    },
+    {
+        id: 4,
+        label: 'Devolvido'
+    },
+    {
+        id: 5,
+        label: 'Não Devolvido'
+    },
+];
+
 // export const getStatusRent = (value) => {
 //     var array = ['Pendente', 'Entregue', 'Devolvido', 'Cancelado'];
 

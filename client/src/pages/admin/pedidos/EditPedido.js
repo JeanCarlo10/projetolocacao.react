@@ -1,10 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Container from '@material-ui/core/Container';
-import Select from '@mui/material/Select';
-import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormLabel from '@mui/material/FormLabel';
@@ -16,6 +14,7 @@ import Button from '@material-ui/core/Button';
 import Breadcrumbs from '@material-ui/core/Breadcrumbs';
 import Link from '@material-ui/core/Link';
 import Radio from '@mui/material/Radio';
+import Grid from '@mui/material/Grid';
 import RadioGroup from '@mui/material/RadioGroup';
 import MenuItem from '@mui/material/MenuItem';
 import SaveIcon from '@material-ui/icons/Save';
@@ -29,6 +28,7 @@ import ListaProdutos from '../../../components/lista-produtos';
 import { DatePicker } from '@material-ui/pickers';
 import '../../../assets/css/card-location.css';
 import Notification from '../../../components/notification';
+import { allStatus } from '../../../functions/static_data';
 
 export function currencyFormatter(value) {
     if (!Number(value)) return "";
@@ -60,34 +60,6 @@ const NumberFormatCustom = React.forwardRef(function NumberFormatCustom(props, r
         />
     );
 });
-
-const nameStatus = [
-    {
-        id: 1,
-        checked: false,
-        label: 'Pendente'
-    },
-    {
-        id: 2,
-        checked: false,
-        label: 'Entregue'
-    },
-    {
-        id: 3,
-        checked: false,
-        label: 'Cancelado'
-    },
-    {
-        id: 4,
-        checked: false,
-        label: 'Devolvido'
-    },
-    {
-        id: 5,
-        checked: false,
-        label: 'Não Devolvido'
-    },
-];
 
 export default function EditPedido() {
     const classes = useStyles();
@@ -128,6 +100,8 @@ export default function EditPedido() {
             setDataDevolucao(response.data.dataDevolucao);
             setProdutos(response.data.products);
             setDadosEndereco(response.data.dadosEndereco);
+
+            console.log(response.data);
         }
 
         getPedido();
@@ -138,10 +112,8 @@ export default function EditPedido() {
     };
 
     const handleChangeStatus = (event) => {
-
-
         setStatus(event.target.value);
-    };
+    }
 
     const handleDateDeliveryChange = (date) => {
         setDataEntrega(date);
@@ -159,15 +131,22 @@ export default function EditPedido() {
         setProdutos([...produtos, produto]);
     }
 
-    const handleDeleteProduto = (produto) => {
-        const newProducts = produtos.filter((item) => item.id !== produto);
+    const handleDeleteProduto = useCallback((produto) => {
+        let newProducts = [...produtos];
+
+        newProducts.splice(produtos.indexOf(produto), 1);
 
         setProdutos(newProducts);
-    }
+    }, [produtos]);
 
     useEffect(() => {
         setTotalGeral(totalParcial - desconto);
     }, [totalParcial, desconto]);
+
+    useEffect(() => {
+        const total = produtos.reduce((count, item) => count + item.valorItem, 0)
+        setTotalParcial(total);
+    }, [produtos])
 
     async function handleSubmit() {
         const data = {
@@ -245,38 +224,50 @@ export default function EditPedido() {
                     <Card style={{ borderRadius: 15 }}>
                         <form onSubmit={handleSubmit}>
                             <CardContent className={classes.inputs}>
-                                <div className={classes.twoInputs}>
-                                    <TextField
-                                        variant='outlined'
-                                        size="small"
-                                        label="Nº Pedido"
-                                        InputLabelProps={{ shrink: true }}
-                                        disabled
-                                        value={numeroPedido}
-                                    />
-                                    <DatePicker
-                                        label='Data pedido'
-                                        size='small'
-                                        disabled
-                                        inputVariant='outlined'
-                                        format="dd/MM/yyyy"
-                                        value={dataPedido}
-                                    />
-                                    <FormControl variant="outlined" size="small" fullWidth>
-                                        <InputLabel>Status</InputLabel>
-                                        <Select
-                                            value={status}
-                                            onChange={handleChangeStatus}
+                                <Grid container spacing={2} flexDirection={'row'}>
+                                    <Grid item xs={12} sm={4} md={4}>
+                                        <TextField
+                                            variant='outlined'
+                                            fullWidth
+                                            size="small"
+                                            label="Nº Pedido"
+                                            InputLabelProps={{ shrink: true }}
+                                            disabled
+                                            value={numeroPedido}
+                                        />
+                                    </Grid>
+
+                                    <Grid item xs={12} sm={4} md={4}>
+                                        <DatePicker
+                                            label='Data pedido'
+                                            fullWidth
+                                            size='small'
+                                            disabled
+                                            inputVariant='outlined'
+                                            format="dd/MM/yyyy"
+                                            value={dataPedido}
+                                        />
+                                    </Grid>
+
+                                    <Grid item xs={12} sm={4} md={4}>
+                                        <TextField
+                                            select
                                             label="Status"
+                                            variant="outlined"
+                                            size="small"
+                                            fullWidth
+                                            value={status ? status : ""}
+                                            onChange={handleChangeStatus}
+                                            defaultValue={status}
                                         >
-                                            <MenuItem value={'Pendente'}>Pendente</MenuItem>
-                                            <MenuItem value={'Entregue'}>Entregue</MenuItem>
-                                            <MenuItem value={'Cancelado'}>Cancelado</MenuItem>
-                                            <MenuItem value={'Devolvido'}>Devolvido</MenuItem>
-                                            <MenuItem value={'Não Devolvido'}>Não Devolvido</MenuItem>
-                                        </Select>
-                                    </FormControl>
-                                </div>
+                                            {allStatus.map((item) => (
+                                                <MenuItem key={item.id} value={item.label}>
+                                                    {item.label}
+                                                </MenuItem>
+                                            ))}
+                                        </TextField>
+                                    </Grid>
+                                </Grid>
 
                                 <TextField
                                     variant='outlined'
@@ -300,7 +291,7 @@ export default function EditPedido() {
                                 </FormControl>
 
                                 {enderecoAtual == 'novo' ? <BuscarCEP onUpdate={handleSearchCEP} initialData={dadosEndereco} /> :
-                                    nomeCliente != null ?
+                                    currentClient.nomeCliente != null ?
                                         <div className='container'>
                                             <div className="card">
                                                 <div className='left-column'>
@@ -352,6 +343,7 @@ export default function EditPedido() {
                                         disabled
                                         size="small"
                                         label="Total parcial"
+                                        className={classes.bold}
                                         getInputRef={inputRef}
                                         InputProps={{
                                             inputComponent: NumberFormatCustom,
@@ -374,6 +366,7 @@ export default function EditPedido() {
                                         variant="outlined"
                                         size="small"
                                         label="Total geral"
+                                        className={classes.bold}
                                         getInputRef={inputRef}
                                         InputProps={{
                                             inputComponent: NumberFormatCustom,
@@ -473,5 +466,10 @@ const useStyles = makeStyles((theme) => ({
             backgroundColor: '#007B55',
             color: '#FFF',
         },
+    },
+    bold: {
+        '& .MuiInputBase-input': {
+            fontWeight: 700
+        }
     },
 }));

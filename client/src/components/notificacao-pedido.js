@@ -197,21 +197,21 @@ export default function NotificacaoPedido(props) {
                             </div>
                         }
                         title={
-                                <div className="containerTitle">
-                                    <Typography style={{ color: '#2d2a26', fontWeight: 'bold', fontFamily: 'Public Sans' }}>
-                                        {info.nomeCliente}
-                                    </Typography>
-
-                                    {info.pedido_cliente[0].contacts.map((item) => (
-                                        <Stack mb={0.5}>
-                                            <Chip style={{ fontFamily: 'Public Sans' }} icon={item.tipoTelefone == "Celular" ? <PhoneAndroidIcon /> : <PhoneIcon />} label={item.numero} />
-                                        </Stack>
-                                    ))}
+                            <div className="containerTitle">
+                                <div className="title">
+                                    {info.nomeCliente}
                                 </div>
+
+                                {info.pedido_cliente[0].contacts.map((item) => (
+                                    <Stack mb={0.5}>
+                                        <Chip style={{ fontFamily: 'Public Sans' }} icon={item.tipoTelefone == "Celular" ? <PhoneAndroidIcon /> : <PhoneIcon />} label={item.numero} />
+                                    </Stack>
+                                ))}
+                            </div>
                         }
                         subheader={
                             <div className="subTitleAddress">
-                                {info.logradouro}, Nº {info.numero} - {info.bairro} - {info.complemento}
+                                {info.logradouro}, Nº {info.numero} - Bairro: {info.bairro} - {info.complemento}
                             </div>
                         }>
                     </CardHeader>

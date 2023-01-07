@@ -4,35 +4,13 @@
     border: 2px solid #D4D4D4;
 }
 
-.title {
-    font-family: 'Public Sans';
-}
-
 .subTitleAddress {
     font-family: 'Public Sans';
 }
 
-.animation {
-    animation: pulse 4s infinite;
-    background: #f500560d !important; 
-    /* background: #FBEAEC  !important; */
-    border: 2px solid #dc3545 !important;
-}
-
-@keyframes pulse {
-    0% {
-        transform: scale(1);
-    }
-    70% {
-        transform: scale(0.98);
-    }
-    100% {
-        transform: scale(1);
-    }
-}
-
 .title {
     font-size: 18px;
+    font-family: 'Public Sans';
     font-weight: bold;
     color: #2d2a26;
     text-transform: uppercase;
@@ -116,4 +94,23 @@
     flex-direction: row;
     align-items: center;
     gap: 15px;
+}
+
+.animation {
+    animation: pulse 4s infinite;
+    background: #f500560d !important; 
+    /* background: #FBEAEC  !important; */
+    border: 2px solid #dc3545 !important;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    70% {
+        transform: scale(0.98);
+    }
+    100% {
+        transform: scale(1);
+    }
 }

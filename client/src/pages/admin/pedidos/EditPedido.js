@@ -18,6 +18,8 @@ import Grid from '@mui/material/Grid';
 import RadioGroup from '@mui/material/RadioGroup';
 import MenuItem from '@mui/material/MenuItem';
 import SaveIcon from '@material-ui/icons/Save';
+import IconButton from '@mui/material/IconButton';
+import MapOutlinedIcon from '@mui/icons-material/MapOutlined';
 import TextField from '@mui/material/TextField';
 
 import NumberFormat from 'react-number-format';
@@ -74,6 +76,15 @@ export default function EditPedido() {
     const [totalParcial, setTotalParcial] = useState();
     const [desconto, setDesconto] = useState(0);
     const [observacao, setObservacao] = useState('');
+
+    const [cep, setCep] = useState('');
+    const [cidade, setCidade] = useState('');
+    const [bairro, setBairro] = useState('');
+    const [logradouro, setLogradouro] = useState('');
+    const [complemento, setComplemento] = useState('');
+    const [numero, setNumero] = useState('');
+    const [uf, setUf] = useState('');
+
     const [dataPedido, setDataPedido] = useState();
     const [dataEntrega, setDataEntrega] = useState(null);
     const [dataDevolucao, setDataDevolucao] = useState(null);
@@ -100,6 +111,15 @@ export default function EditPedido() {
             setDataDevolucao(response.data.dataDevolucao);
             setProdutos(response.data.products);
             setDadosEndereco(response.data.dadosEndereco);
+
+            //Dados do endereço
+            setCep(response.data.cep);
+            setCidade(response.data.cidade);
+            setBairro(response.data.bairro);
+            setLogradouro(response.data.logradouro);
+            setComplemento(response.data.complemento);
+            setNumero(response.data.numero);
+            setUf(response.data.uf);
 
             console.log(response.data);
         }
@@ -291,7 +311,7 @@ export default function EditPedido() {
                                 </FormControl>
 
                                 {enderecoAtual == 'novo' ? <BuscarCEP onUpdate={handleSearchCEP} initialData={dadosEndereco} /> :
-                                    currentClient.nomeCliente != null ?
+                                    nomeCliente != null ?
                                         <div className='container'>
                                             <div className="card">
                                                 <div className='left-column'>
@@ -299,9 +319,9 @@ export default function EditPedido() {
                                                         <h4>Endereço de entrega</h4>
                                                     </div>
 
-                                                    <p>{currentClient.logradouro}, Nº {currentClient.numero}</p>
-                                                    <p>{currentClient.bairro} - {currentClient.cidade}</p>
-                                                    <p>CEP: {currentClient.cep}</p>
+                                                    <p>{logradouro}, Nº {numero}</p>
+                                                    <p>Bairro: {bairro} - {cidade}</p>
+                                                    <p>CEP: {cep}</p>
                                                 </div>
 
                                                 <div className='right-column'>
@@ -310,8 +330,10 @@ export default function EditPedido() {
                                             </div>
                                         </div> : ""
                                 }
-
-                                <ListaProdutos produtos={produtos} addProduto={handleAddProduto} deleteProduto={handleDeleteProduto} />
+                                
+                                <div style={{ marginBottom: '10px' }}>
+                                    <ListaProdutos produtos={produtos} addProduto={handleAddProduto} deleteProduto={handleDeleteProduto} />
+                                </div>
 
                                 <div className={classes.twoInputs}>
                                     <DatePicker
@@ -386,7 +408,7 @@ export default function EditPedido() {
                                 />
                             </CardContent>
                             <CardActions style={{ justifyContent: 'flex-end', marginRight: 15 }}>
-                                <Button variant="contained" size="medium" className={classes.btnDefaultGreen} type="submit" startIcon={<SaveIcon />}>Salvar</Button>
+                                <Button variant="contained" size="large" className={classes.btnDefaultGreen} type="submit" startIcon={<SaveIcon />}>Salvar</Button>
                             </CardActions>
                         </form>
                     </Card>
@@ -457,7 +479,7 @@ const useStyles = makeStyles((theme) => ({
     btnDefaultGreen: {
         background: '#00AB55',
         color: '#FFF',
-        borderRadius: 10,
+        borderRadius: '5px',
         border: 'none',
         textTransform: 'none',
         boxShadow: 'none',

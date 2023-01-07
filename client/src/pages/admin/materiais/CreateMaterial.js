@@ -80,7 +80,7 @@ export default function CreateMaterial() {
                 />
               </CardContent>
               <CardActions style={{ justifyContent: 'flex-end', marginRight: 15 }}>
-                <Button variant="contained" size="medium" className={classes.btnDefaultGreen} type="submit" startIcon={<SaveIcon />}>Salvar</Button>
+                <Button variant="contained" size="large" className={classes.btnDefaultGreen} type="submit" startIcon={<SaveIcon />}>Salvar</Button>
               </CardActions>
             </form>
           </Card>
@@ -143,7 +143,7 @@ const useStyles = makeStyles((theme) => ({
   btnDefaultGreen: {
     background: '#00AB55',
     color: '#FFF',
-    borderRadius: 10,
+    borderRadius: '5px',
     border: 'none',
     textTransform: 'none',
     boxShadow: 'none',

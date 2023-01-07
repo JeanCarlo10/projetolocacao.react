@@ -82,23 +82,16 @@ export default function ListaContatos(props) {
   }
 
   return (
-    <Box sx={{
-      marginTop: '10px',
-      border: "1px solid #E0E1E0",
-      borderLeft: "5px solid #009DE0",
-      borderRadius: "5px",
-      padding: '16px',
-
-    }}>
-      <Typography style={{ marginBottom: 15, color: '#009DE0', fontWeight: 'bold' }}>
+    <Box display="flex" flexDirection="column" className={classes.boxCustom}>
+      <Typography style={{ padding: '15px', color: '#009DE0', fontWeight: 'bold' }}>
         Contato(s)
         <Divider variant="fullWidth" />
       </Typography>
       <form>
-        <Grid container className={classes.inputs}>
-          <Grid container flexDirection='row' alignItems='center' columnSpacing={2}>
+        <Grid container direction="column" padding={2} spacing={2}>
+          <Grid container item direction="row" spacing={2} className={classes.aligns}>
             <Grid item xs={12} sm={6} md={6}>
-              <FormControl variant="outlined" size="small" fullWidth>
+              <FormControl style={{ margin: '8px' }} variant="outlined" size="small" fullWidth>
                 <InputLabel>Tipo</InputLabel>
                 <Select
                   value={tipoTelefone}
@@ -123,8 +116,8 @@ export default function ListaContatos(props) {
             </Grid>
           </Grid>
 
-          <Grid container flexDirection='row' alignItems='center' columnSpacing={1} pt={1} pb={2}>
-            <Grid item xs={12} sm={8} md={9}>
+          <Grid container item direction="row" spacing={2} className={classes.aligns}>
+            <Grid item xs={12} sm={8} md={10}>
               <TextField
                 variant="outlined"
                 label="Observação"
@@ -134,52 +127,64 @@ export default function ListaContatos(props) {
                 onChange={(event) => setObservacao(event.target.value)}
               />
             </Grid>
-            <Grid item sm={4} md={3}>
-              <Button onClick={handleAddContact} variant="contained" size="medium" className={classes.btnAddBlue} startIcon={<AddCircleOutlinedIcon />}>Adicionar</Button>
+            <Grid item xs={12} sm={4} md={2}>
+              <Button onClick={handleAddContact} variant="contained" fullWidth size="medium" className={classes.btnAddBlue} startIcon={<AddCircleOutlinedIcon />}>Adicionar</Button>
             </Grid>
+          </Grid>
+          <Grid container item>
+            <TableContainer>
+              <Table className={classes.table} size="small">
+                <TableHead>
+                  <TableRow>
+                    <StyledTableCell>Tipo</StyledTableCell>
+                    <StyledTableCell>Número</StyledTableCell>
+                    <StyledTableCell>Observação</StyledTableCell>
+                    <StyledTableCell align="right">Ações</StyledTableCell>
+                  </TableRow>
+                </TableHead>
+
+                <TableBody>
+                  {contatos && contatos.map((contact) => (
+                    <StyledTableRow key={contact.id}>
+                      <StyledTableCell align="left"><Chip label={contact.tipoTelefone} /></StyledTableCell>
+                      <StyledTableCell>{contact.numero}</StyledTableCell>
+                      <StyledTableCell>{contact.observacao}</StyledTableCell>
+                      <StyledTableCell component="th" scope="row" align="right">
+                        <Tooltip title="Excluir">
+                          <IconButton onClick={() => deleteContato(contact.id)}>
+                            <DeleteIcon />
+                          </IconButton>
+                        </Tooltip>
+                      </StyledTableCell>
+                    </StyledTableRow>
+                  ))}
+                </TableBody>
+              </Table>
+              {contatos.length > 0 ? null : <div className={classes.noRegisters}>Nenhum registro</div>}
+            </TableContainer>
           </Grid>
         </Grid>
       </form>
-
-      <TableContainer>
-        <Table className={classes.table} size="small">
-          <TableHead>
-            <TableRow>
-              <StyledTableCell>Tipo</StyledTableCell>
-              <StyledTableCell>Número</StyledTableCell>
-              <StyledTableCell>Observação</StyledTableCell>
-              <StyledTableCell align="right">Ações</StyledTableCell>
-            </TableRow>
-          </TableHead>
-
-          <TableBody>
-            {contatos && contatos.map((contact) => (
-              <StyledTableRow key={contact.id}>
-                <StyledTableCell align="left"><Chip label={contact.tipoTelefone} /></StyledTableCell>
-                <StyledTableCell>{contact.numero}</StyledTableCell>
-                <StyledTableCell>{contact.observacao}</StyledTableCell>
-                <StyledTableCell component="th" scope="row" align="right">
-                  <Tooltip title="Excluir">
-                    <IconButton onClick={() => deleteContato(contact.id)}>
-                      <DeleteIcon />
-                    </IconButton>
-                  </Tooltip>
-                </StyledTableCell>
-              </StyledTableRow>
-            ))}
-          </TableBody>
-        </Table>
-        {contatos.length > 0 ? null : <div className={classes.noRegisters}>Nenhum registro</div>}
-      </TableContainer>
     </Box>
   );
 }
 
 const useStyles = makeStyles((theme) => ({
-  inputs: {
-    '& .MuiTextField-root': {
-      margin: '0 !important',
-    },
+  boxCustom: {
+    border: "1px solid #E0E1E0",
+    borderLeft: "5px solid #009DE0",
+    borderTopLeftRadius: "5px",
+    borderBottomLeftRadius: "5px",
+    borderTopRightRadius: "5px",
+    borderBottomRightRadius: "5px",
+  },
+  aligns: {
+    paddingLeft: "8px !important",
+    paddingRight: "8px !important",
+    paddingTop: "0px !important",
+    paddingBottom: "0px !important",
+    display: 'flex',
+    alignItems: 'center'
   },
   noRegisters: {
     textAlign: 'center',
@@ -196,11 +201,13 @@ const useStyles = makeStyles((theme) => ({
   btnAddBlue: {
     background: '#009DE0',
     color: '#FFF',
-    borderRadius: 5,
+    borderRadius: '5px',
     border: 'none',
     textTransform: 'none',
+    marginLeft: '8px',
     boxShadow: 'none',
     fontWeight: 'bold',
+    padding: '8px 16px',
 
     '&:hover': {
       backgroundColor: '#052F5F',

@@ -321,7 +321,7 @@ const useStyles = makeStyles((theme) => ({
   btnDefaultGreen: {
     background: '#00AB55',
     color: '#FFF',
-    borderRadius: 10,
+    borderRadius: '5px',
     border: 'none',
     textTransform: 'none',
     boxShadow: 'none',

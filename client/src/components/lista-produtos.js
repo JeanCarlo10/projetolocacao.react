@@ -9,6 +9,7 @@ import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
 import IconButton from '@material-ui/core/IconButton';
 import Typography from '@mui/material/Typography';
+import Grid from '@mui/material/Grid';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell, { tableCellClasses } from '@mui/material/TableCell';
@@ -131,116 +132,135 @@ export default function ListaProdutos(props) {
   }
 
   return (
-    <Box sx={{
-      marginTop: '10px',
-      border: "1px solid #E0E1E0",
-      borderLeft: "5px solid #009DE0",
-      borderRadius: "5px",
-      padding: '16px'
-    }}>
-      <Typography style={{ marginBottom: 15, color: '#009DE0', fontWeight: 'bold' }}>
+    <Box display="flex" flexDirection="column" className={classes.boxCustom}>
+      <Typography style={{ padding: '15px 15px 0 15px', color: '#009DE0', fontWeight: 'bold' }}>
         Itens do pedido
         <Divider variant="fullWidth" />
       </Typography>
 
       <form>
-        <FormControl variant="outlined" size="small" style={{ minWidth: '100%' }}>
-          <InputLabel>Material</InputLabel>
-          <Select
-            onChange={handleSelectMaterials}
-            value={materialId}
-            label="Material"
-          >
-            {selectMaterials.map((material) => (
-              <MenuItem value={material._id} key={material._id}>{material.nomeMaterial}</MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+        <Grid container direction="column" padding={2} spacing={2}>
+          <Grid container item direction="row">
+            <FormControl variant="outlined" size="small" style={{ minWidth: '100%' }}>
+              <InputLabel>Material</InputLabel>
+              <Select
+                onChange={handleSelectMaterials}
+                value={materialId}
+                label="Material"
+              >
+                {selectMaterials.map((material) => (
+                  <MenuItem value={material._id} key={material._id}>{material.nomeMaterial}</MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
 
-        <Box style={{ marginLeft: -7, display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-          <TextField
-            fullWidth
-            variant="outlined"
-            size="small"
-            type='number'
-            label="Quantidade"
-            value={qtde}
-            onChange={(event) => setQtde(event.target.value)}
-          />
+          <Grid container item direction="row" spacing={2} className={classes.aligns}>
+            <Grid item xs={12} sm={3} md={3}>
+              <TextField
+                fullWidth
+                variant="outlined"
+                size="small"
+                type='number'
+                label="Quantidade"
+                value={qtde}
+                onChange={(event) => setQtde(event.target.value)}
+              />
+            </Grid>
 
-          <FormControl variant="outlined" size="small" fullWidth>
-            <InputLabel>Unidade Medida</InputLabel>
-            <Select
-              value={unidadeMedida}
-              onChange={handleChangeUnidadeMedida}
-              label="Unidade Medida"
-            >
-              <MenuItem value={'Unidade'}>Unidade</MenuItem>
-              <MenuItem value={'Metro'}>Metro</MenuItem>
-            </Select>
-          </FormControl>
+            <Grid item xs={12} sm={3} md={3}>
+              <FormControl variant="outlined" size="small" fullWidth style={{margin: '8px'}}>
+                <InputLabel>Unidade Medida</InputLabel>
+                <Select
+                  value={unidadeMedida}
+                  onChange={handleChangeUnidadeMedida}
+                  label="Unidade Medida"
+                >
+                  <MenuItem value={'Unidade'}>Unidade</MenuItem>
+                  <MenuItem value={'Metro'}>Metro</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
 
-          <TextField
-            fullWidth
-            variant="outlined"
-            size="small"
-            label="Valor"
-            getInputRef={inputRef}
-            InputProps={{
-              inputComponent: NumberFormatCustom,
-            }}
-            value={valorItem}
-            onChange={(event) => setValorItem(event.target.value)}
-          />
-          <div style={{ marginLeft: 10 }}>
-            <Button onClick={handleAddProduct} variant="contained" size="medium" className={classes.btnAddBlue} startIcon={<AddCircleOutlinedIcon />}>Adicionar</Button>
-          </div>
-        </Box>
+            <Grid item xs={12} sm={4} md={4}>
+              <TextField
+                fullWidth
+                variant="outlined"
+                size="small"
+                label="Valor"
+                getInputRef={inputRef}
+                InputProps={{
+                  inputComponent: NumberFormatCustom,
+                }}
+                value={valorItem}
+                onChange={(event) => setValorItem(event.target.value)}
+              />
+            </Grid>
+
+            <Grid item xs={12} sm={2} md={2}>
+              <Button onClick={handleAddProduct} variant="contained" size="medium" fullWidth className={classes.btnAddBlue} startIcon={<AddCircleOutlinedIcon />}>Adicionar</Button>
+            </Grid>
+          </Grid>
+
+          <Grid container item>
+            <TableContainer>
+              <Table className={classes.table} size="small">
+                <TableHead>
+                  <TableRow>
+                    <StyledTableCell align="left">Produto</StyledTableCell>
+                    <StyledTableCell align="center">Quantidade</StyledTableCell>
+                    <StyledTableCell align="right">Valor</StyledTableCell>
+                    <StyledTableCell align="right">Ação</StyledTableCell>
+                  </TableRow>
+                </TableHead>
+
+                <TableBody>
+                  {produtos && produtos.map((prod) => (
+                    <StyledTableRow key={prod.id}>
+                      <StyledTableCell align="left">{prod.nomeMaterial}</StyledTableCell>
+                      <StyledTableCell align="center">{prod.qtde + " " + unidadeMedidaMap[(prod.unidadeMedida)]}</StyledTableCell>
+                      <StyledTableCell align="right">{currencyFormatter(prod.valorItem)}</StyledTableCell>
+                      <StyledTableCell component="th" scope="row" align="right">
+                        <IconButton onClick={() => deleteProduto(prod.id)}>
+                          <DeleteIcon />
+                        </IconButton>
+                      </StyledTableCell>
+                    </StyledTableRow>
+                  ))}
+                </TableBody>
+              </Table>
+              {produtos.length > 0 ? null : <div className={classes.noRegisters}>Nenhum registro</div>}
+            </TableContainer>
+          </Grid>
+        </Grid>
       </form>
-
-      <TableContainer>
-        <Table className={classes.table} size="small">
-          <TableHead>
-            <TableRow>
-              <StyledTableCell align="left">Produto</StyledTableCell>
-              <StyledTableCell align="center">Quantidade</StyledTableCell>
-              <StyledTableCell align="right">Valor</StyledTableCell>
-              <StyledTableCell align="right">Ação</StyledTableCell>
-            </TableRow>
-          </TableHead>
-
-          <TableBody>
-            {produtos && produtos.map((prod) => (
-              <StyledTableRow key={prod.id}>
-                <StyledTableCell align="left">{prod.nomeMaterial}</StyledTableCell>
-                <StyledTableCell align="center">{prod.qtde + " " + unidadeMedidaMap[(prod.unidadeMedida)]}</StyledTableCell>
-                <StyledTableCell align="right">{currencyFormatter(prod.valorItem)}</StyledTableCell>
-                <StyledTableCell component="th" scope="row" align="right">
-                  <IconButton onClick={() => deleteProduto(prod.id)}>
-                    <DeleteIcon />
-                  </IconButton>
-                </StyledTableCell>
-              </StyledTableRow>
-            ))}
-          </TableBody>
-        </Table>
-        {produtos.length > 0 ? null : <div className={classes.noRegisters}>Nenhum registro</div>}
-      </TableContainer>
     </Box>
   );
 }
 
 const useStyles = makeStyles((theme) => ({
+  boxCustom: {
+    border: "1px solid #E0E1E0",
+    borderLeft: "5px solid #009DE0",
+    borderTopLeftRadius: "5px",
+    borderBottomLeftRadius: "5px",
+    borderTopRightRadius: "5px",
+    borderBottomRightRadius: "5px",
+  },
+  aligns: {
+    paddingLeft: "8px !important",
+    paddingRight: "8px !important",
+    paddingTop: "0px !important",
+    paddingBottom: "0px !important",
+    display: 'flex',
+    alignItems: 'center'
+  },
   noRegisters: {
     textAlign: 'center',
     paddingTop: 10,
     fontWeight: 700,
     fontSize: 16,
     color: '#595A4A'
-  },
-  formControl: {
-    margin: theme.spacing(2),
-    minWidth: '50%',
   },
   table: {
     minWidth: 700,
@@ -250,11 +270,13 @@ const useStyles = makeStyles((theme) => ({
   btnAddBlue: {
     background: '#009DE0',
     color: '#FFF',
-    borderRadius: 5,
+    borderRadius: '5px',
     border: 'none',
     textTransform: 'none',
     boxShadow: 'none',
     fontWeight: 'bold',
+    marginLeft: '8px',
+    padding: '8px 16px',
 
     '&:hover': {
       backgroundColor: '#052F5F',

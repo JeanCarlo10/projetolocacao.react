@@ -255,7 +255,7 @@ export default function CreatePedido() {
                           </div>
 
                           <p>{currentClient.logradouro}, Nº {currentClient.numero}</p>
-                          <p>{currentClient.bairro} - {currentClient.cidade}</p>
+                          <p>Bairro: {currentClient.bairro} - {currentClient.cidade}</p>
                           <p>CEP: {currentClient.cep}</p>
                         </div>
 
@@ -265,8 +265,9 @@ export default function CreatePedido() {
                       </div>
                     </div> : ""
                 }
-
-                <ListaProdutos produtos={produtos} addProduto={handleAddProduto} deleteProduto={handleDeleteProduto} />
+                <div style={{marginBottom: '10px'}}>
+                  <ListaProdutos produtos={produtos} addProduto={handleAddProduto} deleteProduto={handleDeleteProduto} />
+                </div>
 
                 <div className={classes.twoInputs}>
                   <DatePicker
@@ -342,7 +343,7 @@ export default function CreatePedido() {
                 />
               </CardContent>
               <CardActions style={{ justifyContent: 'flex-end', marginRight: 15 }}>
-                <Button variant="contained" size="medium" className={classes.btnDefaultGreen} type="submit" startIcon={<SaveIcon />}>Salvar</Button>
+                <Button variant="contained" size="large" className={classes.btnDefaultGreen} type="submit" startIcon={<SaveIcon />}>Salvar</Button>
               </CardActions>
             </form>
           </Card>
@@ -414,7 +415,7 @@ const useStyles = makeStyles((theme) => ({
   btnDefaultGreen: {
     background: '#00AB55',
     color: '#FFF',
-    borderRadius: 10,
+    borderRadius: '5px',
     border: 'none',
     textTransform: 'none',
     boxShadow: 'none',

@@ -60,9 +60,3 @@ export const allStatus = [
         label: 'Não Devolvido'
     },
 ];
-
-// export const getStatusRent = (value) => {
-//     var array = ['Pendente', 'Entregue', 'Devolvido', 'Cancelado'];
-
-//     return array[value-1];
-// };

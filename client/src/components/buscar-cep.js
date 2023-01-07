@@ -77,11 +77,10 @@ export default function BuscarCep(props) {
     }
 
     return (
-        <div className={classes.boxCustom}>
             <form>
-                <Box display="flex" flexDirection="column">
+                <Box display="flex" flexDirection="column" className={classes.boxCustom}>
                     <Notification notify={notify} setNotify={setNotify} />
-                    <Typography style={{ padding: '15px', color: '#00AB55', fontWeight: 'bold' }}>
+                    <Typography style={{ padding: '15px 15px 0px 15px', color: '#00AB55', fontWeight: 'bold' }}>
                         Endereço
                         <Divider variant="fullWidth" />
                     </Typography>
@@ -186,12 +185,11 @@ export default function BuscarCep(props) {
                     </Grid>
                 </Box>
             </form>
-        </div >
     );
 }
 
 const useStyles = makeStyles((theme) => ({
-    boxCustom: {
+    boxCustom: {        
         border: "1px solid #E0E1E0",
         borderLeft: "5px solid #00AB55",
         borderTopLeftRadius: "5px",

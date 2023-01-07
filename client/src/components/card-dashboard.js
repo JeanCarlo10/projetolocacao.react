@@ -1,7 +1,7 @@
 import React from 'react';
 import IconButton from '@material-ui/core/IconButton';
 import { Grid, Typography, Card } from '@mui/material';
-import '../components/card-dashboard.css';
+import '../assets/css/card-dashboard.css';
 
 export default function CardDashboard({ number, text, icon, color, className }) {
     return (

@@ -4,6 +4,29 @@
     border: 2px solid #D4D4D4;
 }
 
+.animation {
+    background: #f500560d !important; 
+    border: 2px solid #dc3545 !important;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        -moz-box-shadow: 0 0 0 0 rgba(240, 2, 2, 0.4);
+        box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.4);
+    }
+
+    70% {
+        -moz-box-shadow: 0 0 0 8px rgba(255, 0, 0, 0);
+        box-shadow: 0 0 0 8px rgba(255, 0, 0, 0);
+    }
+
+    100% {
+        -moz-box-shadow: 0 0 0 0 rgba(255, 0, 0, 0);
+        box-shadow: 0 0 0 0 rgba(255, 0, 0, 0);
+    }
+}
+
 .subTitleAddress {
     font-family: 'Public Sans';
 }
@@ -33,7 +56,7 @@
     padding: 6px
 }
 
-.info span{
+.info span {
     font-size: 14px;
     font-weight: bold;
     color: #2d2a26;
@@ -80,7 +103,7 @@
 .status-devolvido {
     font-size: 18px;
     font-weight: 600;
-    color: #0033c6;   
+    color: #0033c6;
 }
 
 .btn-arrow {
@@ -94,23 +117,4 @@
     flex-direction: row;
     align-items: center;
     gap: 15px;
-}
-
-.animation {
-    animation: pulse 4s infinite;
-    background: #f500560d !important; 
-    /* background: #FBEAEC  !important; */
-    border: 2px solid #dc3545 !important;
-}
-
-@keyframes pulse {
-    0% {
-        transform: scale(1);
-    }
-    70% {
-        transform: scale(0.98);
-    }
-    100% {
-        transform: scale(1);
-    }
 }

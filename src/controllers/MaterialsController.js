@@ -1,16 +1,24 @@
 const Material = require('../models/MaterialModel');
 
 module.exports = {
-    async index(req, res){
+    async index(req, res) {
+        const material = await Material.find(
+            { nomeMaterial: { $regex: req.query.keyword, $options: "i" } }
+        )
+
+        res.json(material);
+    },
+
+    async detailsInProducts(req, res) {
         const material = await Material.find();
 
         res.json(material);
     },
 
     //ADD MATERIAL
-    async create(req, res) { 
+    async create(req, res) {
         try {
-            const model  = req.body
+            const model = req.body
 
             const material = await Material.create(model);
 
@@ -18,33 +26,33 @@ module.exports = {
 
             return res.send({ material });
 
-        } catch (err){
+        } catch (err) {
             return res.status(500).send({
-                 error: 'Por favor, contate o administrador! Erro ao cadastrar o material'
+                error: 'Por favor, contate o administrador! Erro ao cadastrar o material'
             })
         }
     },
-    
-    //GET MATERIALS
-    async details(req, res){
-        const {_id} = req.params;
 
-        const material = await Material.findOne({_id});
+    //GET MATERIALS
+    async details(req, res) {
+        const { _id } = req.params;
+
+        const material = await Material.findOne({ _id });
         res.json(material);
     },
 
     //DELETE MATERIAL
-    async delete(req, res){
+    async delete(req, res) {
         const { _id } = req.params;
-        const material = await Material.findByIdAndDelete({_id});
+        const material = await Material.findByIdAndDelete({ _id });
         return res.json(material);
     },
 
     //UPDATE MATERIAL
-    async update(req, res){
+    async update(req, res) {
         const model = req.body;
 
-        const material = await Material.findOneAndUpdate({_id: model._id}, model, {new:true});
+        const material = await Material.findOneAndUpdate({ _id: model._id }, model, { new: true });
 
         return res.json(material);
     }

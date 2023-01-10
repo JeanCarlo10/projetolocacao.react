@@ -45,8 +45,7 @@ export default function IndexMaterial() {
   const ref = useRef(null);
 
   const [materials, setMaterials] = useState([]);
-  const [filterMaterials, setFilterMaterials] = useState([]);
-  const [search, setSearch] = useState("");
+  const [keyword, setKeyword] = useState("");
 
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
@@ -65,15 +64,15 @@ export default function IndexMaterial() {
   }, []);
 
   useEffect(() => {
-    async function loadMaterials() {
-      const response = await api.get("/api/materials");
+    async function getMaterials() {
+      var filter = `keyword=${keyword}`;
+      const results = await api.get(`http://localhost:5000/api/materials/index?${filter}`);
 
-      setMaterials(response.data);
-      setFilterMaterials(response.data);
+      setMaterials(results.data);
       setLoading(false);
     }
-    loadMaterials();
-  }, []);
+    getMaterials();
+  }, [keyword]);
 
   const handleDelete = (id) => {
     Swal.fire({
@@ -105,22 +104,6 @@ export default function IndexMaterial() {
     setRowsPerPage(+event.target.value);
     setPage(0);
   };
-
-  //Filtrar Lista
-  const handleChangeSearch = ({ target }) => {
-    setSearch(target.value);
-    filter(target.value);
-  }
-
-  const filter = (endSearch) => {
-    var resultSearch = filterMaterials.filter((result) => {
-      if (result.nomeMaterial.toString().toLowerCase().includes(endSearch.toLowerCase())
-      ) {
-        return result;
-      }
-    });
-    setMaterials(resultSearch);
-  }
 
   return (
     <div className={classes.root}>
@@ -160,8 +143,8 @@ export default function IndexMaterial() {
                     <SearchIcon />
                   </IconButton>
                   <InputBase
-                    value={search}
-                    onChange={handleChangeSearch}
+                    value={keyword}
+                    onChange={e => setKeyword(e.target.value)}
                     placeholder="Buscar..."
                   />
                 </div>

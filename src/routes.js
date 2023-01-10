@@ -28,10 +28,11 @@ routes.get('/api/clients/thumbnail-avatar/:_id', Client.thumbnailAvatar);
 
 //Rotas de Materiais
 routes.post('/api/materials', Material.create);
-routes.get('/api/materials', Material.index);
+routes.get('/api/materials/index', Material.index);
 routes.get('/api/materials.details/:_id', Material.details);
 routes.delete('/api/materials/:_id', Material.delete);
 routes.put('/api/materials', Material.update);
+routes.get('/api/materials', Material.detailsInProducts);
 
 //Rotas de Pedidos
 routes.post('/api/rents', Rent.create);

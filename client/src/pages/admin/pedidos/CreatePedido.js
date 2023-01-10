@@ -265,7 +265,8 @@ export default function CreatePedido() {
                       </div>
                     </div> : ""
                 }
-                <div style={{marginBottom: '10px'}}>
+                
+                <div style={{ marginTop: '10px', marginBottom: '10px' }}>
                   <ListaProdutos produtos={produtos} addProduto={handleAddProduto} deleteProduto={handleDeleteProduto} />
                 </div>
 

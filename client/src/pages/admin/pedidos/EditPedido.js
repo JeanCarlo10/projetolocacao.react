@@ -310,7 +310,8 @@ export default function EditPedido() {
                                     </RadioGroup>
                                 </FormControl>
 
-                                {enderecoAtual == 'novo' ? <BuscarCEP onUpdate={handleSearchCEP} initialData={dadosEndereco} /> :
+                                {enderecoAtual == 'novo' ? 
+                                <BuscarCEP onUpdate={handleSearchCEP} initialData={dadosEndereco} />               :
                                     nomeCliente != null ?
                                         <div className='container'>
                                             <div className="card">
@@ -331,7 +332,7 @@ export default function EditPedido() {
                                         </div> : ""
                                 }
                                 
-                                <div style={{ marginBottom: '10px' }}>
+                                <div style={{ marginTop: '10px', marginBottom: '10px' }}>
                                     <ListaProdutos produtos={produtos} addProduto={handleAddProduto} deleteProduto={handleDeleteProduto} />
                                 </div>
 

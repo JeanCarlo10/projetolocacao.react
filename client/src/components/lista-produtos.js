@@ -102,8 +102,9 @@ export default function ListaProdutos(props) {
   useEffect(() => {
     async function getDadosMaterial() {
 
-      const results = await api.get('http://localhost:5000/api/materials');
-      setSelectMaterials(results.data);
+      const response = await api.get(`http://localhost:5000/api/materials`);
+      
+      setSelectMaterials(response.data);
     }
 
     getDadosMaterial();

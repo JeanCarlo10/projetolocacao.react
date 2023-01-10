@@ -168,7 +168,7 @@ export default function BuscarCep(props) {
                                     size="small"
                                     label="Número"
                                     value={numero}
-                                    onChange={e => { setNumero(e.target.value) }}
+                                    onChange={e => { setNumero(e.target.value); }}
                                 />
                             </Grid>
                             <Grid item xs={12} sm={8} md={9}>

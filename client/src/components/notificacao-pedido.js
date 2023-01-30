@@ -24,6 +24,7 @@ import Chip from '@mui/material/Chip';
 import Stack from '@mui/material/Stack';
 import PhoneIcon from '@mui/icons-material/Phone';
 import PhoneAndroidIcon from '@mui/icons-material/PhoneAndroid';
+import TextField from '@mui/material/TextField';
 
 import { set, differenceInHours } from 'date-fns';
 import api from '../services/api';
@@ -72,6 +73,8 @@ export default function NotificacaoPedido(props) {
     const unidadeMedidaMap = { 'Unidade': 'unidade(s)', 'Metro': 'metro(s)' };
 
     const [listaPedidos, setListaPedidos] = useState([]);
+    const [observacaoUpdated, setObservacaoUpdated] = useState();
+
 
     useEffect(() => {
         async function getDadosPedido() {
@@ -116,8 +119,14 @@ export default function NotificacaoPedido(props) {
             sx: {
                 bgcolor: stringToColor(name),
             },
-            children: `${name.split(' ')[0][0]}${name.split(' ')[1][0]}`,
+            children: `${name.split(' ')[0][0]}${name.split(' ')[1][0]}`
         };
+    }
+
+    const handleChangeObservacao = (e) => {
+        setObservacaoUpdated(e.target.value);
+        // console.log(_id);
+         //console.log(observacao);
     }
 
     const handleChangeStatusEntregue = async (_id, status) => {
@@ -143,7 +152,8 @@ export default function NotificacaoPedido(props) {
 
     return (
         <>
-            {listaPedidos.map((info) => {
+            {listaPedidos
+            .map((info) => {
                 var classname = "card-info";
                 var dataDevolucao = new Date(info.dataDevolucao);
                 set(dataDevolucao, {
@@ -155,7 +165,7 @@ export default function NotificacaoPedido(props) {
 
                 var hours = differenceInHours(dataDevolucao, new Date());
 
-                if (info.status == "Não Devolvido" || (hours < 24 && info.status == "Pendente")) {
+                if (info.status == "Não Devolvido" || (hours < 24 && info.status == "Pendente" || info.status == "Entregue")) {
                     classname += " animation"
                 }
 
@@ -295,6 +305,27 @@ export default function NotificacaoPedido(props) {
                                     </TableContainer>
                                 </div>
                             </div>
+
+                            {info.status == 'Pendente' || info.status == 'Entregue' ?
+                                <TextField style={{ marginTop: '15px' }}
+                                    fullWidth
+                                    variant="outlined"
+                                    label="Observação"
+                                    multiline
+                                    rows={4}
+                                    value={info.observacao}
+                                    onChange={handleChangeObservacao}
+                                /> :
+                                <TextField style={{ marginTop: '15px' }}
+                                    fullWidth
+                                    disabled
+                                    variant="outlined"
+                                    label="Observação"
+                                    multiline
+                                    rows={4}
+                                    value={info.observacao}
+                                />
+                            }
                         </CardContent>
                     </Collapse>
                 </Card>);

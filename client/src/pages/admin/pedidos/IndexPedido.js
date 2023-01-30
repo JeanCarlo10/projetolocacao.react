@@ -46,12 +46,11 @@ export default function IndexPedido() {
   const ref = useRef(null);
 
   const [rents, setRents] = useState([]);
-  const [filterRents, setFilterRents] = useState([]);
   const [keyword, setKeyword] = useState("");
   const [loading, setLoading] = useState(true);
   //   const [isOpenMenu, setIsOpenMenu] = useState(false);
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
 
   useEffect(() => {
     lottie.loadAnimation({
@@ -81,7 +80,6 @@ export default function IndexPedido() {
 
       setRents(results.data);
       console.log(results.data);
-      // setFilterRents(results.data);
       setLoading(false);
     }
     loadRents();
@@ -119,24 +117,6 @@ export default function IndexPedido() {
     setPage(0);
   };
 
-  //Filtrar Lista
-  //const handleChangeSearch = (text) => {
-  //setSearch(text);
-  // setSearch(target.value);
-  //filter(target.value);
-  //}
-
-  // const filter = (endSearch) => {
-  //   var resultSearch = filterRents.filter((result) => {
-  //     if (result.nomeCliente.toString().toLowerCase().includes(endSearch.toLowerCase())
-  //       || result.cpf.toString().toLowerCase().includes(endSearch.toLowerCase())
-  //       || result.cnpj.toString().toLowerCase().includes(endSearch.toLowerCase())
-  //     ) {
-  //       return result;
-  //     }
-  //   });
-  //   setRents(resultSearch);
-  // }
   return (
     <div className={classes.root}>
       <MenuAdmin />

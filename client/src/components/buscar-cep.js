@@ -161,16 +161,19 @@ export default function BuscarCep(props) {
                         </Grid>
 
                         <Grid container item direction="row" spacing={2} className={classes.aligns}>
+                            
                             <Grid item xs={12} sm={4} md={3}>
                                 <TextField
                                     variant="outlined"
                                     fullWidth
                                     size="small"
                                     label="Número"
-                                    value={numero}
-                                    onChange={e => { setNumero(e.target.value); }}
+                                    value={numero ? numero : ""}
+                                    // value={numero}
+                                    onChange={e => { setNumero(e.target.value);}}
                                 />
                             </Grid>
+                            
                             <Grid item xs={12} sm={8} md={9}>
                                 <TextField
                                     variant="outlined"

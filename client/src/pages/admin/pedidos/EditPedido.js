@@ -89,7 +89,7 @@ export default function EditPedido() {
     const [dataEntrega, setDataEntrega] = useState(null);
     const [dataDevolucao, setDataDevolucao] = useState(null);
     const [produtos, setProdutos] = useState([]);
-    const [dadosEndereco, setDadosEndereco] = useState({});
+    const [dadosEndereco, setDadosEndereco] = useState({} || undefined);
     const { idPedido } = useParams();
 
     //Dados cliente
@@ -298,17 +298,18 @@ export default function EditPedido() {
                                     value={nomeCliente}
                                 />
 
-                                <FormControl>
+                                {/* <FormControl>
                                     <FormLabel></FormLabel>
                                     <RadioGroup
                                         row
-                                        value={enderecoAtual}
+                                        value={enderecoAtual ? enderecoAtual : ""}
+                                        // value={enderecoAtual }
                                         onChange={handleChangeAddress}
                                     >
                                         <FormControlLabel value="atual" control={<Radio />} label="Endereço atual" />
                                         <FormControlLabel value="novo" control={<Radio />} label="Novo endereço" />
                                     </RadioGroup>
-                                </FormControl>
+                                </FormControl> */}
 
                                 {enderecoAtual == 'novo' ? 
                                 <BuscarCEP onUpdate={handleSearchCEP} initialData={dadosEndereco} />               :

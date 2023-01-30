@@ -58,7 +58,7 @@ module.exports = {
             }
         });
 
-        const result = await Rent.aggregate(pipeline);
+        const result = await Rent.aggregate(pipeline).sort({_id: -1 });
         
         res.json(result);
         // console.log(result);

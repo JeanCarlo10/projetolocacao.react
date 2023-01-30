@@ -30,7 +30,7 @@ export default function Dashboard() {
     }
 
     getDadosPedido();
-  }, []);
+  }, [statuses]);
 
   return (
     <div className={classes.root}>

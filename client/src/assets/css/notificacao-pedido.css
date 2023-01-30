@@ -66,6 +66,7 @@
 .info-content p {
     font-size: 18px;
     font-weight: bold;
+    margin-top: 10px;
     margin-bottom: 5px;
     color: #2d2a26;
 }

@@ -229,7 +229,7 @@ export default function CreateCliente() {
           <Card style={{ borderRadius: 15 }}>
             <form onSubmit={handleSubmit}>
               <CardContent className={classes.inputs}>
-                <Box className={classes.containerAvatar}>
+                  {/*<Box className={classes.containerAvatar}>
 
                   <Grid container spacing={4}>
                     <Grid item xs={12} sm={6} md={2}>
@@ -254,7 +254,7 @@ export default function CreateCliente() {
                       </Typography>
                     </Grid>
 
-                    <Grid item xs={12} sm={6} md={4}>
+                   <Grid item xs={12} sm={6} md={4}>
                       <div className={classes.containerOptions}>
                         <div style={{ marginBottom: 10 }}>
                           <Button size="large" variant="contained" component="label" startIcon={<InsertPhotoIcon className={classes.colorIcon} />}>
@@ -263,11 +263,11 @@ export default function CreateCliente() {
                           </Button>
                         </div>
 
-                        {/* <div style={{ marginBottom: 10 }}>
+                        <div style={{ marginBottom: 10 }}>
                           <Button onClick={getVideo} size="large" variant="contained" component="label" startIcon={<PhotoCameraIcon className={classes.colorIcon} />}>
                             Abrir câmera
                           </Button>
-                        </div> */}
+                        </div>
                         <div className={classes.btnOption}>
                           <Button size="small" variant="outlined" onClick={onUploadImage} >
                             Carregar foto
@@ -280,7 +280,7 @@ export default function CreateCliente() {
 
                         </div>
                       </div>
-                    </Grid>
+                    </Grid> */}
 
                     {/* <Grid item xs={12} sm={6} md={6}>
                       <div className='camera'>
@@ -293,9 +293,9 @@ export default function CreateCliente() {
                         <canvas ref={photoRef}></canvas>
                         <button onClick={closePhoto}>Excluir foto</button>
                       </div>
-                    </Grid> */}
+                    </Grid> 
                   </Grid>
-                </Box>
+                </Box>*/}
 
                 <FormControl variant="outlined" size="small" className={classes.formControl}>
                   <InputLabel>Tipo</InputLabel>
@@ -409,13 +409,14 @@ export default function CreateCliente() {
                   value={email}
                   onChange={e => setEmail(e.target.value)}
                 />
-                <div style={{ marginBottom: '10px'
+                <div style={{
+                  marginBottom: '10px'
                 }}>
                   <BuscarCEP onUpdate={handleSearchCEP} initialData={dadosEndereco} />
                 </div>
                 <ListaContatos contatos={contatos} addContato={handleAddContato} deleteContato={handleDeleteContato} />
               </CardContent>
-              <CardActions style={{ justifyContent: 'flex-end',  marginRight: 15 }}>
+              <CardActions style={{ justifyContent: 'flex-end', marginRight: 15 }}>
                 <Button variant="contained" size="large" className={classes.btnDefaultGreen} type="submit" startIcon={<SaveIcon />}>Salvar</Button>
               </CardActions>
             </form>

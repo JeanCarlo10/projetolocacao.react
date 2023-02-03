@@ -20,6 +20,7 @@ import Avatar from '@material-ui/core/Avatar';
 import InputBase from '@material-ui/core/InputBase';
 import { IconButton } from '@mui/material';
 import DeleteIcon from '@material-ui/icons/Delete';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 import EditIcon from '@material-ui/icons/Edit';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import SearchIcon from '@material-ui/icons/Search';
@@ -85,28 +86,6 @@ export default function IndexPedido() {
     loadRents();
     // setTimeout(() => loadRents(), 2000);
   }, [keyword]);
-
-  const handleDelete = (id) => {
-    Swal.fire({
-      icon: 'warning',
-      title: 'Exclusão',
-      text: 'Deseja realmente excluir este pedido?',
-      showCloseButton: true,
-      confirmButtonText: 'Sim, excluir!',
-      confirmButtonColor: '#d33333',
-      showCancelButton: true,
-      cancelButtonText: 'Não',
-      reverseButtons: true,
-    }).then((result) => {
-      if (result.isConfirmed) {
-        api.delete('api/rents/' + id)
-
-        if (result.status = 200) {
-          window.location.href = '/admin/pedidos';
-        }
-      }
-    })
-  }
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -181,7 +160,21 @@ export default function IndexPedido() {
                       rents.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
                         <TableRow hover key={row._id}>
                           <TableCell align="left" style={{ width: "15%" }}>
-                            <Chip label={row.status} />
+                            {row.status == 'Pendente' &&
+                              <Chip label={row.status} className={classes.chipPendente} />
+                            }
+                            {row.status == 'Entregue' &&
+                              <Chip label={row.status} className={classes.chipEntregue} />
+                            }
+                            {row.status == 'Cancelado' &&
+                              <Chip label={row.status} className={classes.chipCancelado} />
+                            }
+                            {row.status == 'Devolvido' &&
+                              <Chip label={row.status} className={classes.chipDevolvido} />
+                            }
+                            {row.status == 'Não Devolvido' &&
+                              <Chip label={row.status} className={classes.chipNaoDevolvido} />
+                            }
                           </TableCell>
 
                           <TableCell align="center" style={{ width: "10%" }}>{row.numeroPedido}</TableCell>
@@ -202,9 +195,9 @@ export default function IndexPedido() {
                             </p>
                           </TableCell>
                           <TableCell component="th" scope="row" align="right">
-                            <Tooltip title="Excluir">
-                              <IconButton onClick={() => handleDelete(row._id)}>
-                                <DeleteIcon />
+                            <Tooltip title="Visualizar">
+                              <IconButton href={'/admin/pedidos/overview/' + row._id}>
+                                <VisibilityIcon />
                               </IconButton>
                             </Tooltip>
                             <Tooltip title="Editar">
@@ -327,4 +320,29 @@ const useStyles = makeStyles((theme) => ({
       marginBottom: theme.spacing(1),
     },
   },
+  chipPendente: {
+    background: '#FF6700',
+    color: '#FFF',
+    fontWeight: 500
+  },
+  chipEntregue: {
+    background: '#00AB55',
+    color: '#FFF',
+    fontWeight: 500
+  },
+  chipCancelado: {
+    background: '#ABABAB',
+    color: '#FFF',
+    fontWeight: 500
+  },
+  chipDevolvido: {
+    background: '#0033C6',
+    color: '#FFF',
+    fontWeight: 500,
+  },
+  chipNaoDevolvido: {
+    background: '#E71A3B',
+    color: '#FFF',
+    fontWeight: 500,    
+  }
 }));

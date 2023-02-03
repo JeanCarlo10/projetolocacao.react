@@ -18,6 +18,7 @@ import EditUsuario from './pages/admin/usuarios/EditUsuario';
 import IndexPedido from './pages/admin/pedidos/IndexPedido';
 import CreatePedido from './pages/admin/pedidos/CreatePedido';
 import EditPedido from './pages/admin/pedidos/EditPedido';
+import OverviewPedido from './pages/admin/pedidos/OverviewPedido';
 
 import Login from './pages/admin/login';
 import PrivateRoute from './services/wAuth';
@@ -40,6 +41,7 @@ export default function Routes() {
                 <PrivateRoute path="/admin/pedidos" exact component={IndexPedido} />
                 <PrivateRoute path="/admin/pedidos/create" exact component={CreatePedido} />
                 <PrivateRoute path="/admin/pedidos/edit/:idPedido" exact component={EditPedido} />
+                <PrivateRoute path="/admin/pedidos/overview/:idPedido" exact component={OverviewPedido} />
 
                 <PrivateRoute path="/admin/usuarios" exact component={IndexUsuario} />
                 <PrivateRoute path="/admin/usuarios/create" exact component={CreateUsuario} />

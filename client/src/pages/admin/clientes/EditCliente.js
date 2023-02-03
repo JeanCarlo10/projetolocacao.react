@@ -186,7 +186,7 @@ export default function EditCliente() {
                     <Card style={{ borderRadius: 15 }}>
                         <form onSubmit={handleSubmit}>
                             <CardContent className={classes.inputs}>
-                                <Box className={classes.containerAvatar}>
+                                {/* <Box className={classes.containerAvatar}>
 
                                     <Grid container spacing={4}>
                                         <Grid item xs={12} sm={6} md={2}>
@@ -234,7 +234,7 @@ export default function EditCliente() {
                                             </div>
                                         </Grid>
                                     </Grid>
-                                </Box>
+                                </Box> */}
                                 <FormControl disabled variant="outlined" size="small" className={classes.formControl}>
                                     <InputLabel>Tipo</InputLabel>
                                     <Select

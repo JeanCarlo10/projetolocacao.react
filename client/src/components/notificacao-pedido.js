@@ -118,6 +118,7 @@ export default function NotificacaoPedido(props) {
         return {
             sx: {
                 bgcolor: stringToColor(name),
+                textTransform: 'uppercase',
             },
             children: `${name.split(' ')[0][0]}${name.split(' ')[1][0]}`
         };
@@ -126,7 +127,7 @@ export default function NotificacaoPedido(props) {
     const handleChangeObservacao = (e) => {
         setObservacaoUpdated(e.target.value);
         // console.log(_id);
-         //console.log(observacao);
+        //console.log(observacao);
     }
 
     const handleChangeStatusEntregue = async (_id, status) => {
@@ -153,183 +154,185 @@ export default function NotificacaoPedido(props) {
     return (
         <>
             {listaPedidos
-            .map((info) => {
-                var classname = "card-info";
-                var dataDevolucao = new Date(info.dataDevolucao);
-                set(dataDevolucao, {
-                    hours: 0,
-                    minutes: 0,
-                    seconds: 0,
-                    milliseconds: 0
-                });
+                .map((info) => {
+                    var classname = "card-info";
+                    var dataDevolucao = new Date(info.dataDevolucao);
+                    set(dataDevolucao, {
+                        hours: 0,
+                        minutes: 0,
+                        seconds: 0,
+                        milliseconds: 0
+                    });
 
-                var hours = differenceInHours(dataDevolucao, new Date());
+                    var hours = differenceInHours(dataDevolucao, new Date());
 
-                if (info.status == "Não Devolvido" || (hours < 24 && info.status == "Pendente" || info.status == "Entregue")) {
-                    classname += " animation"
-                }
+                    if (info.status == "Não Devolvido" || (hours < 24 && info.status == "Pendente" || info.status == "Entregue")) {
+                        classname += " animation"
+                    }
 
-                return (<Card elevation={0} className={classname}>
-                    <CardHeader key={info._id}
-                        avatar={
-                            <Avatar {...stringAvatar(`${info.nomeCliente}`)} />
-                        }
-                        action={
-                            <div>
-                                {info.status == "Pendente" &&
-                                    <Tooltip title="Entregar">
-                                        <IconButton style={{ color: '#1c7e2e' }} onClick={() => handleChangeStatusEntregue(info._id, "Entregue")}>
-                                            <CheckCircleRoundedIcon fontSize='large' />
-                                        </IconButton>
-                                    </Tooltip>
-                                }
-                                {info.status == "Pendente" &&
-                                    <Tooltip title="Cancelar">
-                                        <IconButton style={{ color: '#e71a3b' }} onClick={() => handleChangeStatusCancelado(info._id, "Cancelado")}>
-                                            <CancelRoundedIcon fontSize='large' />
-                                        </IconButton>
-                                    </Tooltip>
-                                }
-                                {info.status == "Entregue" &&
-                                    <Tooltip title="Devolvido">
-                                        <IconButton style={{ color: '#0033c6' }} onClick={() => handleChangeStatusDevolvido(info._id, "Devolvido")}>
-                                            <ReplayCircleFilledRoundedIcon fontSize='large' />
-                                        </IconButton>
-                                    </Tooltip>
-                                }
-                                {info.status == "Não Devolvido" &&
-                                    <Tooltip title="Devolvido">
-                                        <IconButton style={{ color: '#0033c6' }} onClick={() => handleChangeStatusDevolvido(info._id, "Devolvido")}>
-                                            <ReplayCircleFilledRoundedIcon fontSize='large' />
-                                        </IconButton>
-                                    </Tooltip>
-                                }
-                            </div>
-                        }
-                        title={
-                            <div className="containerTitle">
-                                <div className="title">
-                                    {info.nomeCliente}
-                                </div>
-
-                                {info.pedido_cliente[0].contacts.map((item) => (
-                                    <Stack mb={0.5}>
-                                        <Chip style={{ fontFamily: 'Public Sans' }} icon={item.tipoTelefone == "Celular" ? <PhoneAndroidIcon /> : <PhoneIcon />} label={item.numero} />
-                                    </Stack>
-                                ))}
-                            </div>
-                        }
-                        subheader={
-                            <div className="subTitleAddress">
-                                {info.logradouro}, Nº {info.numero} - Bairro: {info.bairro} - {info.complemento}
-                            </div>
-                        }>
-                    </CardHeader>
-                    <CardContent>
-                        {info.status == 'Pendente' &&
-                            <div className='status-pendente'>
-                                Status: {info.status}
-                            </div>
-                        }
-                        {info.status == 'Cancelado' &&
-                            <div className='status-cancelado'>
-                                Status: {info.status}
-                            </div>
-                        }
-                        {info.status == 'Entregue' &&
-                            <div className='status-entregue'>
-                                Status: {info.status}
-                            </div>
-                        }
-                        {info.status == 'Devolvido' &&
-                            <div className='status-devolvido'>
-                                Status: {info.status}
-                            </div>
-                        }
-                        {info.status == 'Não Devolvido' &&
-                            <div className='status-cancelado'>
-                                Status: {info.status}
-                            </div>
-                        }
-                    </CardContent>
-                    <CardActions disableSpacing>
-                        <div className='info-data-devolucao'>
-                            <p style={{ marginLeft: 8 }}>Data de devolução</p>
-                            <div style={{ display: 'flex', alignItems: 'center' }}>
-                                <IconButton>
-                                    <EventBusyRoundedIcon style={{ color: '#e71a3b' }} />
-                                </IconButton>
-                                <div style={{ color: '#e71a3b', fontWeight: 'bold' }}>
-                                    {new Date(info.dataDevolucao).toLocaleDateString('pt-br')}
-                                </div>
-                            </div>
-                        </div>
-
-                        <ExpandMore
-                            expand={info.expanded}
-                            onClick={() => handleExpandClick(info._id)}
-                        ><ExpandMoreIcon />
-                        </ExpandMore>
-                    </CardActions>
-                    <Collapse in={info.expanded} timeout={'auto'} unmountOnExit>
-                        <CardContent>
-                            <div className='info'>
-                                <span>
-                                    Nº Pedido: {info.numeroPedido}
-                                </span>
-                                <span>
-                                    Data do pedido: {new Date(info.dataPedido).toLocaleDateString('pt-br')}
-                                </span>
-                            </div>
-
-                            <div className='info-content'>
-                                <p>Produto(s)</p>
-                                <div>
-                                    <TableContainer>
-                                        <Table className={classes.table}>
-                                            <TableHead>
-                                                <TableRow>
-                                                    <StyledTableCell align="left">Material</StyledTableCell>
-                                                    <StyledTableCell align="center">Quantidade</StyledTableCell>
-                                                </TableRow>
-                                            </TableHead>
-                                            <TableBody>
-                                                {info.products.map((item) => (
-                                                    <StyledTableRow key={item._id}>
-                                                        <StyledTableCell align="left">{item.nomeMaterial}</StyledTableCell>
-                                                        <StyledTableCell align="center">{item.qtde + " " + unidadeMedidaMap[(item.unidadeMedida)]} </StyledTableCell>
-                                                    </StyledTableRow>
-                                                ))}
-                                            </TableBody>
-                                        </Table>
-                                    </TableContainer>
-                                </div>
-                            </div>
-
-                            {info.status == 'Pendente' || info.status == 'Entregue' ?
-                                <TextField style={{ marginTop: '15px' }}
-                                    fullWidth
-                                    variant="outlined"
-                                    label="Observação"
-                                    multiline
-                                    rows={4}
-                                    value={info.observacao}
-                                    onChange={handleChangeObservacao}
-                                /> :
-                                <TextField style={{ marginTop: '15px' }}
-                                    fullWidth
-                                    disabled
-                                    variant="outlined"
-                                    label="Observação"
-                                    multiline
-                                    rows={4}
-                                    value={info.observacao}
+                    return (<Card elevation={0} className={classname}>
+                        <CardHeader key={info._id}
+                            avatar={
+                                <Avatar
+                                    {...stringAvatar(`${info.nomeCliente}`)}
                                 />
                             }
+                            action={
+                                <div>
+                                    {info.status == "Pendente" &&
+                                        <Tooltip title="Entregar">
+                                            <IconButton style={{ color: '#1c7e2e' }} onClick={() => handleChangeStatusEntregue(info._id, "Entregue")}>
+                                                <CheckCircleRoundedIcon fontSize='large' />
+                                            </IconButton>
+                                        </Tooltip>
+                                    }
+                                    {info.status == "Pendente" &&
+                                        <Tooltip title="Cancelar">
+                                            <IconButton style={{ color: '#e71a3b' }} onClick={() => handleChangeStatusCancelado(info._id, "Cancelado")}>
+                                                <CancelRoundedIcon fontSize='large' />
+                                            </IconButton>
+                                        </Tooltip>
+                                    }
+                                    {info.status == "Entregue" &&
+                                        <Tooltip title="Devolvido">
+                                            <IconButton style={{ color: '#0033c6' }} onClick={() => handleChangeStatusDevolvido(info._id, "Devolvido")}>
+                                                <ReplayCircleFilledRoundedIcon fontSize='large' />
+                                            </IconButton>
+                                        </Tooltip>
+                                    }
+                                    {info.status == "Não Devolvido" &&
+                                        <Tooltip title="Devolvido">
+                                            <IconButton style={{ color: '#0033c6' }} onClick={() => handleChangeStatusDevolvido(info._id, "Devolvido")}>
+                                                <ReplayCircleFilledRoundedIcon fontSize='large' />
+                                            </IconButton>
+                                        </Tooltip>
+                                    }
+                                </div>
+                            }
+                            title={
+                                <div className="containerTitle">
+                                    <div className="title">
+                                        {info.nomeCliente}
+                                    </div>
+
+                                    {info.pedido_cliente[0].contacts.map((item) => (
+                                        <Stack mb={0.5}>
+                                            <Chip style={{ fontFamily: 'Public Sans' }} icon={item.tipoTelefone == "Celular" ? <PhoneAndroidIcon /> : <PhoneIcon />} label={item.numero} />
+                                        </Stack>
+                                    ))}
+                                </div>
+                            }
+                            subheader={
+                                <div className="subTitleAddress">
+                                    {info.logradouro}, Nº {info.numero} - Bairro: {info.bairro} - {info.complemento}
+                                </div>
+                            }>
+                        </CardHeader>
+                        <CardContent>
+                            {info.status == 'Pendente' &&
+                                <div className='status-pendente'>
+                                    Status: {info.status}
+                                </div>
+                            }
+                            {info.status == 'Cancelado' &&
+                                <div className='status-cancelado'>
+                                    Status: {info.status}
+                                </div>
+                            }
+                            {info.status == 'Entregue' &&
+                                <div className='status-entregue'>
+                                    Status: {info.status}
+                                </div>
+                            }
+                            {info.status == 'Devolvido' &&
+                                <div className='status-devolvido'>
+                                    Status: {info.status}
+                                </div>
+                            }
+                            {info.status == 'Não Devolvido' &&
+                                <div className='status-cancelado'>
+                                    Status: {info.status}
+                                </div>
+                            }
                         </CardContent>
-                    </Collapse>
-                </Card>);
-            })}
+                        <CardActions disableSpacing>
+                            <div className='info-data-devolucao'>
+                                <p style={{ marginLeft: 8 }}>Data de devolução</p>
+                                <div style={{ display: 'flex', alignItems: 'center' }}>
+                                    <IconButton>
+                                        <EventBusyRoundedIcon style={{ color: '#e71a3b' }} />
+                                    </IconButton>
+                                    <div style={{ color: '#e71a3b', fontWeight: 'bold' }}>
+                                        {new Date(info.dataDevolucao).toLocaleDateString('pt-br')}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <ExpandMore
+                                expand={info.expanded}
+                                onClick={() => handleExpandClick(info._id)}
+                            ><ExpandMoreIcon />
+                            </ExpandMore>
+                        </CardActions>
+                        <Collapse in={info.expanded} timeout={'auto'} unmountOnExit>
+                            <CardContent>
+                                <div className='info'>
+                                    <span>
+                                        Nº Pedido: {info.numeroPedido}
+                                    </span>
+                                    <span>
+                                        Data do pedido: {new Date(info.dataPedido).toLocaleDateString('pt-br')}
+                                    </span>
+                                </div>
+
+                                <div className='info-content'>
+                                    <p>Produto(s)</p>
+                                    <div>
+                                        <TableContainer>
+                                            <Table className={classes.table}>
+                                                <TableHead>
+                                                    <TableRow>
+                                                        <StyledTableCell align="left">Material</StyledTableCell>
+                                                        <StyledTableCell align="center">Quantidade</StyledTableCell>
+                                                    </TableRow>
+                                                </TableHead>
+                                                <TableBody>
+                                                    {info.products.map((item) => (
+                                                        <StyledTableRow key={item._id}>
+                                                            <StyledTableCell align="left">{item.nomeMaterial}</StyledTableCell>
+                                                            <StyledTableCell align="center">{item.qtde + " " + unidadeMedidaMap[(item.unidadeMedida)]} </StyledTableCell>
+                                                        </StyledTableRow>
+                                                    ))}
+                                                </TableBody>
+                                            </Table>
+                                        </TableContainer>
+                                    </div>
+                                </div>
+
+                                {info.status == 'Pendente' || info.status == 'Entregue' ?
+                                    <TextField style={{ marginTop: '15px' }}
+                                        fullWidth
+                                        variant="outlined"
+                                        label="Observação"
+                                        multiline
+                                        rows={4}
+                                        value={info.observacao}
+                                        onChange={handleChangeObservacao}
+                                    /> :
+                                    <TextField style={{ marginTop: '15px' }}
+                                        fullWidth
+                                        disabled
+                                        variant="outlined"
+                                        label="Observação"
+                                        multiline
+                                        rows={4}
+                                        value={info.observacao}
+                                    />
+                                }
+                            </CardContent>
+                        </Collapse>
+                    </Card>);
+                })}
         </>
     );
 }

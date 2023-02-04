@@ -16,13 +16,15 @@ import Breadcrumbs from '@material-ui/core/Breadcrumbs';
 import Link from '@material-ui/core/Link';
 import Typography from '@material-ui/core/Typography';
 import CardHeader from '@material-ui/core/CardHeader';
-import Avatar from '@material-ui/core/Avatar';
+import TextField from '@mui/material/TextField';
+import CardContent from '@mui/material/CardContent';
+import InputAdornment from '@mui/material/InputAdornment';
+import Box from '@mui/material/Box';
+import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
 import InputBase from '@material-ui/core/InputBase';
-import { IconButton } from '@mui/material';
-import DeleteIcon from '@material-ui/icons/Delete';
+import IconButton from '@mui/material/IconButton';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import EditIcon from '@material-ui/icons/Edit';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
 import SearchIcon from '@material-ui/icons/Search';
 import AddCircleRoundedIcon from '@material-ui/icons/AddCircleRounded';
 import EventAvailableRoundedIcon from '@mui/icons-material/EventAvailableRounded';
@@ -100,7 +102,7 @@ export default function IndexPedido() {
     <div className={classes.root}>
       <MenuAdmin />
       <main className={classes.content}>
-        <Container maxWidth="lg" className={classes.container}>
+        <Container maxWidth="xl" className={classes.container}>
 
           <CardHeader className={classes.cardHeader}
             title="Pedidos"
@@ -127,21 +129,33 @@ export default function IndexPedido() {
             }
           />
 
-          {loading ? (<div style={{ width: 450, margin: '0 auto' }} ref={container} />) : (
-            <Card style={{ borderRadius: 15 }}>
-              <div className={classes.twoElements}>
-                <div className={classes.iconButton}>
-                  <IconButton>
-                    <SearchIcon />
-                  </IconButton>
-                  <InputBase
+          <Box sx={{ mt: 2, mb: 2 }}>
+            <Card>
+              <CardContent>
+                <Box sx={{ maxWidth: 500 }}>
+                  <TextField
+                    fullWidth
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <IconButton>
+                            <SearchRoundedIcon />
+                          </IconButton>
+                        </InputAdornment>
+                      )
+                    }}
                     value={keyword}
                     onChange={e => setKeyword(e.target.value)}
-                    placeholder="Buscar..."
+                    placeholder="Buscar"
+                    variant="outlined"
                   />
-                </div>
-              </div>
+                </Box>
+              </CardContent>
+            </Card>
+          </Box>
 
+          {loading ? (<div style={{ width: 450, margin: '0 auto' }} ref={container} />) : (
+            <Card style={{ borderRadius: 15 }}>
               <TableContainer >
                 <Table className={classes.table} size="small">
                   <TableHead>
@@ -238,27 +252,30 @@ export default function IndexPedido() {
 const useStyles = makeStyles((theme) => ({
   root: {
     display: 'flex',
-  },
-  iconButton: {
-    borderRadius: 10,
-    borderColor: '#BCBCBC',
-    borderStyle: 'solid',
-    borderWidth: 2
-  },
-  chipOne: {
-    color: '#4DB4C6',
-    background: '#E7F7F9',
-  },
 
-  chipTwo: {
-    color: 'orange',
-    background: 'black',
-  },
+    '& label.Mui-focused': {
+      color: '#00AB55',
+    },
+    '& .MuiOutlinedInput-root': {
+      borderRadius: 8,
+      fontWeight: 500,
+      fontFamily: 'Public Sans',
 
-  avatarFilter: {
-    color: '#4DB4C6',
-    backgroundColor: '#E7F7F9',
-    marginRight: theme.spacing(2),
+      '& fieldset': {
+        borderColor: '#dce0e4',
+      },
+      '&:hover fieldset': {
+        borderColor: '#3d3d3d',
+      },
+      '&.Mui-focused fieldset': {
+        borderColor: '#00AB55',
+      },
+    },
+
+    '& .MuiPaper-elevation1': {
+      borderRadius: '8px',
+      boxShadow: 'rgb(100 116 139 / 6%) 0px 1px 1px, rgb(100 116 139 / 10%) 0px 1px 2px'
+    },
   },
   content: {
     flexGrow: 1,
@@ -278,7 +295,10 @@ const useStyles = makeStyles((theme) => ({
     minWidth: 750,
     '& .MuiTableCell-head': {
       fontWeight: 'bold',
-      fontSize: 14
+      fontSize: 16,
+      padding: 16,
+      backgroundColor: '#F3F4F6',
+      color: '#374151'
     }
   },
   noRegisters: {
@@ -287,9 +307,6 @@ const useStyles = makeStyles((theme) => ({
     fontWeight: 700,
     fontSize: 16,
     color: '#595A4A'
-  },
-  buttonTable: {
-    // margin: theme.spacing(0.5)
   },
   btnDefaultGreen: {
     background: '#00AB55',
@@ -302,15 +319,6 @@ const useStyles = makeStyles((theme) => ({
     '&:hover': {
       backgroundColor: '#007B55',
       color: '#FFF',
-    },
-  },
-  twoElements: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    margin: theme.spacing(1),
-
-    '& .MuiTextField-root': {
-      margin: theme.spacing(1),
     },
   },
   cardHeader: {
@@ -343,6 +351,6 @@ const useStyles = makeStyles((theme) => ({
   chipNaoDevolvido: {
     background: '#E71A3B',
     color: '#FFF',
-    fontWeight: 500,    
+    fontWeight: 500,
   }
 }));

@@ -17,18 +17,15 @@ import Link from '@material-ui/core/Link';
 import Typography from '@material-ui/core/Typography';
 import CardHeader from '@material-ui/core/CardHeader';
 import Tooltip from '@mui/material/Tooltip';
-import Avatar from '@material-ui/core/Avatar';
-import Divider from '@material-ui/core/Divider';
-import InputBase from '@material-ui/core/InputBase';
-import MenuItem from '@mui/material/MenuItem';
-import Menu from '@mui/material/Menu';
-import { IconButton, ListItemIcon, ListItemText } from '@mui/material';
+import TextField from '@mui/material/TextField';
+import CardContent from '@mui/material/CardContent';
+import InputAdornment from '@mui/material/InputAdornment';
+import Box from '@mui/material/Box';
+import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
-import SearchIcon from '@material-ui/icons/Search';
+import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
 import AddCircleRoundedIcon from '@material-ui/icons/AddCircleRounded';
-import FilterListRoundedIcon from '@material-ui/icons/FilterListRounded';
 import PhoneIcon from '@mui/icons-material/Phone';
 import PhoneAndroidIcon from '@mui/icons-material/PhoneAndroid';
 
@@ -52,8 +49,7 @@ export default function IndexCliente() {
 
   const tipoPessoaMap = { 'Fisica': 'Física', 'Juridica': 'Jurídica' };
   const [clients, setClients] = useState([]);
-  const [filterClients, setFilterClients] = useState([]);
-  const [search, setSearch] = useState("");
+  const [keyword, setKeyword] = useState("");
 
   const [loading, setLoading] = useState(true);
   const [isOpenMenu, setIsOpenMenu] = useState(false);
@@ -85,17 +81,15 @@ export default function IndexCliente() {
 
   useEffect(() => {
     async function loadClients() {
+      var filter = `keyword=${keyword}`;
+      const results = await api.get(`http://localhost:5000/api/clients/index?${filter}`);
 
-      const response = await api.get("/api/clients");
-
-      setClients(response.data);
-      setFilterClients(response.data);
-
+      setClients(results.data);
       setLoading(false);
     }
     loadClients();
     //setTimeout(() => loadClients(), 2000);
-  }, []);
+  }, [keyword]);
 
   const handleDelete = (id) => {
     Swal.fire({
@@ -128,31 +122,13 @@ export default function IndexCliente() {
     setPage(0);
   };
 
-  //Filtrar Lista
-  const handleChangeSearch = ({ target }) => {
-    setSearch(target.value);
-    filter(target.value);
-  }
-
-  const filter = (endSearch) => {
-    var resultSearch = filterClients.filter((result) => {
-      if (result.nomeCliente.toString().toLowerCase().includes(endSearch.toLowerCase())
-        || result.cpf.toString().toLowerCase().includes(endSearch.toLowerCase())
-        || result.cnpj.toString().toLowerCase().includes(endSearch.toLowerCase())
-      ) {
-        return result;
-      }
-    });
-    setClients(resultSearch);
-  }
-
   return (
     <div className={classes.root}>
       <MenuAdmin />
 
       <main className={classes.content}>
 
-        <Container maxWidth="lg" className={classes.container}>
+        <Container maxWidth="xl" className={classes.container}>
 
           <CardHeader className={classes.cardHeader}
             title="Clientes"
@@ -179,21 +155,33 @@ export default function IndexCliente() {
             }
           />
 
-          {loading ? (<div style={{ width: 450, margin: '0 auto' }} ref={container} />) : (
-            <Card style={{ borderRadius: 15 }}>
-              <div className={classes.twoElements}>
-                <div className={classes.iconButton}>
-                  <IconButton >
-                    <SearchIcon />
-                  </IconButton>
-                  <InputBase
-                    value={search}
-                    onChange={handleChangeSearch}
-                    placeholder="Buscar..."
+          <Box sx={{ mt: 2, mb: 2 }}>
+            <Card>
+              <CardContent>
+                <Box sx={{ maxWidth: 500 }}>
+                  <TextField
+                    fullWidth
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <IconButton>
+                            <SearchRoundedIcon />
+                          </IconButton>
+                        </InputAdornment>
+                      )
+                    }}
+                    value={keyword}
+                    onChange={e => setKeyword(e.target.value)}
+                    placeholder="Buscar cliente"
+                    variant="outlined"
                   />
-                </div>
-              </div>
+                </Box>
+              </CardContent>
+            </Card>
+          </Box>
 
+          {loading ? (<div style={{ width: 450, margin: '0 auto' }} ref={container} />) : (
+            <Card style={{ borderRadius: 8 }}>
               <TableContainer >
                 <Table className={classes.table} size="small">
                   <TableHead>
@@ -300,17 +288,30 @@ export default function IndexCliente() {
 const useStyles = makeStyles((theme) => ({
   root: {
     display: 'flex',
-  },
-  iconButton: {
-    borderRadius: 10,
-    borderColor: '#BCBCBC',
-    borderStyle: 'solid',
-    borderWidth: 2
-  },
-  avatarFilter: {
-    color: '#4DB4C6',
-    backgroundColor: '#E7F7F9',
-    marginRight: theme.spacing(2),
+
+    '& label.Mui-focused': {
+      color: '#00AB55',
+    },
+    '& .MuiOutlinedInput-root': {
+      borderRadius: 8,
+      fontWeight: 500,
+      fontFamily: 'Public Sans',
+
+      '& fieldset': {
+        borderColor: '#dce0e4',
+      },
+      '&:hover fieldset': {
+        borderColor: '#3d3d3d',
+      },
+      '&.Mui-focused fieldset': {
+        borderColor: '#00AB55',
+      },
+    },
+
+    '& .MuiPaper-elevation1': {
+      borderRadius: '8px',
+      boxShadow: 'rgb(100 116 139 / 6%) 0px 1px 1px, rgb(100 116 139 / 10%) 0px 1px 2px'
+    },
   },
   content: {
     flexGrow: 1,
@@ -326,7 +327,10 @@ const useStyles = makeStyles((theme) => ({
     minWidth: 750,
     '& .MuiTableCell-head': {
       fontWeight: 'bold',
-      fontSize: 14
+      fontSize: 16,
+      padding: 16,
+      backgroundColor: '#F3F4F6',
+      color: '#374151'
     }
   },
   noRegisters: {
@@ -335,9 +339,6 @@ const useStyles = makeStyles((theme) => ({
     fontWeight: 700,
     fontSize: 16,
     color: '#595A4A'
-  },
-  buttonTable: {
-    // margin: theme.spacing(0.5)
   },
   btnDefaultGreen: {
     background: '#00AB55',
@@ -352,15 +353,6 @@ const useStyles = makeStyles((theme) => ({
       color: '#FFF',
     },
   },
-  twoElements: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    margin: theme.spacing(1),
-
-    '& .MuiTextField-root': {
-      margin: theme.spacing(1),
-    },
-  },
   cardHeader: {
     "& .MuiCardHeader-title": {
       fontWeight: 700,
@@ -368,5 +360,4 @@ const useStyles = makeStyles((theme) => ({
       marginBottom: theme.spacing(1),
     },
   },
-  // appBarSpacer: theme.mixins.toolbar,
 }));

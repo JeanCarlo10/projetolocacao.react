@@ -19,7 +19,7 @@ routes.get('/api/users/destroytoken', User.destroyToken);
 
 //Rotas de Clientes
 routes.post('/api/clients', Client.create);
-routes.get('/api/clients', Client.index);
+routes.get('/api/clients/index', Client.index);
 routes.get('/api/clients.details/:_id', Client.details);
 routes.delete('/api/clients/:_id', Client.delete);
 routes.put('/api/clients', Client.update);

@@ -16,15 +16,11 @@ import Breadcrumbs from '@material-ui/core/Breadcrumbs';
 import Link from '@material-ui/core/Link';
 import Typography from '@material-ui/core/Typography';
 import CardHeader from '@material-ui/core/CardHeader';
-import Avatar from '@material-ui/core/Avatar';
-import Divider from '@material-ui/core/Divider';
 import InputBase from '@material-ui/core/InputBase';
-import { Menu, MenuItem, IconButton, ListItemIcon, ListItemText } from '@mui/material';
-
+import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@material-ui/icons/Delete';
 import SearchIcon from '@material-ui/icons/Search';
 import EditIcon from '@material-ui/icons/Edit';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
 
 import MenuAdmin from '../../../components/menu-admin';
 import api from '../../../services/api';

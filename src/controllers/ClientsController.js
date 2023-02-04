@@ -3,8 +3,10 @@ const Photo = require('../models/PhotoModel');
 const fs = require('fs');
 
 module.exports = {
-    async index(req, res){
-        const client = await Client.find();
+    async index(req, res) {
+        const client = await Client.find(
+            { nomeCliente: { $regex: req.query.keyword, $options: "i" } }
+        )
 
         res.json(client);
     },

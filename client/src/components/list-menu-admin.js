@@ -2,7 +2,6 @@ import React from 'react';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-import ListSubheader from '@material-ui/core/ListSubheader';
 import Button from '@material-ui/core/Button';
 import ShoppingCartIcon from '@material-ui/icons/ShoppingCart';
 import PeopleIcon from '@material-ui/icons/People';
@@ -18,22 +17,17 @@ import { getToken, logout } from '../services/auth';
 export const mainListItems = (
   <div>
     <ListItem>
-        <Button 
-          style={{ background: '#00AB55', color: '#FFF', borderRadius: 10, border: 'none', textTransform: 'none', boxShadow: 'none' }}
-          variant="contained" 
-          size="large"
-          fullWidth
-          href={'/admin/pedidos/create'} 
-          startIcon={<AddCircleRoundedIcon/>}>
-            Novo pedido
-        </Button>
-
-      {/* <div className='makeStyles-drawerPaperClose'>
-        <AddCircleRoundedIcon />
-      </div> */}
+      <Button
+        style={{ background: '#00AB55', color: '#FFF', borderRadius: 10, border: 'none', textTransform: 'none', boxShadow: 'none' }}
+        variant="contained"
+        size="large"
+        fullWidth
+        href={'/admin/pedidos/create'}
+        startIcon={<AddCircleRoundedIcon />}>
+        Novo pedido
+      </Button>
     </ListItem>
 
-    
     <ListItem button component="a" href="/admin">
       <ListItemIcon style={{ color: "#7F8F97" }}>
         <HouseIcon />
@@ -58,13 +52,6 @@ export const mainListItems = (
       </ListItemIcon>
       <ListItemText style={{ color: "#7F8F97" }} primary="Pedidos" />
     </ListItem>
-  </div>
-);
-
-export const secondaryListItems = (
-  <div>
-    <ListSubheader inset style={{ color: "#B7C0CD" }}>OPÇÕES</ListSubheader>
-
     <ListItem button component="a" href="/admin/usuarios">
       <ListItemIcon style={{ color: "#7F8F97" }}>
         <PersonAddIcon />
@@ -79,6 +66,25 @@ export const secondaryListItems = (
     </ListItem>
   </div>
 );
+
+// export const secondaryListItems = (
+//   <div>
+//     <ListSubheader inset style={{ color: "#B7C0CD" }}>OPÇÕES</ListSubheader>
+
+//     <ListItem button component="a" href="/admin/usuarios">
+//       <ListItemIcon style={{ color: "#7F8F97" }}>
+//         <PersonAddIcon />
+//       </ListItemIcon>
+//       <ListItemText style={{ color: "#7F8F97" }} primary="Usuários" />
+//     </ListItem>
+//     <ListItem button onClick={confirmSair}>
+//       <ListItemIcon style={{ color: "#7F8F97" }}>
+//         <ExitToApp />
+//       </ListItemIcon>
+//       <ListItemText style={{ color: "#7F8F97" }} primary="Sair" />
+//     </ListItem>
+//   </div>
+// );
 
 async function confirmSair() {
   if (window.confirm("Deseja realmente sair do sistema?")) {

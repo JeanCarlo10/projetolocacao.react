@@ -1,5 +1,14 @@
-
 const Rent = require('../models/RentModel');
+const nodeSchedule = require('node-schedule');
+
+//const dataHoje = new Date().toLocaleDateString('pt-br');
+const job = nodeSchedule.scheduleJob('7 13 * * *', async (req, res) => {
+    // req.query.status = "Não Devolvido";
+    // const rent = await Rent.findOneAndUpdate(model, { new: true });
+    
+    console.log('Tarefa agendada está funcionado');
+    job.cancel();
+})
 
 module.exports = {
     async index(req, res) {
@@ -30,11 +39,11 @@ module.exports = {
                 },
             }
         ];
-        
+
         if (req.query.keyword != null && req.query.keyword != "") {
             query.push({
                 nomeCliente: { $regex: req.query.keyword, $options: "i" }
-            }) 
+            })
         }
 
         if (req.query.statuses != null && req.query.statuses != "") {
@@ -58,8 +67,8 @@ module.exports = {
             }
         });
 
-        const result = await Rent.aggregate(pipeline).sort({_id: -1 });
-        
+        const result = await Rent.aggregate(pipeline).sort({ _id: -1 });
+
         res.json(result);
         // console.log(result);
     },
@@ -78,14 +87,13 @@ module.exports = {
         const totalEntregues = await Rent.countDocuments({ status: "Entregue" });
         const totalNaoDevolvido = await Rent.countDocuments({ status: "Não Devolvido" });
 
-        res.json({ totalPendentes, totalEntregues, totalNaoDevolvido });
+        res.json({ totalPendentes, totalEntregues, totalNaoDevolvido });        
     },
 
     //ADD RENT
     async create(req, res) {
         try {
             var model = req.body
-            // console.log(model);
             model.numeroPedido = await Rent.countDocuments() + 1;
 
             const rent = await Rent.create(model);

@@ -11,6 +11,12 @@ module.exports = {
         res.json(client);
     },
 
+    async detailsInProducts(req, res) {
+        const client = await Client.find();
+
+        res.json(client);
+    },
+
     async thumbnailAvatar(req, res) {
         const {_id} = req.params;
 

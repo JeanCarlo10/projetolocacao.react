@@ -3,9 +3,6 @@ import { useParams } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Container from '@material-ui/core/Container';
-import FormControl from '@mui/material/FormControl';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import FormLabel from '@mui/material/FormLabel';
 import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
@@ -13,13 +10,9 @@ import CardHeader from '@material-ui/core/CardHeader';
 import Button from '@material-ui/core/Button';
 import Breadcrumbs from '@material-ui/core/Breadcrumbs';
 import Link from '@material-ui/core/Link';
-import Radio from '@mui/material/Radio';
 import Grid from '@mui/material/Grid';
-import RadioGroup from '@mui/material/RadioGroup';
 import MenuItem from '@mui/material/MenuItem';
 import SaveIcon from '@material-ui/icons/Save';
-import IconButton from '@mui/material/IconButton';
-import MapOutlinedIcon from '@mui/icons-material/MapOutlined';
 import TextField from '@mui/material/TextField';
 
 import NumberFormat from 'react-number-format';
@@ -29,6 +22,7 @@ import BuscarCEP from '../../../components/buscar-cep';
 import ListaProdutos from '../../../components/lista-produtos';
 import { DatePicker } from '@material-ui/pickers';
 import '../../../assets/css/card-location.css';
+import ImageDirection from '../../../assets/img/image-direction.svg';
 import Notification from '../../../components/notification';
 import { allStatus } from '../../../functions/static_data';
 
@@ -327,7 +321,7 @@ export default function EditPedido() {
                                                 </div>
 
                                                 <div className='right-column'>
-                                                    <img className="img" src={require('../../../assets/Directions-bro.svg')} width={200} height={160} />
+                                                    <img className="img" src={ImageDirection} width={200} height={160} />
                                                 </div>
                                             </div>
                                         </div> : ""

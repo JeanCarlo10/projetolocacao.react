@@ -30,6 +30,7 @@ import api from '../../../services/api';
 import ListaProdutos from '../../../components/lista-produtos';
 import { DatePicker } from '@material-ui/pickers';
 import '../../../assets/css/card-location.css';
+import ImageDirection from '../../../assets/img/image-direction.svg';
 import { allStatus } from '../../../functions/static_data';
 
 export function currencyFormatter(value) {
@@ -278,7 +279,7 @@ export default function OverviewPedido() {
                                         </div>
 
                                         <div className='right-column'>
-                                            <img className="img" src={require('../../../assets/Directions-bro.svg')} width={200} height={160} />
+                                            <img className="img" src={ImageDirection} width={200} height={160} />
                                         </div>
                                     </div>
                                 </div>

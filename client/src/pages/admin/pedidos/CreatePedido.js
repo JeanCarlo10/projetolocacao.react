@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
+import { styled } from '@mui/material/styles';
 import TextField from '@mui/material/TextField';
 import Select from '@mui/material/Select';
 import InputLabel from '@mui/material/InputLabel';
@@ -27,6 +28,7 @@ import ListaProdutos from '../../../components/lista-produtos';
 import NumberFormat from 'react-number-format';
 import { DatePicker } from '@material-ui/pickers';
 import '../../../assets/css/card-location.css';
+import ImageDirection from '../../../assets/img/image-direction.svg';
 import Notification from '../../../components/notification';
 
 export function currencyFormatter(value) {
@@ -60,6 +62,21 @@ const NumberFormatCustom = React.forwardRef(function NumberFormatCustom(props, r
   );
 });
 
+const GroupHeader = styled('div')(({ theme }) => ({
+  position: 'sticky',
+  top: '-8px',
+  padding: '4px 10px',
+  color: 'black',
+  //backgroundColor: '#00ab55'
+  // theme.palette.mode === 'light'
+  //   ? lighten(theme.palette.primary.light, 0.85)
+  //   : darken(theme.palette.primary.main, 0.8),
+}));
+
+const GroupItems = styled('ul')({
+  padding: 0,
+});
+
 export default function CreatePedido() {
   const classes = useStyles();
   const inputRef = React.createRef();
@@ -82,8 +99,20 @@ export default function CreatePedido() {
   const [clientId, setClientId] = useState('');
   const [currentClient, setCurrentClient] = useState({});
 
+
   //Dados Produto
   const [produtos, setProdutos] = useState([]);
+
+  const [selectedId, setSelectedId] = useState(undefined);
+  const [value, setValue] = useState('');
+
+  const options = selectClients.map((option) => {
+    const firstLetter = option.nomeCliente[0].toUpperCase();
+    return {
+      firstLetter: /[0-9]/.test(firstLetter) ? '0-9' : firstLetter,
+      ...option,
+    };
+  });
 
   useEffect(() => {
     async function getDadosCliente() {
@@ -94,6 +123,14 @@ export default function CreatePedido() {
 
     getDadosCliente();
   }, []);
+
+  const autoCompleteSelectedOption = useMemo((e) => {
+    if (!selectedId) return null;
+
+    const selectedOption = selectClients.find(opcao => opcao.idCliente === selectedId);
+
+    return selectedOption;
+  }, [selectedId, selectClients]);
 
   function handleSelectClients(e) {
     const _id = e.target.value;
@@ -233,6 +270,37 @@ export default function CreatePedido() {
                   </Select>
                 </FormControl>
 
+                {/* <Autocomplete
+                  options={options.sort((a, b) => -b.firstLetter.localeCompare(a.firstLetter))}
+                  groupBy={(option) => option.firstLetter}
+                  getOptionLabel={(option) => option.nomeCliente}
+                  value={value}
+                  onInputChange={(_, newValue) => setValue(newValue)}
+                  sx={{ width: 300 }}
+                  renderInput={(params) => <TextField {...params} label="Cliente" />}
+                  renderGroup={(params) => (
+                    <li key={params.key}>
+                      <GroupHeader>{params.group}</GroupHeader>
+                      <GroupItems>{params.children}</GroupItems>
+                    </li>
+                  )}
+                /> */}
+
+                {/* <Autocomplete
+                  openText="Abrir"
+                  closeText="Fechar"
+                  noOptionsText="Não há resultados"
+                  loadingText="Carregando..."
+
+                  options={selectClients}
+                  getOptionLabel={(option) => option.nomeCliente}
+                  value={autoCompleteSelectedOption}
+                  onInputChange={(_, newValue) => setValue(newValue)}
+                  onChange={(_, newValue) => { setSelectedId(newValue?.idCliente); setValue(''); }}
+                  sx={{ width: 300 }}
+                  renderInput={(params) => <TextField {...params} label="Cliente" />}
+                /> */}
+
                 <FormControl>
                   <FormLabel></FormLabel>
                   <RadioGroup
@@ -260,12 +328,12 @@ export default function CreatePedido() {
                         </div>
 
                         <div className='right-column'>
-                          <img className="img" src={require('../../../assets/Directions-bro.svg')} width={200} height={160} />
+                          <img className="img" src={ImageDirection} width={200} height={160} />
                         </div>
                       </div>
                     </div> : ""
                 }
-                
+
                 <div style={{ marginTop: '10px', marginBottom: '10px' }}>
                   <ListaProdutos produtos={produtos} addProduto={handleAddProduto} deleteProduto={handleDeleteProduto} />
                 </div>
@@ -275,7 +343,6 @@ export default function CreatePedido() {
                     label='Data entrega'
                     size='small'
                     autoOk
-                    className={classes.colorButtonDatePicker}
                     inputVariant='outlined'
                     format="dd/MM/yyyy"
                     cancelLabel="CANCELAR"

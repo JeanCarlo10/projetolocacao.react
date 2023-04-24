@@ -9,8 +9,8 @@ import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import AppBar from '@material-ui/core/AppBar';
 import IconButton from '@material-ui/core/IconButton';
 import CssBaseline from '@material-ui/core/CssBaseline';
-
-import { mainListItems, secondaryListItems } from './list-menu-admin';
+import Logo from '../assets/img/logo-locacao-palmeiras.png';
+import { mainListItems } from './list-menu-admin';
 import { getNameUser } from '../services/auth';
 
 export default function MenuAdmin(props) {
@@ -45,7 +45,7 @@ export default function MenuAdmin(props) {
         }}
         open={open}>
         <div className={classes.toolbarIcon}>
-          <img src={require('../assets/logo.svg')} style={{ marginRight: 130 }} width={40} height={40} />
+          <img src={Logo} style={{ marginRight: 130 }} width={40} height={40} />
           <IconButton onClick={handleDrawerClose}>
             <ChevronLeftIcon />
           </IconButton>
@@ -60,8 +60,8 @@ export default function MenuAdmin(props) {
         </div>
         <Divider />
         <List>{mainListItems}</List>
-        <Divider />
-        <List>{secondaryListItems}</List>
+        {/* <Divider /> */}
+        {/* <List>{secondaryListItems}</List> */}
       </Drawer>
     </>
   )

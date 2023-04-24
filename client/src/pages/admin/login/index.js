@@ -1,35 +1,21 @@
 import React, { useState } from 'react';
-import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
 import CircularProgress from '@material-ui/core/CircularProgress';
-// import OutlinedInput from '@mui/material/OutlinedInput';
 import OutlinedInput from '@material-ui/core/OutlinedInput';
 import IconButton from '@material-ui/core/IconButton';
-// import IconButton from '@mui/material/IconButton';
-
 import InputLabel from '@material-ui/core/InputLabel';
-// import InputLabel from '@mui/material/InputLabel';
 import InputAdornment from '@material-ui/core/InputAdornment';
-// import InputAdornment from '@mui/material/InputAdornment';
-import Link from '@material-ui/core/Link';
-import Box from '@material-ui/core/Box';
-
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
-import Container from '@material-ui/core/Container';
-
 import Visibility from '@material-ui/icons/Visibility';
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Notification from '../../../components/notification';
 import api from '../../../services/api';
 import { login, setNameUser, setIdUser } from '../../../services/auth';
-import { Grid } from '@material-ui/core';
-import Paper from '@mui/material/Paper';
-// import FormControl from '@mui/material/FormControl';
 import FormControl from '@material-ui/core/FormControl';
+import ImageLogin from '../../../assets/img/image_login.svg';
 
 export default function SignIn() {
   const classes = useStyles();
@@ -113,7 +99,7 @@ export default function SignIn() {
 
       <Notification notify={notify} setNotify={setNotify} />
       <div className={classes.columnLeft}>
-        <img className={classes.image} src={require('../../../assets/Mobile login-bro.svg')} />
+        <img className={classes.image} src={ImageLogin} />
       </div>
       <div className={classes.columnRight}>
         <div className={classes.titleLogin}>
@@ -183,7 +169,7 @@ const useStylesFacebook = makeStyles((theme) => ({
     color: theme.palette.grey[theme.palette.type === 'light' ? 200 : 700],
   },
   top: {
-    color: '#1a90ff',
+    color: '#00AB55',
     animationDuration: '550ms',
     position: 'absolute',
     left: 0,
@@ -191,7 +177,6 @@ const useStylesFacebook = makeStyles((theme) => ({
   circle: {
     strokeLinecap: 'round',
   },
-
 }));
 
 const useStyles = makeStyles((theme) => ({
@@ -207,7 +192,6 @@ const useStyles = makeStyles((theme) => ({
   },
   columnLeft: {
     flexBasis: '60%',
-
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',

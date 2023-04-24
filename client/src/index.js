@@ -43,9 +43,9 @@ const theme = createMuiTheme({
     },
     MuiButton: {
       textPrimary: {
-        color: '#00AB55',
+        color: '#00AB55 !important',
         '&:hover': {
-          backgroundColor: '#00ab5514'
+          backgroundColor: '#00ab5514 !important'
         },
       }
     },

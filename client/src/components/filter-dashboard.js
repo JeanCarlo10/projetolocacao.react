@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { styled } from '@mui/material/styles';
 import { makeStyles } from '@material-ui/core/styles';
-import InputBase from '@material-ui/core/InputBase';
+import TextField from '@mui/material/TextField';
+import InputAdornment from '@mui/material/InputAdornment';
+import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
 import IconButton from '@material-ui/core/IconButton';
 import {
   Grid, Card, Checkbox, Tooltip, FormControl, OutlinedInput,
@@ -9,7 +11,6 @@ import {
 } from '@mui/material';
 import ArrowBackIosRoundedIcon from '@mui/icons-material/ArrowBackIosRounded';
 import ArrowForwardIosRoundedIcon from '@mui/icons-material/ArrowForwardIosRounded';
-import SearchIcon from '@material-ui/icons/Search';
 import { formatCurrentMonth } from '../helpers/dateFilter';
 import { statusFilterDashboard } from '../../src/functions/static_data';
 
@@ -20,15 +21,32 @@ const RootStyle = styled(Card)(({ theme }) => ({
   backgroundColor: '#FFF',
   borderRadius: 15,
   marginBottom: 10,
+  boxShadow: 'rgb(100 116 139 / 6%) 0px 1px 1px, rgb(100 116 139 / 10%) 0px 1px 2px'
+
 }));
 
-const ITEM_HEIGHT = 48;
+const ITEM_HEIGHT = 70;
 const ITEM_PADDING_TOP = 8;
 const MenuProps = {
+  MenuListProps: {
+    sx: {
+      "&& .Mui-selected": {
+        backgroundColor: "#00ab5514",
+        '&: hover': {
+          backgroundColor: "#00ab5514"
+        }
+      },
+      "&& .Mui-checked": {
+        color: '#00AB55'
+      }
+    }
+  },
+  
   PaperProps: {
     style: {
       maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
       width: 250,
+
     },
   },
 };
@@ -91,22 +109,28 @@ export default function FilterDashboard(props) {
         </Grid>
 
         <Grid item xs={12} sm={4} md={4}>
-          <div className={classes.iconButton}>
-            <IconButton>
-              <SearchIcon />
-            </IconButton>
-            <InputBase
-              value={search}
-              onChange={({target}) => onChangeSearch(target.value)}
-              placeholder="Buscar por cliente..."
-            />
-          </div>
+          <TextField className={classes.input}
+            fullWidth
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <IconButton>
+                    <SearchRoundedIcon />
+                  </IconButton>
+                </InputAdornment>
+              )
+            }}
+            value={search}
+            onChange={({ target }) => onChangeSearch(target.value)}
+            placeholder="Buscar cliente"
+            variant="outlined"
+          />
         </Grid>
 
-        <Grid item row xs={12} sm={4} md={4} className={classes.input}>
-          <FormControl fullWidth>
+        <Grid item row xs={12} sm={4} md={4} >
+          <FormControl fullWidth className={classes.select}>
             <InputLabel>Status</InputLabel>
-            <Select className={classes.select}
+            <Select
               multiple
               value={status}
               onChange={handleChange}
@@ -136,27 +160,53 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: 'space-between',
     marginTop: 6,
   },
-  iconButton: {
-    borderRadius: 10,
-    borderColor: '#BCBCBC',
-    borderStyle: 'solid',
-    borderWidth: 2
-  },
   select: {
     '& .MuiSelect-select': {
-      padding: '14.5px !important'
+      padding: '14.5px !important',
     },
+
+
+
+    '& .MuiInputLabel-root': {
+      '&.Mui-focused': {
+        color: '#00AB55',
+      },
+    },
+
+    '& .MuiOutlinedInput-root': {
+      fontWeight: 500,
+      fontFamily: 'Public Sans',
+
+      '& fieldset': {
+        borderRadius: 8,
+        borderColor: '#BCBCBC',
+        borderStyle: 'solid',
+        borderWidth: 2,
+      },
+
+      '&:hover fieldset': {
+        borderColor: '#00AB55',
+      },
+      '&.Mui-focused fieldset': {
+        borderColor: '#00AB55',
+      },
+    }
   },
   input: {
     '& label.Mui-focused': {
       color: '#00AB55',
     },
     '& .MuiOutlinedInput-root': {
+      fontWeight: 500,
+      fontFamily: 'Public Sans',
+      height: '52px',
+
       '& fieldset': {
-        borderRadius: 10,
+        borderRadius: 8,
         borderColor: '#BCBCBC',
         borderStyle: 'solid',
         borderWidth: 2,
+
       },
       '&:hover fieldset': {
         borderColor: '#00AB55',

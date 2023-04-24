@@ -21,11 +21,9 @@ import CardContent from '@mui/material/CardContent';
 import InputAdornment from '@mui/material/InputAdornment';
 import Box from '@mui/material/Box';
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
-import InputBase from '@material-ui/core/InputBase';
 import IconButton from '@mui/material/IconButton';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import EditIcon from '@material-ui/icons/Edit';
-import SearchIcon from '@material-ui/icons/Search';
 import AddCircleRoundedIcon from '@material-ui/icons/AddCircleRounded';
 import EventAvailableRoundedIcon from '@mui/icons-material/EventAvailableRounded';
 import EventBusyRoundedIcon from '@mui/icons-material/EventBusyRounded';
@@ -33,7 +31,6 @@ import EventBusyRoundedIcon from '@mui/icons-material/EventBusyRounded';
 import lottie from 'lottie-web';
 import MenuAdmin from '../../../components/menu-admin';
 import api from '../../../services/api';
-import Swal from 'sweetalert2';
 
 const StyledTableRow = withStyles((theme) => ({
   root: {

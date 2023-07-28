@@ -117,7 +117,7 @@ export default function CreatePedido() {
   useEffect(() => {
     async function getDadosCliente() {
 
-      const results = await api.get('http://localhost:5000/api/clients');
+      const results = await api.get('api/clients');
       setSelectClients(results.data);
     }
 

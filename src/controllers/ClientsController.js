@@ -1,6 +1,5 @@
 const Client = require('../models/ClientModel');
 const Photo = require('../models/PhotoModel');
-const fs = require('fs');
 
 module.exports = {
     async index(req, res) {

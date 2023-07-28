@@ -121,7 +121,7 @@ export default function NotificacaoPedido(props) {
             var filter = `dataDevolucao=${currentMonth.toJSON()}`;
             filter += `&keyword=${keyword}`;
             filter += `&statuses=${statuses.join(",")}`;
-            const results = await api.get(`http://localhost:5000/api/rents/search?${filter}`);
+            const results = await api.get(`api/rents/search?${filter}`);
 
             setListaPedidos(results.data);
         }
@@ -173,21 +173,21 @@ export default function NotificacaoPedido(props) {
 
     const handleChangeStatusEntregue = async (_id, status) => {
         const item = listaPedidos.find((item) => item._id == _id);
-        await api.post('http://localhost:5000/api/rents/change-status', { _id, status });
+        await api.post('api/rents/change-status', { _id, status });
         item.status = status;
         setListaPedidos([...listaPedidos]);
     }
 
     const handleChangeStatusCancelado = async (_id, status) => {
         const item = listaPedidos.find((item) => item._id == _id);
-        await api.post('http://localhost:5000/api/rents/change-status', { _id, status });
+        await api.post('api/rents/change-status', { _id, status });
         item.status = status;
         setListaPedidos([...listaPedidos]);
     }
 
     const handleChangeStatusDevolvido = async (_id, status) => {
         const item = listaPedidos.find((item) => item._id == _id);
-        await api.post('http://localhost:5000/api/rents/change-status', { _id, status });
+        await api.post('api/rents/change-status', { _id, status });
         item.status = status;
         setListaPedidos([...listaPedidos]);
     }

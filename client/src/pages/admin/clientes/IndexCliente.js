@@ -82,7 +82,7 @@ export default function IndexCliente() {
   useEffect(() => {
     async function loadClients() {
       var filter = `keyword=${keyword}`;
-      const results = await api.get(`http://localhost:5000/api/clients/index?${filter}`);
+      const results = await api.get(`api/clients/index?${filter}`);
 
       setClients(results.data);
       setLoading(false);

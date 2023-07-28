@@ -65,7 +65,7 @@ export default function IndexMaterial() {
   useEffect(() => {
     async function getMaterials() {
       var filter = `keyword=${keyword}`;
-      const results = await api.get(`http://localhost:5000/api/materials/index?${filter}`);
+      const results = await api.get(`api/materials/index?${filter}`);
 
       setMaterials(results.data);
       setLoading(false);

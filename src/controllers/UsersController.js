@@ -1,6 +1,6 @@
 const User = require('../models/UserModel');
 const jwt = require('jsonwebtoken');
-const secret = "mysecret";
+require('dotenv').config();
 
 module.exports = {
     async index(req, res){
@@ -60,7 +60,7 @@ module.exports = {
                         res.status(200).json({status: 2, error: "A senha não confere"});
                     }else{
                         const payload = { email };
-                        const token = jwt.sign(payload, secret, {
+                        const token = jwt.sign(payload, process.env.JWT_SECRET, {
                             expiresIn: '24h'
                         })
                         res.cookie('token', token, { httpOnly: true });
@@ -76,7 +76,7 @@ module.exports = {
         if (!token){
             res.json({ status: 401, msg: 'Não autorizado: Token inexistente!'});
         }else{
-            jwt.verify(token, secret, function(err, decoded){
+            jwt.verify(token, process.env.JWT_SECRET, function(err, decoded){
                 if (err){
                     res.json({ status: 401, msg: 'Não autorizado: Token inválido!'});
                 }else{

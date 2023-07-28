@@ -20,7 +20,6 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Button from '@material-ui/core/Button';
 import DeleteIcon from '@material-ui/icons/Delete';
 import AddCircleOutlinedIcon from '@mui/icons-material/AddCircleOutlined';
-
 import NumberFormat from 'react-number-format';
 import api from '../services/api';
 
@@ -102,7 +101,7 @@ export default function ListaProdutos(props) {
   useEffect(() => {
     async function getDadosMaterial() {
 
-      const response = await api.get(`http://localhost:5000/api/materials`);
+      const response = await api.get(`api/materials`);
       
       setSelectMaterials(response.data);
     }

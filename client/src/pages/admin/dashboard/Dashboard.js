@@ -25,7 +25,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     async function getDadosPedido() {
-      const results = await api.get(`http://localhost:5000/api/rents/status`);
+      const results = await api.get(`api/rents/status`);
       setListaPedidos(results.data);
     }
 

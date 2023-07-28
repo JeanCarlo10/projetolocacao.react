@@ -143,7 +143,7 @@ export default function CreateCliente() {
     const formdata = new FormData();
     formdata.append("avatar", file);
 
-    const results = await api.post('http://localhost:5000/api/clients/upload-avatar', formdata, {
+    const results = await api.post('api/clients/upload-avatar', formdata, {
       method: "POST",
       body: formdata,
     });
@@ -241,7 +241,7 @@ export default function CreateCliente() {
                         }
                         {photoId != null &&
                           <Avatar
-                            // src={'http://localhost:5000/api/clients/thumbnail-avatar/' + photoId}
+                            // src={'api/clients/thumbnail-avatar/' + photoId}
                             src={file === '' ? '' : URL.createObjectURL(file)}
                             sx={{ width: 126, height: 126, objectFit: 'cover' }}
                           />

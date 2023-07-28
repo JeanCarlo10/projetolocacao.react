@@ -66,7 +66,7 @@ export default function IndexPedido() {
   //     async function getDadosPedido() {
   //         var filter = `&keyword=${keyword}`;
   //         filter += `&statuses=${statuses.join(",")}`;
-  //         const results = await api.get(`http://localhost:5000/api/rents/search?${filter}`);
+  //         const results = await api.get(`api/rents/search?${filter}`);
   //         setRents(results.data);
   //     }
 
@@ -76,7 +76,7 @@ export default function IndexPedido() {
   useEffect(() => {
     async function loadRents() {
       var filter = `keyword=${keyword}`;
-      const results = await api.get(`http://localhost:5000/api/rents/index?${filter}`);
+      const results = await api.get(`api/rents/index?${filter}`);
 
       setRents(results.data);
       console.log(results.data);

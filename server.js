@@ -8,6 +8,7 @@ const routes = require('./src/routes');
 const nodeSchedule = require('node-schedule');
 const Rent = require('./src/models/RentModel');
 require('dotenv').config();
+require('./src/services/updateRentStatusJob');
 const app = express();
 
 const port = process.env.PORT_BACK;
@@ -26,26 +27,6 @@ app.get('/', (req, res) => {
     
     console.log(result);
 });
-
-const dataHoje = new Date().toLocaleDateString('pt-br');
-const job = nodeSchedule.scheduleJob('42 17 * * *', async (req, res) => {
-    // const model = req.body;
-    app.get('/', (req, res) => {
-        Rent.find().then((result) => {
-            res.send(result);
-        });
-        
-        console.log(result);
-    });
-    
-    // req.query.status = "Não Devolvido";
-    // const rent = await Rent.findOneAndUpdate(model, { new: true });
-
-    console.log('Tarefa agendada está funcionado');
-    job.cancel();
-
-    return res.json(rent);
-})
 
 app.post('/', async (req, res) => {
     try {

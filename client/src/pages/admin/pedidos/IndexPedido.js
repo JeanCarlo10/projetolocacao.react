@@ -170,7 +170,7 @@ export default function IndexPedido() {
                     {rents &&
                       rents.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
                         <TableRow hover key={row._id}>
-                          <TableCell align="left" style={{ width: "15%" }}>
+                          <TableCell align="left">
                             {row.status == 'Pendente' &&
                               <Chip label={row.status} className={classes.chipPendente} />
                             }
@@ -188,10 +188,10 @@ export default function IndexPedido() {
                             }
                           </TableCell>
 
-                          <TableCell align="center" style={{ width: "10%" }}>{row.numeroPedido}</TableCell>
+                          <TableCell align="center">{row.numeroPedido}</TableCell>
                           <TableCell align="center">{new Date(row.dataPedido).toLocaleDateString('pt-br')}</TableCell>
-                          <TableCell align="left" style={{ width: "35%" }}>{row.nomeCliente}</TableCell>
-                          <TableCell align="center" style={{ width: "10%" }}>
+                          <TableCell align="left">{row.nomeCliente}</TableCell>
+                          <TableCell align="center">
                             <p className={classes.textPeriodo}>
                               <EventAvailableRoundedIcon />
                               <div style={{ marginLeft: 5 }}>

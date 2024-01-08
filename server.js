@@ -77,5 +77,5 @@ app.use(routes);
 
 app.listen(port, function () {
     console.log(`Servidor rodando na porta ${port}`)
-    console.log('Teste BACKEND: ' + process.env.API_URL)
+    // console.log('Teste BACKEND: ' + process.env.API_URL)
 });

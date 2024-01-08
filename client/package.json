@@ -31,7 +31,8 @@
     "react-scripts": "^5.0.1",
     "sweetalert2": "^11.4.16",
     "sweetalert2-react-content": "^5.0.0",
-    "typescript": "^3.9.7"
+    "typescript": "^3.9.7",
+    "update-browserslist-db": "^1.0.13"
   },
   "scripts": {
     "start": "react-scripts start",

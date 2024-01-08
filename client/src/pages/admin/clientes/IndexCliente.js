@@ -45,7 +45,6 @@ const StyledTableRow = withStyles((theme) => ({
 export default function IndexCliente() {
   const classes = useStyles();
   const container = useRef(null);
-  const ref = useRef(null);
 
   const tipoPessoaMap = { 'Fisica': 'Física', 'Juridica': 'Jurídica' };
   const [clients, setClients] = useState([]);
@@ -91,7 +90,8 @@ export default function IndexCliente() {
     //setTimeout(() => loadClients(), 2000);
   }, [keyword]);
 
-  const handleDelete = (id) => {
+  const handleDelete = (id, nomeCliente) => {
+
     Swal.fire({
       icon: 'warning',
       title: 'Exclusão',

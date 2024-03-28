@@ -11,11 +11,18 @@ import CardHeader from '@material-ui/core/CardHeader';
 import Button from '@material-ui/core/Button';
 import Breadcrumbs from '@material-ui/core/Breadcrumbs';
 import Link from '@material-ui/core/Link';
-import Notification from '../../../components/notification';
 import SaveIcon from '@material-ui/icons/Save';
 
+import Notification from '../../../components/notification';
 import MenuAdmin from '../../../components/menu-admin';
 import api from '../../../services/api';
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+
+const schema = yup.object({
+    nomeMaterial: yup.string().required("Nome do material obrigatório!")
+})
 
 export default function EditMaterial() {
     const classes = useStyles();
@@ -23,6 +30,14 @@ export default function EditMaterial() {
     const [nomeMaterial, setNomeMaterial] = useState('');
     const [notify, setNotify] = useState({ isOpen: false, message: '', type: '' });
     const { idMaterial } = useParams();
+
+    const {
+        register,
+        handleSubmit,
+        formState: { errors }
+    } = useForm({
+        resolver: yupResolver(schema)
+    });
 
     useEffect(() => {
         async function getMaterial() {
@@ -38,27 +53,23 @@ export default function EditMaterial() {
         setNomeMaterial('');
     }
 
-    async function handleSubmit() {
+    async function submitForm() {
         const data = {
             nomeMaterial: nomeMaterial,
             _id: idMaterial
         }
 
-        if (nomeMaterial != '') {
-            const response = await api.put('/api/materials', data);
+        const response = await api.put('/api/materials', data);
 
-            if (response.status == 200) {
-                setNotify({
-                    isOpen: true,
-                    message: 'Material atualizado com sucesso',
-                    type: 'success'
-                });
-                window.location.href = '/admin/materiais'
-            } else {
-                alert('Erro ao atualizar o material');
-            }
+        if (response.status == 200) {
+            setNotify({
+                isOpen: true,
+                message: 'Material atualizado com sucesso',
+                type: 'success'
+            });
+            window.location.href = '/admin/materiais';
         } else {
-            alert('Campos obrigatórios');
+            alert('Erro! contate o administrador do sistema');
         }
     }
 
@@ -86,10 +97,12 @@ export default function EditMaterial() {
                     />
 
                     <Card style={{ borderRadius: 15 }}>
-                        <form onSubmit={handleSubmit}>
+                        <form onSubmit={handleSubmit(submitForm)}>
                             <CardContent className={classes.inputs}>
                                 <TextField
-                                    required
+                                    {...register("nomeMaterial")}
+                                    error={!!errors.nomeMaterial}
+                                    helperText={errors.nomeMaterial?.message}
                                     autoFocus
                                     variant="outlined"
                                     size="small"
@@ -112,6 +125,10 @@ export default function EditMaterial() {
 const useStyles = makeStyles((theme) => ({
     root: {
         display: 'flex',
+
+        '& .MuiFormHelperText-contained': {
+            marginLeft: '0px'
+        }
     },
     content: {
         flexGrow: 1,

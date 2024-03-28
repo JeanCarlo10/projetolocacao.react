@@ -58,7 +58,7 @@ app.post('/', async (req, res) => {
     }
 });
 
-mongoose.connect(process.env.MONGO_CONNECTION, {
+mongoose.connect(process.env.MONGO_CONNECTION_LOCAL, {
     useUnifiedTopology: true,
     useNewUrlParser: true,
     useFindAndModify: false,

@@ -1,14 +1,4 @@
 const Rent = require('../models/RentModel');
-const nodeSchedule = require('node-schedule');
-
-//const dataHoje = new Date().toLocaleDateString('pt-br');
-const job = nodeSchedule.scheduleJob('7 13 * * *', async (req, res) => {
-    // req.query.status = "Não Devolvido";
-    // const rent = await Rent.findOneAndUpdate(model, { new: true });
-    
-    console.log('Tarefa agendada está funcionado');
-    job.cancel();
-})
 
 module.exports = {
     async index(req, res) {

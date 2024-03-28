@@ -1,0 +1,27 @@
+version: '3.8'
+services:
+  mongo:
+    image: mongo:latest
+    container_name: mongo
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: useradmin
+      MONGO_INITDB_ROOT_PASSWORD: passwordadmin
+    volumes:
+      - ./mongodb:/data/db
+volumes:
+  mongodata:
+    driver: local
+    
+  frontend:
+    build:
+      context: ./client
+    ports:
+      - "3000:3000"
+
+  backend:
+    build:
+      context: ./
+    ports:
+      - "5000:5000"

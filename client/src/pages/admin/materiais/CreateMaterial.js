@@ -10,11 +10,18 @@ import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import CardHeader from '@material-ui/core/CardHeader';
-import Notification from '../../../components/notification';
 import SaveIcon from '@material-ui/icons/Save';
 
+import Notification from '../../../components/notification';
 import MenuAdmin from '../../../components/menu-admin';
 import api from '../../../services/api';
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+
+const schema = yup.object({
+  nomeMaterial: yup.string().required("Nome do material obrigatório!")
+})
 
 export default function CreateMaterial() {
   const classes = useStyles();
@@ -22,26 +29,31 @@ export default function CreateMaterial() {
   const [nomeMaterial, setNomeMaterial] = useState('');
   const [notify, setNotify] = useState({ isOpen: false, message: '', type: '' });
 
-  async function handleSubmit() {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors }
+  } = useForm({
+    resolver: yupResolver(schema)
+  });
+
+  async function submitForm() {
     const data = {
       nomeMaterial: nomeMaterial,
     }
 
-    if (nomeMaterial != '') {
-      const response = await api.post('/api/materials', data);
+    const response = await api.post('/api/materials', data);
 
-      if (response.status == 200) {
-        setNotify({
-          isOpen: true,
-          message: 'Cadastro realizado com sucesso',
-          type: 'success'
-        });
-        window.location.href = '/admin/materiais'
-      } else {
-        alert('Erro ao cadastrar o material');
-      }
-    } else {
-      alert('Campos obrigatórios');
+    if (response.status == 200) {
+      setNotify({
+        isOpen: true,
+        message: 'Cadastro realizado com sucesso',
+        type: 'success'
+      });
+      window.location.href = '/admin/materiais';
+    }
+    else {
+      alert('Erro! contate o administrador do sistema');
     }
   }
 
@@ -68,10 +80,12 @@ export default function CreateMaterial() {
             className={classes.cardHeader}
           />
           <Card style={{ borderRadius: 15 }}>
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit(submitForm)}>
               <CardContent className={classes.inputs}>
                 <TextField
-                  required
+                  {...register("nomeMaterial")}
+                  error={!!errors.nomeMaterial}
+                  helperText={errors.nomeMaterial?.message}
                   variant="outlined"
                   size="small"
                   label="Descrição"
@@ -93,6 +107,10 @@ export default function CreateMaterial() {
 const useStyles = makeStyles((theme) => ({
   root: {
     display: 'flex',
+
+    '& .MuiFormHelperText-contained': {
+      marginLeft: '0px'
+    }
   },
   content: {
     flexGrow: 1,

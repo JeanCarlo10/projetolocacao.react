@@ -113,7 +113,7 @@ export default function IndexMaterial() {
             title="Materiais"
             subheader={
               <Breadcrumbs style={{ fontSize: 14 }} separator="•" aria-label="breadcrumb">
-                <Link color="inherit" href={'/admin/materiais'} >
+                <Link color="inherit" href={'/admin'} >
                   Painel
                 </Link>
                 <Typography color="textPrimary" style={{ fontSize: 14 }}>Lista de materiais</Typography>

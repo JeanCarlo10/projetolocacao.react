@@ -1,20 +1,13 @@
-FROM node:14-alpine as client
+FROM node:14
 
-WORKDIR /app
-
-ENV PATH /app/node_modules/.bin:$PATH
+WORKDIR /usr/src/app
 
 COPY package*.json ./
-RUN npm ci --silent
-COPY . ./
 
-RUN npm run build
+RUN npm install
 
-FROM nginx:stable-alpine
-
-COPY --from=client /app/build /var/www/html
-COPY ./docker/nginx.conf /etc/nginx/conf.d
+COPY . .
 
 EXPOSE 3000
 
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["npm", "start"]

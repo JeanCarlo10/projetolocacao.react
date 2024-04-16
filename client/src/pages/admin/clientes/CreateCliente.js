@@ -11,14 +11,7 @@ import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import CardHeader from '@material-ui/core/CardHeader';
 import MenuItem from '@material-ui/core/MenuItem';
-import Box from '@mui/material/Box';
-import Grid from '@mui/material/Grid';
 import SaveIcon from '@material-ui/icons/Save';
-import InsertPhotoIcon from '@mui/icons-material/InsertPhoto';
-import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
-import Avatar from '@mui/material/Avatar';
-import IconButton from '@mui/material/IconButton';
-import { PhotoOutlined } from '@material-ui/icons';
 
 import FormData from "form-data";
 import api from '../../../services/api';
@@ -27,9 +20,41 @@ import MenuAdmin from '../../../components/menu-admin';
 import BuscarCEP from '../../../components/buscar-cep';
 import ListaContatos from '../../../components/lista-contatos';
 import Notification from '../../../components/notification';
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+
+const schema = yup.object({
+  nomeCliente: yup.string().when("tipo", {
+    is: 'Fisica',
+    then: () => yup.string().required("Nome do cliente obrigatório!"),
+  }),
+  nomeFantasia: yup.string().when("tipo", {
+    is: 'Juridica',
+    then: () => yup.string().required("Nome fantasia obrigatório!"),
+  }),
+
+  cpf: yup.string().when("tipo", {
+    is: 'Fisica',
+    then: () => yup.string().required("CPF obrigatório!"),
+  }),
+
+  cnpj: yup.string().when("tipo", {
+    is: "Juridica",
+    then: () => yup.string().required("CNPJ obrigatório!"),
+  }),
+})
 
 export default function CreateCliente() {
   const classes = useStyles();
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors }
+  } = useForm({
+    resolver: yupResolver(schema)
+  });
 
   const videoRef = useRef(null);
   const photoRef = useRef(null);
@@ -157,8 +182,7 @@ export default function CreateCliente() {
     setPhotoId(null);
   }
 
-  async function handleSubmit(event) {
-    event.preventDefault();
+  async function submitForm() {
 
     const data = {
       nomeCliente: nome,
@@ -185,21 +209,18 @@ export default function CreateCliente() {
       contacts: contatos,
     }
 
-    if (tipo != '') {
-      const response = await api.post('/api/clients', data);
 
-      if (response.status == 200) {
-        setNotify({
-          isOpen: true,
-          message: 'Cadastro realizado com sucesso',
-          type: 'success'
-        });
-        window.location.href = '/admin/clientes'
-      } else {
-        alert('Erro ao cadastrar o cliente');
-      }
+    const response = await api.post('/api/clients', data);
+
+    if (response.status == 200) {
+      setNotify({
+        isOpen: true,
+        message: 'Cadastro realizado com sucesso',
+        type: 'success'
+      });
+      window.location.href = '/admin/clientes'
     } else {
-      alert('Campos obrigatórios');
+      alert('Erro! contate o administrador do sistema');
     }
   }
 
@@ -227,9 +248,9 @@ export default function CreateCliente() {
           />
 
           <Card style={{ borderRadius: 15 }}>
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit(submitForm)}>
               <CardContent className={classes.inputs}>
-                  {/*<Box className={classes.containerAvatar}>
+                {/*<Box className={classes.containerAvatar}>
 
                   <Grid container spacing={4}>
                     <Grid item xs={12} sm={6} md={2}>
@@ -282,7 +303,7 @@ export default function CreateCliente() {
                       </div>
                     </Grid> */}
 
-                    {/* <Grid item xs={12} sm={6} md={6}>
+                {/* <Grid item xs={12} sm={6} md={6}>
                       <div className='camera'>
                         <video ref={videoRef}></video>
                         <IconButton onClick={takePhoto} aria-label="delete">
@@ -300,6 +321,7 @@ export default function CreateCliente() {
                 <FormControl variant="outlined" size="small" className={classes.formControl}>
                   <InputLabel>Tipo</InputLabel>
                   <Select
+                    {...register("tipo")}
                     value={tipo}
                     onChange={handleTipoPessoaChange}
                     label="Tipo de pessoa"
@@ -311,9 +333,11 @@ export default function CreateCliente() {
 
                 {tipo == 'Fisica' &&
                   <TextField
-                    required
+                    {...register("nomeCliente")}
+                    error={!!errors.nomeCliente}
+                    helperText={errors.nomeCliente?.message}
                     variant="outlined"
-                    label="Nome cliente"
+                    label="Nome cliente*"
                     size="small"
                     autoFocus
                     value={nome}
@@ -323,9 +347,11 @@ export default function CreateCliente() {
 
                 {tipo == 'Juridica' &&
                   <TextField
-                    required
+                    {...register("nomeFantasia")}
+                    error={!!errors.nomeFantasia}
+                    helperText={errors.nomeFantasia?.message}
                     variant="outlined"
-                    label="Nome fantasia"
+                    label="Nome fantasia*"
                     size="small"
                     autoFocus
                     value={nome}
@@ -360,10 +386,12 @@ export default function CreateCliente() {
                 <div className={classes.twoInputs}>
                   {tipo == 'Fisica' &&
                     <TextField
+                      {...register("cpf")}
+                      error={!!errors.cpf}
+                      helperText={errors.cpf?.message}
                       variant="outlined"
                       size="small"
-                      required
-                      label="CPF"
+                      label="CPF*"
                       value={cpf}
                       onChange={handleChangeCPF}
                     />
@@ -371,10 +399,12 @@ export default function CreateCliente() {
 
                   {tipo == 'Juridica' &&
                     <TextField
+                      {...register("cnpj")}
+                      error={!!errors.cnpj}
+                      helperText={errors.cnpj?.message}
                       variant="outlined"
                       size="small"
-                      required
-                      label="CNPJ"
+                      label="CNPJ*"
                       value={cnpj}
                       onChange={handleChangeCNPJ}
                     />
@@ -430,6 +460,10 @@ export default function CreateCliente() {
 const useStyles = makeStyles((theme) => ({
   root: {
     display: 'flex',
+
+    '& .MuiFormHelperText-contained': {
+      marginLeft: '0px'
+    }
   },
   containerAvatar: {
     width: "100%",

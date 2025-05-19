@@ -6,6 +6,7 @@ import Dashboard from './pages/admin/dashboard/Dashboard';
 import IndexCliente from './pages/admin/clientes/IndexCliente';
 import CreateCliente from './pages/admin/clientes/CreateCliente';
 import EditCliente from './pages/admin/clientes/EditCliente';
+import OverviewCliente from './pages/admin/clientes/OverviewCliente';
 
 import IndexMaterial from './pages/admin/materiais/IndexMaterial';
 import CreateMaterial from './pages/admin/materiais/CreateMaterial';
@@ -33,6 +34,7 @@ export default function Routes() {
                 <PrivateRoute path="/admin/clientes" exact component={IndexCliente} />
                 <PrivateRoute path="/admin/clientes/create" exact component={CreateCliente} />
                 <PrivateRoute path="/admin/clientes/edit/:idCliente" exact component={EditCliente} />
+                <PrivateRoute path="/admin/clientes/overview/:idCliente" exact component={OverviewCliente} />
 
                 <PrivateRoute path="/admin/materiais" exact component={IndexMaterial} />
                 <PrivateRoute path="/admin/materiais/create" exact component={CreateMaterial} />

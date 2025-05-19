@@ -4,6 +4,7 @@ const User = require('./controllers/UsersController');
 const Client = require('./controllers/ClientsController');
 const Material = require('./controllers/MaterialsController');
 const Rent = require('./controllers/RentsController');
+const upload = require('../upload');
 
 routes.get('/', User.index);
 
@@ -18,14 +19,12 @@ routes.get('/api/users/checktoken', User.checkToken);
 routes.get('/api/users/destroytoken', User.destroyToken);
 
 //Rotas de Clientes
-routes.post('/api/clients', Client.create);
+routes.post('/api/clients', upload.single('foto'), Client.create);
 routes.get('/api/clients/index', Client.index);
 routes.get('/api/clients', Client.detailsInProducts);
 routes.get('/api/clients.details/:_id', Client.details);
-routes.delete('/api/clients/:_id', Client.delete);
-routes.put('/api/clients', Client.update);
-routes.post('/api/clients/upload-avatar', Client.uploadAvatar);
-routes.get('/api/clients/thumbnail-avatar/:_id', Client.thumbnailAvatar);
+routes.get('/api/clients/overview/:_id', Client.overview);
+routes.put('/api/clients/:_id', upload.single('foto'), Client.update);
 
 //Rotas de Materiais
 routes.post('/api/materials', Material.create);
@@ -40,7 +39,7 @@ routes.post('/api/rents', Rent.create);
 routes.get('/api/rents/index', Rent.index);
 routes.get('/api/rents/search', Rent.search);
 routes.get('/api/rents.details/:_id', Rent.details);
-routes.delete('/api/rents/:_id', Rent.delete);
+routes.get('/api/rents/overview/:_id', Rent.overview);
 routes.put('/api/rents', Rent.update);
 routes.get('/api/rents/status', Rent.status);
 routes.post('/api/rents/change-status', Rent.changeStatus);

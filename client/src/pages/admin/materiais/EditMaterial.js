@@ -1,18 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { TextField } from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
-import Typography from '@material-ui/core/Typography';
-import Container from '@material-ui/core/Container';
-import Card from '@material-ui/core/Card';
-import CardActions from '@material-ui/core/CardActions';
-import CardContent from '@material-ui/core/CardContent';
-import CardHeader from '@material-ui/core/CardHeader';
-import Button from '@material-ui/core/Button';
-import Breadcrumbs from '@material-ui/core/Breadcrumbs';
-import Link from '@material-ui/core/Link';
-import SaveIcon from '@material-ui/icons/Save';
-
+import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
+import Container from '@mui/material/Container';
+import Box from '@mui/material/Box';
+import CardHeader from '@mui/material/CardHeader';
+import Button from '@mui/material/Button';
+import Breadcrumbs from '@mui/material/Breadcrumbs';
+import Link from '@mui/material/Link';
 import Notification from '../../../components/notification';
 import MenuAdmin from '../../../components/menu-admin';
 import api from '../../../services/api';
@@ -25,15 +20,13 @@ const schema = yup.object({
 })
 
 export default function EditMaterial() {
-    const classes = useStyles();
-
-    const [nomeMaterial, setNomeMaterial] = useState('');
     const [notify, setNotify] = useState({ isOpen: false, message: '', type: '' });
     const { idMaterial } = useParams();
 
     const {
         register,
         handleSubmit,
+        setValue,
         formState: { errors }
     } = useForm({
         resolver: yupResolver(schema)
@@ -43,44 +36,37 @@ export default function EditMaterial() {
         async function getMaterial() {
             var response = await api.get('/api/materials.details/' + idMaterial);
 
-            setNomeMaterial(response.data.nomeMaterial);
+            setValue('nomeMaterial', response.data.nomeMaterial);
         }
-
         getMaterial();
-    }, []);
+    }, [idMaterial, setValue]);
 
-    function handleClear() {
-        setNomeMaterial('');
-    }
-
-    async function submitForm() {
-        const data = {
-            nomeMaterial: nomeMaterial,
+    async function submitForm(data) {
+        const response = await api.put('/api/materials', {
+            ...data,
             _id: idMaterial
-        }
+        });
 
-        const response = await api.put('/api/materials', data);
-
-        if (response.status == 200) {
+        if (response.status === 200) {
             setNotify({
                 isOpen: true,
                 message: 'Material atualizado com sucesso',
                 type: 'success'
             });
-            window.location.href = '/admin/materiais';
+            setTimeout(() => {
+                window.location.href = '/admin/materiais';
+            }, 2500);
         } else {
             alert('Erro! contate o administrador do sistema');
         }
     }
 
     return (
-        <div className={classes.root}>
+        <div style={{ display: 'flex' }}>
             <Notification notify={notify} setNotify={setNotify} />
             <MenuAdmin />
-            <main className={classes.content}>
-
-                <Container maxWidth="lg" component="main" className={classes.container}>
-
+            <main style={{ flexGrow: 1, height: '100vh', overflow: 'auto' }}>
+                <Container maxWidth="lg" component="main">
                     <CardHeader
                         title="Editar material"
                         subheader={
@@ -93,97 +79,69 @@ export default function EditMaterial() {
                         }
                         titleTypographyProps={{ align: 'left' }}
                         subheaderTypographyProps={{ align: 'left' }}
-                        className={classes.cardHeader}
+                        sx={{
+                            "& .MuiCardHeader-title": {
+                                fontWeight: 700,
+                                color: '#212B36',
+                                marginBottom: '8px',
+                            },
+                        }}
                     />
 
-                    <Card style={{ borderRadius: 15 }}>
+                    <Box sx={{
+                        padding: 2,
+                        borderRadius: '10px',
+                        border: "1px solid #E0E1E0",
+                        boxShadow: "0px 2px 4px 0 rgba(0, 0, 0, .2)",
+                    }}>
                         <form onSubmit={handleSubmit(submitForm)}>
-                            <CardContent className={classes.inputs}>
-                                <TextField
-                                    {...register("nomeMaterial")}
-                                    error={!!errors.nomeMaterial}
-                                    helperText={errors.nomeMaterial?.message}
-                                    autoFocus
-                                    variant="outlined"
-                                    size="small"
-                                    label="Descrição"
-                                    value={nomeMaterial}
-                                    onChange={e => setNomeMaterial(e.target.value)}
-                                />
-                            </CardContent>
-                            <CardActions style={{ justifyContent: 'flex-end', marginRight: 15 }}>
-                                <Button variant="contained" size="large" className={classes.btnDefaultGreen} type="submit" startIcon={<SaveIcon />}>Salvar</Button>
-                            </CardActions>
+                            <TextField
+                                {...register("nomeMaterial")}
+                                error={!!errors.nomeMaterial}
+                                helperText={errors.nomeMaterial?.message}
+                                autoFocus
+                                variant="outlined"
+                                size="medium"
+                                label="Descrição"
+                                fullWidth
+                            />
+                            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 16 }}>
+                                <Button variant="contained" size="large" type="submit">Salvar</Button>
+                            </div>
                         </form>
-                    </Card>
+                    </Box>
                 </Container>
             </main>
         </div>
     );
 }
+// const useStyles = makeStyles((theme) => ({
+//     root: {
+//         display: 'flex',
 
-const useStyles = makeStyles((theme) => ({
-    root: {
-        display: 'flex',
+//         '& .MuiFormHelperText-contained': {
+//             marginLeft: '0px'
+//         }
+//     },
 
-        '& .MuiFormHelperText-contained': {
-            marginLeft: '0px'
-        }
-    },
-    content: {
-        flexGrow: 1,
-        height: '100vh',
-        overflow: 'auto',
-    },
-    cardHeader: {
-        "& .MuiCardHeader-title": {
-            fontWeight: 700,
-            color: '#212B36',
-            marginBottom: theme.spacing(1),
-        },
-    },
-    container: {
-        paddingTop: theme.spacing(4),
-        paddingBottom: theme.spacing(4),
-    },
-    inputs: {
-        display: 'flex',
-        overflow: 'auto',
-        flexDirection: 'column',
-        '& .MuiTextField-root': {
-            margin: theme.spacing(1),
-        },
+//     boxCustom: {
+//         padding: 16,
+//         borderRadius: 10,
+//         border: "1px solid #E0E1E0",
+//         boxShadow: "0px 2px 4px 0 rgba(0, 0, 0, .2)",
+//     },
 
-        '& label.Mui-focused': {
-            color: '#00AB55',
-        },
-        '& .MuiOutlinedInput-root': {
-            '& fieldset': {
-                borderColor: '#dce0e4',
-            },
-            '&:hover fieldset': {
-                borderColor: '#3d3d3d',
-            },
-            '&.Mui-focused fieldset': {
-                borderColor: '#00AB55',
-            },
-        },
-    },
-    formControl: {
-        margin: theme.spacing(1),
-        minWidth: '50%',
-    },
-    btnDefaultGreen: {
-        background: '#00AB55',
-        color: '#FFF',
-        borderRadius: '5px',
-        border: 'none',
-        textTransform: 'none',
-        boxShadow: 'none',
+//     content: {
+//         flexGrow: 1,
+//         height: '100vh',
+//         overflow: 'auto',
+//     },
 
-        '&:hover': {
-            backgroundColor: '#007B55',
-            color: '#FFF',
-        },
-    },
-}));
+//     cardHeader: {
+//         "& .MuiCardHeader-title": {
+//             fontWeight: 700,
+//             color: '#212B36',
+//             marginBottom: theme.spacing(1),
+//         },
+//     },
+// }));

@@ -1,17 +1,12 @@
 import React, { useState } from 'react';
-import { makeStyles } from '@material-ui/core/styles';
-import { TextField } from '@material-ui/core';
-import Button from '@material-ui/core/Button';
-import Container from '@material-ui/core/Container';
-import Breadcrumbs from '@material-ui/core/Breadcrumbs';
-import Link from '@material-ui/core/Link';
-import Typography from '@material-ui/core/Typography';
-import Card from '@material-ui/core/Card';
-import CardActions from '@material-ui/core/CardActions';
-import CardContent from '@material-ui/core/CardContent';
-import CardHeader from '@material-ui/core/CardHeader';
-import SaveIcon from '@material-ui/icons/Save';
-
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
+import Container from '@mui/material/Container';
+import Breadcrumbs from '@mui/material/Breadcrumbs';
+import Link from '@mui/material/Link';
+import Typography from '@mui/material/Typography';
+import Box from '@mui/material/Box';
+import CardHeader from '@mui/material/CardHeader';
 import Notification from '../../../components/notification';
 import MenuAdmin from '../../../components/menu-admin';
 import api from '../../../services/api';
@@ -24,9 +19,6 @@ const schema = yup.object({
 })
 
 export default function CreateMaterial() {
-  const classes = useStyles();
-
-  const [nomeMaterial, setNomeMaterial] = useState('');
   const [notify, setNotify] = useState({ isOpen: false, message: '', type: '' });
 
   const {
@@ -37,20 +29,18 @@ export default function CreateMaterial() {
     resolver: yupResolver(schema)
   });
 
-  async function submitForm() {
-    const data = {
-      nomeMaterial: nomeMaterial,
-    }
-
+  async function submitForm(data) {
     const response = await api.post('/api/materials', data);
 
-    if (response.status == 200) {
+    if (response.status === 200) {
       setNotify({
         isOpen: true,
-        message: 'Cadastro realizado com sucesso',
+        message: 'Cadastro realizado com sucesso.',
         type: 'success'
       });
-      window.location.href = '/admin/materiais';
+      setTimeout(() => {
+        window.location.href = '/admin/materiais';
+      }, 2500);
     }
     else {
       alert('Erro! contate o administrador do sistema');
@@ -58,12 +48,12 @@ export default function CreateMaterial() {
   }
 
   return (
-    <div className={classes.root}>
+    <div style={{ display: 'flex' }}>
       <Notification notify={notify} setNotify={setNotify} />
       <MenuAdmin />
-      <main className={classes.content}>
+      <main style={{ flexGrow: 1, height: '100vh', overflow: 'auto' }}>
 
-        <Container maxWidth="lg" component="main" className={classes.container}>
+        <Container maxWidth="lg" component="main">
 
           <CardHeader
             title="Cadastrar materiais"
@@ -77,98 +67,38 @@ export default function CreateMaterial() {
             }
             titleTypographyProps={{ align: 'left' }}
             subheaderTypographyProps={{ align: 'left' }}
-            className={classes.cardHeader}
+            sx={{
+              "& .MuiCardHeader-title": {
+                fontWeight: 700,
+                color: '#212B36',
+                marginBottom: '8px',
+              },
+            }}
           />
-          <Card style={{ borderRadius: 15 }}>
+          <Box sx={{
+            padding: 2,
+            borderRadius: '10px',
+            border: "1px solid #E0E1E0",
+            boxShadow: "0px 2px 4px 0 rgba(0, 0, 0, .2)",
+          }}>
             <form onSubmit={handleSubmit(submitForm)}>
-              <CardContent className={classes.inputs}>
-                <TextField
-                  {...register("nomeMaterial")}
-                  error={!!errors.nomeMaterial}
-                  helperText={errors.nomeMaterial?.message}
-                  variant="outlined"
-                  size="small"
-                  label="Descrição"
-                  value={nomeMaterial}
-                  onChange={e => setNomeMaterial(e.target.value)}
-                />
-              </CardContent>
-              <CardActions style={{ justifyContent: 'flex-end', marginRight: 15 }}>
-                <Button variant="contained" size="large" className={classes.btnDefaultGreen} type="submit" startIcon={<SaveIcon />}>Salvar</Button>
-              </CardActions>
+              <TextField
+                {...register("nomeMaterial")}
+                error={!!errors.nomeMaterial}
+                helperText={errors.nomeMaterial?.message}
+                variant="outlined"
+                size="medium"
+                fullWidth
+                label="Descrição"
+              />
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 16 }}>
+                <Button variant="contained" size="large" type="submit">Salvar</Button>
+              </div>
             </form>
-          </Card>
+          </Box>
         </Container>
       </main>
     </div>
   );
 }
-
-const useStyles = makeStyles((theme) => ({
-  root: {
-    display: 'flex',
-
-    '& .MuiFormHelperText-contained': {
-      marginLeft: '0px'
-    }
-  },
-  content: {
-    flexGrow: 1,
-    height: '100vh',
-    overflow: 'auto',
-  },
-  cardHeader: {
-    "& .MuiCardHeader-title": {
-      fontWeight: 700,
-      color: '#212B36',
-      marginBottom: theme.spacing(1),
-    },
-  },
-  container: {
-    paddingTop: theme.spacing(4),
-    paddingBottom: theme.spacing(4),
-  },
-  inputs: {
-    display: 'flex',
-    overflow: 'auto',
-    flexDirection: 'column',
-    '& .MuiTextField-root': {
-      margin: theme.spacing(1),
-    },
-
-    '& label.Mui-focused': {
-      color: '#00AB55',
-    },
-    '& .MuiOutlinedInput-root': {
-      '& fieldset': {
-        borderColor: '#dce0e4',
-      },
-      '&:hover fieldset': {
-        borderColor: '#3d3d3d',
-      },
-      '&.Mui-focused fieldset': {
-        borderColor: '#00AB55',
-      },
-    },
-  },
-  formControl: {
-    margin: theme.spacing(1),
-    minWidth: '50%',
-  },
-  button: {
-    margin: theme.spacing(0.5),
-  },
-  btnDefaultGreen: {
-    background: '#00AB55',
-    color: '#FFF',
-    borderRadius: '5px',
-    border: 'none',
-    textTransform: 'none',
-    boxShadow: 'none',
-
-    '&:hover': {
-      backgroundColor: '#007B55',
-      color: '#FFF',
-    },
-  },
-}));

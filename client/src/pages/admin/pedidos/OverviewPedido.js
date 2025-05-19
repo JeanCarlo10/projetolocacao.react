@@ -1,37 +1,27 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { useParams } from 'react-router-dom';
-import { makeStyles } from '@material-ui/core/styles';
+import React, { useState, useEffect } from 'react';
+import { useParams, useHistory } from "react-router-dom";
 import { styled } from '@mui/material/styles';
-import Typography from '@material-ui/core/Typography';
-import Container from '@material-ui/core/Container';
+import { TextField, Button, InputAdornment } from '@mui/material';
+import CircularProgress from '@mui/material/CircularProgress';
+import Container from '@mui/material/Container';
+import Breadcrumbs from '@mui/material/Breadcrumbs';
+import Link from '@mui/material/Link';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell, { tableCellClasses } from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import Card from '@material-ui/core/Card';
-import CardActions from '@material-ui/core/CardActions';
-import CardContent from '@material-ui/core/CardContent';
-import CardHeader from '@material-ui/core/CardHeader';
-import Button from '@material-ui/core/Button';
-import Breadcrumbs from '@material-ui/core/Breadcrumbs';
-import Link from '@material-ui/core/Link';
-import Grid from '@mui/material/Grid';
-import MenuItem from '@mui/material/MenuItem';
-import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
-import Divider from '@mui/material/Divider';
-import ChevronLeftRoundedIcon from '@mui/icons-material/ChevronLeftRounded';
-
-import NumberFormat from 'react-number-format';
+import Grid from '@mui/material/Grid';
+import CardHeader from '@mui/material/CardHeader';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import MenuAdmin from '../../../components/menu-admin';
 import api from '../../../services/api';
-import ListaProdutos from '../../../components/lista-produtos';
-import { DatePicker } from '@material-ui/pickers';
-import '../../../assets/css/card-location.css';
 import ImageDirection from '../../../assets/img/image-direction.svg';
-import { allStatus } from '../../../functions/static_data';
+import NumberFormat from 'react-number-format';
+import { useForm, Controller } from "react-hook-form";
 
 export function currencyFormatter(value) {
     if (!Number(value)) return "";
@@ -65,17 +55,19 @@ const NumberFormatCustom = React.forwardRef(function NumberFormatCustom(props, r
 });
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
-    fontFamily: 'Public Sans',
-    
+    fontFamily: 'Nunito',
+
     [`&.${tableCellClasses.head}`]: {
         fontWeight: 700,
-        color: '#2d2a26',
+        color: '#000',
         paddingTop: 6,
         paddingBottom: 6,
+        background: '#D2D2D2',
     },
+
     [`&.${tableCellClasses.body}`]: {
         fontSize: 14,
-        color: '#374151',
+        color: '#3B4251',
         fontWeight: 500,
     },
 }));
@@ -84,115 +76,90 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
     '&:nth-of-type(odd)': {
         backgroundColor: theme.palette.action.hover,
     },
-    // hide last border
+
     '&:last-child td, &:last-child th': {
         border: 0,
     },
 }));
 
 export default function OverviewPedido() {
-    const classes = useStyles();
-    const inputRef = React.createRef();
+    const history = useHistory();
 
-    const [numeroPedido, setNumeroPedido] = useState();
-    const [nomeCliente, setNomeCliente] = useState();
-    const [status, setStatus] = useState();
-    const [totalGeral, setTotalGeral] = useState(0);
-    const [totalParcial, setTotalParcial] = useState();
-    const [desconto, setDesconto] = useState(0);
-    const [observacao, setObservacao] = useState('');
-
-    const [cep, setCep] = useState('');
-    const [cidade, setCidade] = useState('');
-    const [bairro, setBairro] = useState('');
-    const [logradouro, setLogradouro] = useState('');
-    const [complemento, setComplemento] = useState('');
-    const [numero, setNumero] = useState('');
-    const [uf, setUf] = useState('');
-
-    const [dataPedido, setDataPedido] = useState();
-    const [dataEntrega, setDataEntrega] = useState(null);
-    const [dataDevolucao, setDataDevolucao] = useState(null);
-    const [produtos, setProdutos] = useState([]);
-    const [dadosEndereco, setDadosEndereco] = useState({} || undefined);
     const { idPedido } = useParams();
-
+    const [pedido, setPedido] = useState(null);
+    const [produtos, setProdutos] = useState([]);
     const unidadeMedidaMap = { 'Unidade': 'unidade(s)', 'Metro': 'metro(s)' };
 
+    const {
+        control,
+        reset,
+    } = useForm({});
+
     useEffect(() => {
-        async function getPedido() {
-            var response = await api.get('/api/rents.details/' + idPedido);
+        const fetchRents = async () => {
+            try {
+                const res = await api.get('/api/rents/overview/' + idPedido);
 
-            setNomeCliente(response.data.nomeCliente);
-            setNumeroPedido(response.data.numeroPedido);
-            setDataPedido(response.data.dataPedido);
-            setStatus(response.data.status);
-            setTotalGeral(response.data.totalGeral);
-            setDesconto(response.data.desconto);
-            setTotalParcial(response.data.totalParcial);
-            setObservacao(response.data.observacao);
-            setDataEntrega(response.data.dataEntrega);
-            setDataDevolucao(response.data.dataDevolucao);
-            setProdutos(response.data.products);
-            setDadosEndereco(response.data.dadosEndereco);
+                const pedido = res.data;
+                setPedido(pedido);
+                setProdutos(pedido.products || []);
 
-            //Dados do endereço
-            setCep(response.data.cep);
-            setCidade(response.data.cidade);
-            setBairro(response.data.bairro);
-            setLogradouro(response.data.logradouro);
-            setComplemento(response.data.complemento);
-            setNumero(response.data.numero);
-            setUf(response.data.uf);
+                reset({
+                    dataPedido: pedido.dataPedido,
+                    numeroPedido: pedido.numeroPedido,
+                    status: pedido.status,
+                    dataEntrega: pedido.dataEntrega,
+                    dataDevolucao: pedido.dataDevolucao,
+                    totalParcial: pedido.totalParcial,
+                    desconto: pedido.desconto,
+                    totalGeral: pedido.totalGeral,
+                    observacao: pedido.observacao,
+                    tipoEndereco: pedido.tipoEndereco,
+                });
 
-            console.log(response.data);
+            } catch (error) {
+                console.error('Erro ao buscar pedido:', error);
+            }
+        };
+        fetchRents();
+    }, [idPedido, reset]);
+
+    if (!pedido) {
+        return (
+            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 5 }}>
+                <CircularProgress />
+            </Box>
+        )
+    }
+
+    const cliente = pedido.idCliente || {};
+    
+    const endereco = pedido?.tipoEndereco === 'novo'
+        ? {
+            logradouro: pedido?.logradouro,
+            numero: pedido?.numero,
+            bairro: pedido?.bairro,
+            cidade: pedido?.cidade,
+            uf: pedido?.uf,
+            cep: pedido?.cep,
+            complemento: pedido?.complemento,
         }
-
-        getPedido();
-    }, []);
-
-    const handleChangeStatus = (event) => {
-        setStatus(event.target.value);
-    }
-
-    const handleDateDeliveryChange = (date) => {
-        setDataEntrega(date);
-    }
-
-    const handleDateDevolutionChange = (date) => {
-        setDataDevolucao(date);
-    }
-
-    const handleSearchCEP = (data) => {
-        setDadosEndereco(data);
-    }
-
-    const handleAddProduto = (produto) => {
-        setProdutos([...produtos, produto]);
-    }
-
-    const handleDeleteProduto = useCallback((produto) => {
-        let newProducts = [...produtos];
-
-        newProducts.splice(produtos.indexOf(produto), 1);
-
-        setProdutos(newProducts);
-    }, [produtos]);
-
-    useEffect(() => {
-        setTotalGeral(totalParcial - desconto);
-    }, [totalParcial, desconto]);
-
-    useEffect(() => {
-        const total = produtos.reduce((count, item) => count + item.valorItem, 0)
-        setTotalParcial(total);
-    }, [produtos])
+        : {
+            logradouro: pedido?.idCliente?.logradouro,
+            numero: pedido?.idCliente?.numero,
+            bairro: pedido?.idCliente?.bairro,
+            cidade: pedido?.idCliente?.cidade,
+            uf: pedido?.idCliente?.uf,
+            cep: pedido?.idCliente?.cep,
+            complemento: pedido?.idCliente?.complemento,
+        };
 
     return (
-        <div className={classes.root}>
+        <div style={{ display: 'flex' }}>
             <MenuAdmin />
-            <main className={classes.content}>
-                <Container maxWidth="lg" component="main" className={classes.container}>
+            <main style={{ flexGrow: 1, height: '100vh', overflow: 'auto' }}>
+
+                <Container maxWidth="lg" component="main">
                     <CardHeader
                         title="Visualizar pedido"
                         subheader={
@@ -205,278 +172,292 @@ export default function OverviewPedido() {
                         }
                         titleTypographyProps={{ align: 'left' }}
                         subheaderTypographyProps={{ align: 'left' }}
-                        className={classes.cardHeader}
+                        sx={{
+                            "& .MuiCardHeader-title": {
+                                fontWeight: 700,
+                                color: '#212B36',
+                                marginBottom: '8px',
+                            },
+                        }}
                     />
 
-                    <Card style={{ borderRadius: 15 }}>
-                        <form>
-                            <CardContent className={classes.inputs}>
-                                <Grid container spacing={2} flexDirection={'row'}>
-                                    <Grid item xs={12} sm={4} md={4}>
-                                        <TextField
-                                            variant='outlined'
-                                            fullWidth
-                                            size="small"
-                                            label="Nº Pedido"
-                                            InputLabelProps={{ shrink: true }}
-                                            disabled
-                                            value={numeroPedido}
-                                        />
-                                    </Grid>
+                    <Box
+                        sx={{
+                            padding: 2,
+                            borderRadius: '10px',
+                            border: "1px solid #E0E1E0",
+                            boxShadow: "0px 2px 4px 0 rgba(0, 0, 0, .2)",
+                        }}>
+                        <Grid container spacing={2}>
 
-                                    <Grid item xs={12} sm={4} md={4}>
+                            <Grid item xs={12} sm={6} md={4}>
+                                <Controller
+                                    name="dataPedido"
+                                    control={control}
+                                    render={({ field, fieldState }) => (
                                         <DatePicker
-                                            label='Data pedido'
-                                            fullWidth
-                                            size='small'
-                                            disabled
-                                            inputVariant='outlined'
-                                            format="dd/MM/yyyy"
-                                            value={dataPedido}
+                                            label="Data do pedido"
+                                            value={field.value}
+                                            onChange={field.onChange}
+                                            renderInput={(params) => (
+                                                <TextField
+                                                    {...params}
+                                                    fullWidth
+                                                    disabled
+                                                    InputProps={{
+                                                        readOnly: true,
+                                                    }}
+                                                />
+                                            )}
                                         />
-                                    </Grid>
-
-                                    <Grid item xs={12} sm={4} md={4}>
-                                        <TextField
-                                            select
-                                            disabled
-                                            label="Status"
-                                            variant="outlined"
-                                            size="small"
-                                            fullWidth
-                                            value={status ? status : ""}
-                                            onChange={handleChangeStatus}
-                                            defaultValue={status}
-                                        >
-                                            {allStatus.map((item) => (
-                                                <MenuItem key={item.id} value={item.label}>
-                                                    {item.label}
-                                                </MenuItem>
-                                            ))}
-                                        </TextField>
-                                    </Grid>
-                                </Grid>
-
-                                <TextField
-                                    variant='outlined'
-                                    size="small"
-                                    label="Cliente"
-                                    InputLabelProps={{ shrink: true }}
-                                    disabled
-                                    value={nomeCliente}
+                                    )}
                                 />
+                            </Grid>
 
-                                <div className='container'>
-                                    <div className="card">
-                                        <div className='left-column'>
-                                            <div>
-                                                <h4>Endereço de entrega</h4>
-                                            </div>
+                            <Grid item xs={12} sm={6} md={4}>
+                                <Controller
+                                    name="numeroPedido"
+                                    control={control}
+                                    render={({ field, fieldState }) => (
+                                        <TextField
+                                            {...field}
+                                            fullWidth
+                                            label="Nº do pedido"
+                                            disabled
+                                            variant="outlined"
+                                            size="medium"
+                                        />
+                                    )}
+                                />
+                            </Grid>
 
-                                            <p>{logradouro}, Nº {numero}</p>
-                                            <p>Bairro: {bairro} - {cidade}</p>
-                                            <p>CEP: {cep}</p>
-                                        </div>
+                            <Grid item xs={12} sm={6} md={4}>
+                                <Controller
+                                    name="status"
+                                    control={control}
+                                    render={({ field, fieldState }) => (
+                                        <TextField
+                                            {...field}
+                                            fullWidth
+                                            label="Status"
+                                            disabled
+                                            variant="outlined"
+                                            size="medium"
+                                        />
+                                    )}
+                                />
+                            </Grid>
 
-                                        <div className='right-column'>
-                                            <img className="img" src={ImageDirection} width={200} height={160} />
-                                        </div>
-                                    </div>
-                                </div>
+                            <Grid item xs={12} sm={12} md={12}>
+                                <TextField
+                                    label="Cliente"
+                                    value={cliente?.tipoPessoa === 'Juridica'
+                                        ? cliente?.nomeFantasia || ''
+                                        : cliente?.nomeCliente || ''}
+                                    fullWidth
+                                    disabled
+                                    InputProps={{
+                                        readOnly: true,
+                                    }}
+                                    variant="outlined"
+                                />
+                            </Grid>
 
-                                <Box display="flex" flexDirection="column" className={classes.boxCustom}>
-                                    <Typography style={{ padding: '15px 15px 0 15px', color: '#009DE0', fontWeight: 'bold' }}>
-                                        Itens do pedido
-                                        <Divider variant="fullWidth" />
-                                    </Typography>
+                            <Grid item xs={12}>
+                                <Box sx={{
+                                    padding: 2,
+                                    borderRadius: '10px',
+                                    border: "2px solid #00AB55",
+                                    boxShadow: "0px 2px 4px 0 hsla(0, 0.00%, 0.00%, 0.20)",
+                                    marginBottom: 1
+                                }}>
+                                    <Grid container spacing={2}>
+                                        <Grid item xs={12} sm={7} md={9}>
+                                            <h2 style={{ color: '#00AB55', marginBottom: 16 }}>Endereço de entrega</h2>
 
-                                    <Grid container item>
-                                        <TableContainer style={{ padding: '10px' }}>
-                                            <Table className={classes.table} size="small">
-                                                <TableHead>
-                                                    <TableRow>
-                                                        <StyledTableCell align="left">Produto</StyledTableCell>
-                                                        <StyledTableCell align="center">Quantidade</StyledTableCell>
-                                                        <StyledTableCell align="right">Valor</StyledTableCell>
-                                                    </TableRow>
-                                                </TableHead>
+                                            <Box sx={{ fontSize: 18, fontWeight: 700, color: '#3B4251' }}>
+                                                <p>{endereco?.logradouro || ''}, Nº {endereco?.numero || ''}</p>
+                                                <p>Bairro: {endereco?.bairro || ''} - Cidade: {endereco?.cidade || ''}</p>
+                                                <p>Complemento: {endereco?.complemento || ''}</p>
+                                                <p>CEP: {endereco?.cep || ''}</p>
+                                            </Box>
+                                        </Grid>
 
-                                                <TableBody>
-                                                    {produtos.map((prod) => (
-                                                        <StyledTableRow key={prod.id}>
-                                                            <StyledTableCell align="left">{prod.nomeMaterial}</StyledTableCell>
-                                                            <StyledTableCell align="center">{prod.qtde + " " + unidadeMedidaMap[(prod.unidadeMedida)]}</StyledTableCell>
-                                                            <StyledTableCell align="right">{currencyFormatter(prod.valorItem)}</StyledTableCell>
-                                                        </StyledTableRow>
-                                                    ))}
-                                                </TableBody>
-                                            </Table>
-                                        </TableContainer>
+                                        <Grid item xs={12} sm={5} md={3}>
+                                            <Box
+                                                sx={{
+                                                    display: { xs: 'none', sm: 'flex' }, justifyContent: 'center',
+                                                    alignItems: 'center',
+                                                    height: '100%'
+                                                }}>
+                                                <img src={ImageDirection} height={180} alt="Mapa" />
+                                            </Box>
+                                        </Grid>
                                     </Grid>
                                 </Box>
+                            </Grid>
 
-                                <div className={classes.twoInputs}>
-                                    <DatePicker
-                                        label='Data entrega'
-                                        size='small'
-                                        autoOk
-                                        disabled
-                                        inputVariant='outlined'
-                                        format="dd/MM/yyyy"
-                                        value={dataEntrega}
-                                        cancelLabel="CANCELAR"
-                                        onChange={handleDateDeliveryChange}
-                                    />
+                            <Grid item xs={12} sm={12} md={12}>
+                                <TableContainer style={{ borderRadius: 10 }}>
+                                    <Table style={{ minWidth: 500 }} size="medium">
+                                        <TableHead>
+                                            <TableRow>
+                                                <StyledTableCell align="left">Produto</StyledTableCell>
+                                                <StyledTableCell align="center">Quantidade</StyledTableCell>
+                                                <StyledTableCell align="right">Valor</StyledTableCell>
+                                            </TableRow>
+                                        </TableHead>
 
-                                    <DatePicker
-                                        label='Data devolução'
-                                        size='small'
-                                        autoOk
-                                        disabled
-                                        inputVariant='outlined'
-                                        format="dd/MM/yyyy"
-                                        cancelLabel="CANCELAR"
-                                        value={dataDevolucao}
-                                        onChange={handleDateDevolutionChange}
-                                    />
-                                </div>
+                                        <TableBody>
+                                            {pedido.products?.map((prod) => (
+                                                <StyledTableRow key={prod.id}>
+                                                    <StyledTableCell align="left">{prod.nomeMaterial}</StyledTableCell>
+                                                    <StyledTableCell align="center">{prod.qtde + " " + unidadeMedidaMap[(prod.unidadeMedida)]}</StyledTableCell>
+                                                    <StyledTableCell align="right">R${currencyFormatter(prod.valorItem)}</StyledTableCell>
+                                                </StyledTableRow>
+                                            ))}
+                                        </TableBody>
+                                    </Table>
+                                </TableContainer>
+                            </Grid>
 
-                                <div className={classes.twoInputs}>
-                                    <TextField
-                                        variant="outlined"
-                                        disabled
-                                        size="small"
-                                        label="Total parcial"
-                                        className={classes.bold}
-                                        getInputRef={inputRef}
-                                        InputProps={{
-                                            inputComponent: NumberFormatCustom,
-                                        }}
-                                        value={totalParcial}
-                                        onChange={(event) => setTotalParcial(event.target.value)}
-                                    />
-                                    <TextField
-                                        variant="outlined"
-                                        size="small"
-                                        label="Desconto"
-                                        disabled
-                                        getInputRef={inputRef}
-                                        InputProps={{
-                                            inputComponent: NumberFormatCustom,
-                                        }}
-                                        value={desconto}
-                                        onChange={(event) => setDesconto(event.target.value)}
-                                    />
-                                    <TextField
-                                        variant="outlined"
-                                        size="small"
-                                        label="Total geral"
-                                        disabled
-                                        className={classes.bold}
-                                        getInputRef={inputRef}
-                                        InputProps={{
-                                            inputComponent: NumberFormatCustom,
-                                        }}
-                                        value={totalGeral}
-                                        onChange={(event) => setTotalGeral(event.target.value)}
-                                    />
-                                </div>
-
-                                <TextField
-                                    variant="outlined"
-                                    label="Observação"
-                                    multiline
-                                    disabled
-                                    rows={4}
-                                    value={observacao}
-                                    onChange={e => setObservacao(e.target.value)}
+                            <Grid item xs={12} sm={6} md={6}>
+                                <Controller
+                                    name="dataEntrega"
+                                    control={control}
+                                    render={({ field, fieldState }) => (
+                                        <DatePicker
+                                            label="Data de entrega"
+                                            value={field.value}
+                                            onChange={field.onChange}
+                                            renderInput={(params) => (
+                                                <TextField
+                                                    {...params}
+                                                    fullWidth
+                                                    disabled
+                                                    InputProps={{
+                                                        readOnly: true,
+                                                    }}
+                                                />
+                                            )}
+                                        />
+                                    )}
                                 />
-                            </CardContent>
-                            <CardActions style={{ justifyContent: 'flex-end', marginRight: 15 }}>
-                                <Button variant="contained" size="large" className={classes.btnDefaultGreen} href={'/admin/pedidos'} startIcon={<ChevronLeftRoundedIcon />}>Voltar</Button>
-                            </CardActions>
-                        </form>
-                    </Card>
+                            </Grid>
+
+                            <Grid item xs={12} sm={6} md={6}>
+                                <Controller
+                                    name="dataDevolucao"
+                                    control={control}
+                                    render={({ field, fieldState }) => (
+                                        <DatePicker
+                                            label="Data de devolução"
+                                            value={field.value}
+                                            onChange={field.onChange}
+                                            renderInput={(params) => (
+                                                <TextField
+                                                    {...params}
+                                                    fullWidth
+                                                    disabled
+                                                    InputProps={{
+                                                        readOnly: true,
+                                                    }}
+                                                />
+                                            )}
+                                        />
+                                    )}
+                                />
+                            </Grid>
+
+                            <Grid item xs={12} sm={6} md={4}>
+                                <Controller
+                                    name="totalParcial"
+                                    control={control}
+                                    render={({ field, fieldState }) => (
+                                        <TextField
+                                            {...field}
+                                            fullWidth
+                                            variant="outlined"
+                                            size="medium"
+                                            disabled
+                                            label="Total parcial"
+                                            InputProps={{
+                                                inputComponent: NumberFormatCustom,
+                                                startAdornment: <InputAdornment position="start">R$</InputAdornment>,
+                                            }}
+                                        />
+                                    )}
+                                />
+                            </Grid>
+
+                            <Grid item xs={12} sm={6} md={4}>
+                                <Controller
+                                    name="desconto"
+                                    control={control}
+                                    render={({ field, fieldState }) => (
+                                        <TextField
+                                            {...field}
+                                            fullWidth
+                                            disabled
+                                            variant="outlined"
+                                            size="medium"
+                                            label="Desconto"
+                                            InputProps={{
+                                                inputComponent: NumberFormatCustom,
+                                                startAdornment: <InputAdornment position="start">R$</InputAdornment>,
+                                            }}
+                                        />
+                                    )}
+                                />
+                            </Grid>
+
+                            <Grid item xs={12} sm={6} md={4}>
+                                <Controller
+                                    name="totalGeral"
+                                    control={control}
+                                    render={({ field, fieldState }) => (
+                                        <TextField
+                                            {...field}
+                                            fullWidth
+                                            variant="outlined"
+                                            size="medium"
+                                            disabled
+                                            label="Total geral"
+                                            InputProps={{
+                                                inputComponent: NumberFormatCustom,
+                                                startAdornment: <InputAdornment position="start">R$</InputAdornment>,
+                                            }}
+                                        />
+                                    )}
+                                />
+                            </Grid>
+
+                            <Grid item xs={12} sm={12} md={12}>
+                                <Controller
+                                    name="observacao"
+                                    control={control}
+                                    render={({ field, fieldState }) => (
+                                        <TextField
+                                            {...field}
+                                            label="Observação"
+                                            fullWidth
+                                            disabled
+                                            multiline
+                                            minRows={4}
+                                            variant="outlined"
+                                            size="medium"
+                                        />
+                                    )}
+                                />
+                            </Grid>
+                        </Grid>
+
+                        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 16 }}>
+                            <Button variant="contained" size="large" onClick={() => history.goBack()}>Voltar</Button>
+                        </div>
+                    </Box>
                 </Container>
             </main>
-        </div>
+        </div >
     );
 }
-
-const useStyles = makeStyles((theme) => ({
-    root: {
-        display: 'flex',
-    },
-    content: {
-        flexGrow: 1,
-        height: '100vh',
-        overflow: 'auto',
-    },
-    cardHeader: {
-        "& .MuiCardHeader-title": {
-            fontWeight: 700,
-            color: '#212B36',
-            marginBottom: theme.spacing(1),
-        },
-    },
-    container: {
-        paddingTop: theme.spacing(4),
-        paddingBottom: theme.spacing(4),
-    },
-    inputs: {
-        display: 'flex',
-        overflow: 'auto',
-        flexDirection: 'column',
-        '& .MuiTextField-root': {
-            margin: theme.spacing(1),
-        },
-    },
-    table: {
-        minWidth: 700,
-        borderRadius: 5,
-        background: '#F3F4F6',        
-    },
-    twoInputs: {
-        display: 'flex',
-        '& .MuiTextField-root': {
-            margin: theme.spacing(1),
-            width: '50%',
-        },
-    },
-    formControl: {
-        margin: theme.spacing(1),
-        minWidth: '50%',
-    },
-    button: {
-        margin: theme.spacing(0.5),
-    },
-
-    btnDefaultGreen: {
-        background: '#00AB55',
-        color: '#FFF',
-        borderRadius: '5px',
-        border: 'none',
-        textTransform: 'none',
-        boxShadow: 'none',
-
-        '&:hover': {
-            backgroundColor: '#007B55',
-            color: '#FFF',
-        },
-    },
-    bold: {
-        '& .MuiInputBase-input': {
-            fontWeight: 700
-        }
-    },
-    boxCustom: {
-        border: "1px solid #E0E1E0",
-        borderLeft: "5px solid #009DE0",
-        borderTopLeftRadius: "5px",
-        borderBottomLeftRadius: "5px",
-        borderTopRightRadius: "5px",
-        borderBottomRightRadius: "5px",
-        marginTop: '10px', 
-        marginBottom: '10px' 
-    },
-}));

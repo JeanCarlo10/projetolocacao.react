@@ -37,26 +37,3 @@ export const statusFilterDashboard = [
         label: 'Não Devolvido'
     },
 ];
-
-export const allStatus = [
-    {
-        id: 1,
-        label: 'Pendente'
-    },
-    {
-        id: 2,
-        label: 'Entregue'
-    },
-    {
-        id: 3,
-        label: 'Cancelado'
-    },
-    {
-        id: 4,
-        label: 'Devolvido'
-    },
-    {
-        id: 5,
-        label: 'Não Devolvido'
-    },
-];

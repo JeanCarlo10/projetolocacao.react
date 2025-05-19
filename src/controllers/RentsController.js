@@ -1,66 +1,129 @@
 const Rent = require('../models/RentModel');
+const getNextSequence = require('../services/getNextSequence');
 
 module.exports = {
     async index(req, res) {
-        // if (req.query.keyword != null && req.query.keyword != "") {
-        //     query.push({
-        //         nomeCliente: { $regex: req.query.keyword, $options: "i" }
-        //     })
-        // }
+        try {
+            const keyword = req.query.keyword || "";
+            const regex = new RegExp(keyword, "i");
 
-        const rent = await Rent.find({ nomeCliente: { $regex: req.query.keyword, $options: "i" } })
-        res.json(rent);
+            const keywordAsNumber = Number(keyword);
+            const isNumeric = !isNaN(keywordAsNumber);
+
+            const statusFilter = req.query.statuses
+                ? req.query.statuses.split(",")
+                : [];
+
+            const pipeline = [
+                {
+                    $lookup: {
+                        from: "clients", // Nome da coleção no MongoDB
+                        localField: "idCliente",
+                        foreignField: "_id",
+                        as: "cliente"
+                    }
+                },
+                { $unwind: "$cliente" },
+                {
+                    $match: {
+                        $and: [
+                            ...(statusFilter.length
+                                ? [{ status: { $in: statusFilter } }]
+                                : []),
+                            {
+                                $or: [
+                                    // Busca por nomeCliente ou nomeFantasia
+                                    { "cliente.nomeCliente": regex },
+                                    { "cliente.nomeFantasia": regex },
+                                    // Se for número, busca pelo número do pedido também
+                                    ...(isNumeric ? [{ numeroPedido: keywordAsNumber }] : [])
+                                ]
+                            }
+                        ]
+                    }
+                },
+                { $sort: { dataPedido: -1 } }
+            ];
+
+            const results = await Rent.aggregate(pipeline);
+
+            res.json(results);
+        } catch (error) {
+            console.error("Erro ao buscar locações:", error);
+            res.status(500).json({ message: "Erro ao buscar locações." });
+        }
     },
 
     async search(req, res) {
-        var date = new Date(req.query.dataDevolucao);
+        try {
+            const date = new Date(req.query.dataDevolucao);
 
-        y = date.getFullYear();
-        m = date.getMonth();
+            const y = date.getFullYear();
+            const m = date.getMonth();
 
-        var firstDay = new Date(y, m, 1);
-        var lastDay = new Date(y, m + 1, 0, 23, 59, 59);
+            const firstDay = new Date(y, m, 1);
+            const lastDay = new Date(y, m + 1, 0, 23, 59, 59);
 
-        var query = [
-            {
-                dataDevolucao: {
-                    $gte: firstDay,
-                    $lte: lastDay,
+            // Filtros iniciais para o $match
+            const matchFilters = [
+                {
+                    dataDevolucao: {
+                        $gte: firstDay,
+                        $lte: lastDay,
+                    },
                 },
+            ];
+
+            // Keyword para buscar no nome do cliente (que está em pedido_cliente depois do lookup)
+            const keyword = req.query.keyword;
+            if (keyword && keyword.trim() !== "") {
+                // Não dá pra filtrar diretamente aqui, porque cliente ainda não foi carregado
+                // Vamos filtrar depois no pipeline com $match no campo 'pedido_cliente.nomeCliente'
             }
-        ];
 
-        if (req.query.keyword != null && req.query.keyword != "") {
-            query.push({
-                nomeCliente: { $regex: req.query.keyword, $options: "i" }
-            })
-        }
-
-        if (req.query.statuses != null && req.query.statuses != "") {
-            let st = req.query.statuses.split(",");
-
-            query.push({
-                status: { $in: st }
-            })
-        }
-
-        const pipeline = [];
-        const rent = pipeline.push({ $match: { $and: query } });
-
-        pipeline.push({
-            $lookup:
-            {
-                from: "clients",
-                localField: "idCliente",
-                foreignField: "_id",
-                as: "pedido_cliente"
+            // Status
+            if (req.query.statuses && req.query.statuses.trim() !== "") {
+                const st = req.query.statuses.split(",");
+                matchFilters.push({ status: { $in: st } });
             }
-        });
 
-        const result = await Rent.aggregate(pipeline).sort({ _id: -1 });
+            // Pipeline do aggregate
+            const pipeline = [
+                { $match: { $and: matchFilters } },
+                {
+                    $lookup: {
+                        from: "clients", // Nome da coleção cliente no MongoDB
+                        localField: "idCliente",
+                        foreignField: "_id",
+                        as: "pedido_cliente",
+                    },
+                },
+                { $unwind: "$pedido_cliente" }, // desestrutura para facilitar filtro e acesso
+            ];
 
-        res.json(result);
-        // console.log(result);
+            // Se tem keyword, adiciona filtro no nomeCliente ou nomeFantasia do cliente
+            if (keyword && keyword.trim() !== "") {
+                const regex = new RegExp(keyword, "i");
+                pipeline.push({
+                    $match: {
+                        $or: [
+                            { "pedido_cliente.nomeCliente": regex },
+                            { "pedido_cliente.nomeFantasia": regex },
+                        ],
+                    },
+                });
+            }
+
+            // Ordena pelo _id descendente (ou outro campo que preferir)
+            pipeline.push({ $sort: { _id: -1 } });
+
+            const result = await Rent.aggregate(pipeline);
+
+            res.json(result);
+        } catch (error) {
+            console.error("Erro no search:", error);
+            res.status(500).json({ message: "Erro ao buscar pedidos." });
+        }
     },
 
     async changeStatus(req, res) {
@@ -77,25 +140,26 @@ module.exports = {
         const totalEntregues = await Rent.countDocuments({ status: "Entregue" });
         const totalNaoDevolvido = await Rent.countDocuments({ status: "Não Devolvido" });
 
-        res.json({ totalPendentes, totalEntregues, totalNaoDevolvido });        
+        res.json({ totalPendentes, totalEntregues, totalNaoDevolvido });
     },
 
     //ADD RENT
     async create(req, res) {
         try {
-            var model = req.body
-            model.numeroPedido = await Rent.countDocuments() + 1;
+            var data = req.body;
 
-            const rent = await Rent.create(model);
+            // Garante número de pedido único e sequencial
+            const numeroPedido = await getNextSequence('numeroPedido');
+            data.numeroPedido = numeroPedido;
 
-            await rent.save();
+            const rent = await Rent.create(data);
 
-            return res.send({ rent });
-
+            return res.status(200).json(rent);
         } catch (err) {
-            return res.status(500).send({
+            console.error('Erro ao criar pedido:', err);
+            return res.status(500).json({
                 error: 'Por favor, contate o administrador! Erro ao cadastrar o pedido'
-            })
+            });
         }
     },
 
@@ -103,15 +167,28 @@ module.exports = {
     async details(req, res) {
         const { _id } = req.params;
 
-        const rent = await Rent.findOne({ _id });
+        const rent = await Rent.findById(_id).populate('idCliente');
         res.json(rent);
     },
 
-    //DELETE RENT
-    async delete(req, res) {
+    //GET RENTS - OVERVIEW
+    async overview(req, res) {
         const { _id } = req.params;
-        const rent = await Rent.findByIdAndDelete({ _id });
-        return res.json(rent);
+
+        try {
+            const rent = await Rent.findById({ _id })
+                .populate('idCliente')
+                .populate('products.idProduto');
+
+            if (!rent) {
+                return res.status(404).json({ error: 'Pedido não encontrado' });
+            }
+
+            res.json(rent);
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: 'Erro ao buscar pedido' });
+        }
     },
 
     //UPDATE RENT

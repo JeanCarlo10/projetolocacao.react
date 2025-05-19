@@ -1,81 +1,52 @@
 const express = require('express');
-const fileUpload = require('express-fileupload');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
-const path = require('path');
 const mongoose = require('mongoose');
 const routes = require('./src/routes');
-const nodeSchedule = require('node-schedule');
-const Rent = require('./src/models/RentModel');
+const path = require('path');
 require('dotenv').config();
 require('./src/services/updateRentStatusJob');
+
 const app = express();
+const port = process.env.PORT_BACK || 500;
 
-const port = process.env.PORT_BACK;
+// Servir arquivos estáticos da pasta uploads
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-app.use(fileUpload({
-    createParentPath: true,
-    limits: {
-        fileSize: 2 * 1024 * 1024 * 1024 //2MB max file(s) size
-    },
+// Conexão com o MongoDB
+async function conectarMongo() {
+  try {
+    await mongoose.connect(process.env.MONGO_CONNECTION_LOCAL);
+    console.log('MongoDB conectado com sucesso!');
+
+  } catch (err) {
+    console.error('Erro ao conectar no MongoDB:', err);
+  }
+}
+conectarMongo();
+
+const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || [];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    // console.log("Requisição com Origin:", origin);
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Não permitido pelo CORS'));
+    }
+  },
+  credentials: true
 }));
 
-app.get('/', (req, res) => {
-    Rent.find().then((result) => {
-        res.send(result);
-    });
-    
-    console.log(result);
-});
-
-app.post('/', async (req, res) => {
-    try {
-        if (!req.files) {
-            res.send({
-                status: false,
-                message: 'Imagem não foi carregada'
-            });
-        } else {
-            //Use the name of the input field (i.e. "avatar") to retrieve the uploaded file
-            let avatar = req.files.avatar;
-
-            //Use the mv() method to place the file in upload directory (i.e. "uploads")
-            avatar.mv('./uploads/' + avatar.name);
-
-            //send response
-            res.send({
-                status: true,
-                message: 'Imagem carregada',
-                data: {
-                    name: avatar.name,
-                    mimetype: avatar.mimetype,
-                    size: avatar.size
-                }
-            });
-        }
-    } catch (err) {
-        res.status(500).send(err);
-    }
-});
-
-mongoose.connect(process.env.MONGO_CONNECTION_LOCAL, {
-    useUnifiedTopology: true,
-    useNewUrlParser: true,
-    useFindAndModify: false,
-}, function (err) {
-    if (err) {
-        console.log(err, 'erro de conexão!')
-    } else {
-        console.log('MongoDB conectado com sucesso!')
-    }
-});
-
-app.use(cors());
 app.use(cookieParser());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+//Routes
 app.use(routes);
 
-app.listen(port, function () {
-    console.log(`Servidor rodando na porta ${port}`)
-    // console.log('Teste BACKEND: ' + process.env.API_URL)
+// Inicialização do servidor
+app.listen(port, () => {
+  console.log(`Servidor rodando na porta ${port}`)
 });

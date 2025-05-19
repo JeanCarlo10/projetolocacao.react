@@ -1,11 +1,20 @@
 const Client = require('../models/ClientModel');
-const Photo = require('../models/PhotoModel');
+const path = require('path');
+const fs = require('fs');
 
 module.exports = {
     async index(req, res) {
-        const client = await Client.find(
-            { nomeCliente: { $regex: req.query.keyword, $options: "i" } }
-        )
+        const keyword = req.query.keyword || "";
+        const regex = new RegExp(keyword, "i");
+
+        const client = await Client.find({
+            $or: [
+                { nomeCliente: { $regex: regex } },
+                { nomeFantasia: { $regex: regex } },
+                { cpf: { $regex: regex } },
+                { cnpj: { $regex: regex } }
+            ]
+        });
 
         res.json(client);
     },
@@ -16,90 +25,115 @@ module.exports = {
         res.json(client);
     },
 
-    async thumbnailAvatar(req, res) {
-        const {_id} = req.params;
-
-        const photo = await Photo.findOne({_id});
-
-        res.setHeader('Content-disposition', 'attachment; filename=' + photo.name);
-        res.setHeader('Content-type', photo.type);
-        res.write(photo.content, 'binary');
-
-        res.end();
-    },
-
-    //UPLOAD IMAGE
-    async uploadAvatar(req, res) {
-        try {
-            if(!req.files) {
-                res.send({
-                    status: false,
-                    message: 'Imagem não foi carregada'
-                });
-            } else {
-                //Use the name of the input field (i.e. "avatar") to retrieve the uploaded file
-                let avatar = req.files.avatar;
-                
-                //send response
-                const photo = await Photo.create({
-                    content: avatar.data.toString("base64"),
-                    name: avatar.name,
-                    type: avatar.mimetype,
-                    size: avatar.size,
-                });
-            
-                await photo.save();
-
-                return res.send(photo);
-                //return res.status(200).json({ photo });
-            }
-            
-        } catch (err) {
-            return res.status(500).send({
-                error: 'Por favor, contate o administrador! Erro ao cadastrar a imagem'
-            })
-        }
-    },
-
     //ADD CLIENT
-    async create(req, res) { 
+    async create(req, res) {
         try {
-            const model  = req.body
-             console.log(model);
-            const client = await Client.create(model);
-            
+            const data = req.body
+
+            // Parse dos contatos (se vierem como JSON string)
+            if (data.contacts) {
+                try {
+                    data.contacts = JSON.parse(data.contacts);
+                } catch (e) {
+                    console.error('Erro ao fazer parse dos contatos:', e);
+                    data.contacts = [];
+                }
+            }
+
+            // Salva a foto se tiver
+            if (req.file) {
+                data.foto = `/uploads/${req.file.filename}`;
+            }
+
+            const client = await Client.create(data);
             await client.save();
 
-            return res.send({ client });
-
-        } catch (err){
-            return res.status(500).send({
-                 error: 'Por favor, contate o administrador! Erro ao cadastrar o cliente'
-            })
+            return res.status(200).json(client);
+        } catch (err) {
+            console.error('Erro ao cadastrar cliente:', err);
+            return res.status(500).json({
+                error: 'Por favor, contate o administrador! Erro ao cadastrar o cliente.'
+            });
         }
     },
-    
-    //GET CLIENTS
-    async details(req, res){
-        const {_id} = req.params;
 
-        const client = await Client.findOne({_id});
-        res.json(client);
+    //GET CLIENTS
+    async details(req, res) {
+        try {
+            const { _id } = req.params;
+            const client = await Client.findOne({ _id });
+
+            if (!client) {
+                return res.status(404).json({ error: 'Cliente não encontrado.' });
+            }
+
+            res.json(client);
+        } catch (error) {
+            console.error('Erro ao buscar cliente:', error);
+            res.status(500).json({ error: 'Erro interno no servidor.' });
+        }
     },
 
-    //DELETE CLIENT
-    async delete(req, res){
+    //GET RENTS - OVERVIEW
+    async overview(req, res) {
         const { _id } = req.params;
-        const client = await Client.findByIdAndDelete({_id});
-        return res.json(client);
+
+        try {
+            const client = await Client.findById(_id);
+
+            if (!client) {
+                return res.status(404).json({ error: 'Cliente não encontrado' });
+            }
+
+            res.json(client);
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: 'Erro ao buscar cliente' });
+        }
     },
 
     //UPDATE CLIENT
-    async update(req, res){
-        const model = req.body;
+    async update(req, res) {
+        try {
+            const data = req.body;
 
-        const client = await Client.findOneAndUpdate({_id: model._id}, model, {new:true});
+            // Parse dos contatos (se vierem como JSON string)
+            if (data.contacts) {
+                try {
+                    data.contacts = JSON.parse(data.contacts);
+                } catch (e) {
+                    console.error('Erro ao fazer parse dos contatos:', e);
+                    data.contacts = [];
+                }
+            }
 
-        return res.json(client);
+            // Se solicitou a remoção da foto
+            if (req.file) {
+                data.foto = `/uploads/${req.file.filename}`;
+            }
+            else if (req.body.removePhoto === 'true') {
+                const clientCurrent = await Client.findById(req.params._id);
+
+                if (clientCurrent?.foto) {
+                    const fotoPath = path.join(__dirname, '..', '..', 'uploads', path.basename(clientCurrent.foto));
+
+                    fs.unlink(fotoPath, (err) => {
+                        if (err) {
+                            console.error('Erro ao excluir foto antiga:', err);
+                        } else {
+                            console.log('Foto removida com sucesso:', fotoPath);
+                        }
+                    });
+                }
+                data.foto = '';
+            }
+
+            // Atualiza o cliente com os dados finais
+            const updatedClient = await Client.findByIdAndUpdate(req.params._id, data, { new: true });
+
+            return res.json(updatedClient);
+        } catch (error) {
+            return res.status(500).json({ error: 'Erro ao atualizar cliente.' });
+        }
     }
 }

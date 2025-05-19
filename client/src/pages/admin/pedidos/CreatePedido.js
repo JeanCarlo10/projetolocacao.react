@@ -1,35 +1,30 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { makeStyles } from '@material-ui/core/styles';
+import React, { useState, useEffect } from 'react';
 import { styled } from '@mui/material/styles';
-import TextField from '@mui/material/TextField';
-import Select from '@mui/material/Select';
-import InputLabel from '@mui/material/InputLabel';
-import FormControl from '@mui/material/FormControl';
-import Button from '@material-ui/core/Button';
-import Container from '@material-ui/core/Container';
-import Breadcrumbs from '@material-ui/core/Breadcrumbs';
-import Link from '@material-ui/core/Link';
-import Typography from '@material-ui/core/Typography';
-import Card from '@material-ui/core/Card';
-import CardActions from '@material-ui/core/CardActions';
-import CardContent from '@material-ui/core/CardContent';
-import CardHeader from '@material-ui/core/CardHeader';
-import MenuItem from '@mui/material/MenuItem';
+import { TextField, FormControl, Button, InputAdornment, FormHelperText } from '@mui/material';
+import Container from '@mui/material/Container';
+import ListSubheader from '@mui/material/ListSubheader';
+import Autocomplete from '@mui/material/Autocomplete';
+import Breadcrumbs from '@mui/material/Breadcrumbs';
+import Link from '@mui/material/Link';
+import Typography from '@mui/material/Typography';
+import Box from '@mui/material/Box';
+import Grid from '@mui/material/Grid';
+import CardHeader from '@mui/material/CardHeader';
 import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormLabel from '@mui/material/FormLabel';
-import SaveIcon from '@material-ui/icons/Save';
-
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import MenuAdmin from '../../../components/menu-admin';
 import api from '../../../services/api';
 import BuscarCEP from '../../../components/buscar-cep';
 import ListaProdutos from '../../../components/lista-produtos';
-import NumberFormat from 'react-number-format';
-import { DatePicker } from '@material-ui/pickers';
-import '../../../assets/css/card-location.css';
 import ImageDirection from '../../../assets/img/image-direction.svg';
 import Notification from '../../../components/notification';
+import NumberFormat from 'react-number-format';
+import { useForm, Controller } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
 
 export function currencyFormatter(value) {
   if (!Number(value)) return "";
@@ -62,184 +57,230 @@ const NumberFormatCustom = React.forwardRef(function NumberFormatCustom(props, r
   );
 });
 
-const GroupHeader = styled('div')(({ theme }) => ({
-  position: 'sticky',
-  top: '-8px',
-  padding: '4px 10px',
-  color: 'black',
-  //backgroundColor: '#00ab55'
-  // theme.palette.mode === 'light'
-  //   ? lighten(theme.palette.primary.light, 0.85)
-  //   : darken(theme.palette.primary.main, 0.8),
+const CustomGroupHeader = styled(ListSubheader)(({ theme }) => ({
+  backgroundColor: '#E9FAE0',
+  color: '#00AB55',
+  fontWeight: 700,
+  fontSize: 18,
+  padding: '0 10px',
+  borderRadius: '0 6px 6px 0',
+  width: '40px'
 }));
 
-const GroupItems = styled('ul')({
-  padding: 0,
+const schema = yup.object({
+  idCliente: yup
+    .string()
+    .required('Selecione um cliente.')
+    .matches(/^[0-9a-fA-F]{24}$/, 'ID de cliente inválido.'),
+
+  dataEntrega: yup.date()
+    .nullable()
+    .typeError("Data de entrega inválida!")
+    .required("Data de entrega obrigatória!"),
+
+  dataDevolucao: yup.date()
+    .nullable()
+    .typeError("Data de devolução inválida!")
+    .min(
+      yup.ref('dataEntrega'),
+      'A data de devolução não pode ser anterior à data de entrega'
+    )
+    .required("Data de devolução obrigatória!"),
+
+  totalParcial: yup.number()
+    .typeError('O total parcial deve ser um número!')
+    .min(0, 'Total parcial não pode ser negativo!'),
+
+  desconto: yup.number()
+    .typeError('O desconto deve ser um número!')
+    .min(0, 'Desconto não pode ser negativo!')
+    .test('desconto-menor-que-total', 'Desconto não pode ser maior que o valor parcial',
+      function (value) {
+        const { totalParcial } = this.parent;
+
+        const desconto = Number(value);
+        const total = Number(totalParcial);
+
+        if (isNaN(desconto) || isNaN(total)) return true;
+
+        return desconto <= total;
+      }),
+
+  totalGeral: yup.number()
+    .typeError('O total deve ser um número!')
+    .min(0, 'Total não pode ser negativo!'),
+
+  products: yup.array()
+    .min(1, 'Informe pelo menos um material.')
+    .required("Informe pelo menos um material."),
 });
 
 export default function CreatePedido() {
-  const classes = useStyles();
-  const inputRef = React.createRef();
-
   const [notify, setNotify] = useState({ isOpen: false, message: '', type: '' });
-  const [numeroPedido, setNumeroPedido] = useState();
-  const [status, setStatus] = useState('Pendente');
-  const [enderecoAtual, setEnderecoAtual] = useState('atual');
-  const [totalParcial, setTotalParcial] = useState();
-  const [desconto, setDesconto] = useState(0);
-  const [totalGeral, setTotalGeral] = useState();
-  const [observacao, setObservacao] = useState('');
-  const [dataPedido, setDataPedido] = useState();
-  const [dataEntrega, setDataEntrega] = useState(null);
-  const [dataDevolucao, setDataDevolucao] = useState(null);
-  const [dadosEndereco, setDadosEndereco] = useState({});
 
-  //Dados cliente
-  const [selectClients, setSelectClients] = useState([]);
-  const [clientId, setClientId] = useState('');
-  const [currentClient, setCurrentClient] = useState({});
-
-
-  //Dados Produto
+  const [usarNovoEndereco, setUsarNovoEndereco] = useState(false);
+  const [currentClient, setCurrentClient] = useState(null);
   const [produtos, setProdutos] = useState([]);
-
-  const [selectedId, setSelectedId] = useState(undefined);
-  const [value, setValue] = useState('');
-
-  const options = selectClients.map((option) => {
-    const firstLetter = option.nomeCliente[0].toUpperCase();
-    return {
-      firstLetter: /[0-9]/.test(firstLetter) ? '0-9' : firstLetter,
-      ...option,
-    };
+  const [clients, setClients] = useState([]);
+  const [dadosEndereco, setDadosEndereco] = useState({
+    logradouro: '',
+    numero: '',
+    complemento: '',
+    bairro: '',
+    cidade: '',
+    uf: '',
+    cep: ''
   });
 
-  useEffect(() => {
-    async function getDadosCliente() {
+  const {
+    handleSubmit,
+    control,
+    setValue,
+    watch,
+    formState: { errors }
+  } = useForm({
+    defaultValues: {
+      idCliente: '',
+      status: 'Pendente',
+      dataEntrega: null,
+      dataDevolucao: null,
+    },
+    resolver: yupResolver(schema),
+    mode: 'onChange',
+  });
 
-      const results = await api.get('api/clients');
-      setSelectClients(results.data);
+  const getNomeExibido = (cliente) => {
+    if (!cliente) return '';
+
+    if (cliente.tipoPessoa === 'Fisica') {
+      return cliente.nomeCliente || '';
+    } else if (cliente.tipoPessoa === 'Juridica') {
+      return cliente.nomeFantasia || '';
     }
 
-    getDadosCliente();
-  }, []);
-
-  const autoCompleteSelectedOption = useMemo((e) => {
-    if (!selectedId) return null;
-
-    const selectedOption = selectClients.find(opcao => opcao.idCliente === selectedId);
-
-    return selectedOption;
-  }, [selectedId, selectClients]);
-
-  function handleSelectClients(e) {
-    const _id = e.target.value;
-    setCurrentClient(selectClients.find(e => e._id == _id));
-    setClientId(_id);
-  }
-
-  const handleAddProduto = (produto) => {
-    setProdutos([...produtos, produto]);
-  }
-
-  const handleDeleteProduto = useCallback((produto) => {
-    let newProducts = [...produtos];
-
-    newProducts.splice(produtos.indexOf(produto), 1);
-
-    setProdutos(newProducts);
-  }, [produtos]);
-
-  const handleChangeAddress = (event) => {
-    setEnderecoAtual(event.target.value);
+    return cliente.nomeCliente || cliente.nomeFantasia || '';
   };
 
-  const handleSearchCEP = (data) => {
-    setDadosEndereco(data);
+  useEffect(() => {
+    async function fetchClients() {
+      try {
+        const result = await api.get('api/clients');
+        const data = result.data;
+
+        const formatted = data
+          .map((cliente) => {
+            const nome = getNomeExibido(cliente) || '';
+            const firstLetter = nome.charAt(0)?.toUpperCase();
+            return {
+              ...cliente,
+              group: /[0-9]/.test(firstLetter) ? "0-9" : firstLetter,
+            };
+          })
+          .sort((a, b) => {
+            return getNomeExibido(a).localeCompare(getNomeExibido(b));
+          });
+
+        setClients(formatted);
+      } catch (err) {
+        console.error("Erro ao buscar clientes:", err);
+      }
+    }
+    fetchClients();
+  }, []);
+
+  const handleAddProduto = (produto) => {
+    const newProducts = [...produtos, produto];
+    setProdutos(newProducts);
   }
 
-  const handleDateDeliveryChange = (date) => {
-    setDataEntrega(date);
-  }
-
-  const handleDateDevolutionChange = (date) => {
-    setDataDevolucao(date);
-  }
+  const handleDeleteProduto = (id) => {
+    setProdutos(prev => prev.filter(p => p.id !== id));
+  };
 
   useEffect(() => {
-    setTotalGeral(totalParcial - desconto);
-  }, [totalParcial, desconto]);
+    setValue('products', produtos);
+  }, [produtos, setValue]);
 
+  const handleChangeAddress = (event) => {
+    setUsarNovoEndereco(event.target.value === 'novo');
+  };
+
+  const handleEnderecoFieldChange = (field, value) => {
+    setDadosEndereco((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const totalParcial = watch("totalParcial");
+  const desconto = watch("desconto");
+
+  //Faz a subtração do total geral com desconto e mostra no campo total geral
   useEffect(() => {
-    const total = produtos.reduce((count, item) => count + item.valorItem, 0)
-    setTotalParcial(total);
-  }, [produtos])
+    const total = (Number(totalParcial) || 0) - (Number(desconto) || 0);
+    setValue("totalGeral", total);
+  }, [totalParcial, desconto, setValue]);
 
-  async function handleSubmit() {
-    let data = {
-      idCliente: currentClient._id,
-      nomeCliente: currentClient.nomeCliente,
-      numeroPedido: numeroPedido,
-      status: status,
-      dataPedido: dataPedido,
-      dataEntrega: dataEntrega,
-      dataDevolucao: dataDevolucao,
-      desconto: desconto,
-      totalGeral: totalGeral,
-      totalParcial: totalParcial,
-      observacao: observacao,
+  //Soma valores dos itens adicionados e no campo total parcial
+  useEffect(() => {
+    const total = produtos.reduce((count, item) => count + (Number(item.valorItem) || 0), 0);
+    setValue("totalParcial", total);
+  }, [produtos, setValue]);
 
-      //Lista de produtos
+  async function submitForm(data) {
+    const payload = {
+      idCliente: data.idCliente,
+      dataEntrega: data.dataEntrega,
+      dataDevolucao: data.dataDevolucao,
+      totalParcial: data.totalParcial,
+      desconto: data.desconto,
+      totalGeral: data.totalGeral,
+      observacao: data.observacao || '',
       products: produtos,
-    }
 
-    if (enderecoAtual == "novo") {
-      data.tipoEndereco = "Novo";
-      data.numero = dadosEndereco.numero;
-      data.complemento = dadosEndereco.complemento;
-      data.logradouro = dadosEndereco.logradouro;
-      data.bairro = dadosEndereco.bairro;
-      data.cidade = dadosEndereco.cidade;
-      data.uf = dadosEndereco.uf;
-      data.cep = dadosEndereco.cep;
-    }
-    else {
-      data.tipoEndereco = "Cadastro Cliente";
-      data.numero = currentClient.numero;
-      data.complemento = currentClient.complemento;
-      data.logradouro = currentClient.logradouro;
-      data.bairro = currentClient.bairro;
-      data.cidade = currentClient.cidade;
-      data.uf = currentClient.uf;
-      data.cep = currentClient.cep;
-    }
+      tipoEndereco: usarNovoEndereco ? 'novo' : 'atual',
+      numero: usarNovoEndereco ? dadosEndereco.numero : currentClient?.numero,
+      logradouro: usarNovoEndereco ? dadosEndereco.logradouro : currentClient?.logradouro,
+      bairro: usarNovoEndereco ? dadosEndereco.bairro : currentClient?.bairro,
+      cidade: usarNovoEndereco ? dadosEndereco.cidade : currentClient?.cidade,
+      uf: usarNovoEndereco ? dadosEndereco.uf : currentClient?.uf,
+      cep: usarNovoEndereco ? dadosEndereco.cep : currentClient?.cep,
+      complemento: usarNovoEndereco ? dadosEndereco.complemento : currentClient?.complemento || '',
+    };
 
-    if (selectClients !== '') {
-      const response = await api.post('/api/rents', data);
+    try {
+      const response = await api.post('/api/rents', payload);
 
-      if (response.status == 200) {
+      if (response.status === 200) {
         setNotify({
           isOpen: true,
-          message: 'Cadastro realizado com sucesso',
+          message: 'Pedido realizado com sucesso.',
           type: 'success'
         });
-        window.location.href = '/admin/pedidos'
+
+        setTimeout(() => {
+          window.location.href = '/admin/pedidos'
+        }, 2500);
       } else {
-        alert('Erro ao cadastrar o pedido');
+        setNotify({
+          isOpen: true,
+          message: 'Erro ao cadastrar pedido. Tente novamente.',
+          type: 'error'
+        });
       }
-    } else {
-      alert('Campos obrigatórios');
+    } catch (error) {
+      setNotify({
+        isOpen: true,
+        message: 'Erro no servidor. Contate o administrador.',
+        type: 'error'
+      });
     }
   }
 
   return (
-    <div className={classes.root}>
+    <div style={{ display: 'flex' }}>
       <Notification notify={notify} setNotify={setNotify} />
       <MenuAdmin />
-      <main className={classes.content}>
+      <main style={{ flexGrow: 1, height: '100vh', overflow: 'auto' }}>
 
-        <Container maxWidth="lg" component="main" className={classes.container}>
-
+        <Container maxWidth="lg" component="main">
           <CardHeader
             title="Cadastrar pedido"
             subheader={
@@ -252,250 +293,296 @@ export default function CreatePedido() {
             }
             titleTypographyProps={{ align: 'left' }}
             subheaderTypographyProps={{ align: 'left' }}
-            className={classes.cardHeader}
+            sx={{
+              "& .MuiCardHeader-title": {
+                fontWeight: 700,
+                color: '#212B36',
+                marginBottom: '8px',
+              },
+            }}
           />
-          <Card style={{ borderRadius: 15 }}>
-            <form onSubmit={handleSubmit}>
-              <CardContent className={classes.inputs}>
-                <FormControl variant="outlined" size="small" className={classes.formControl}>
-                  <InputLabel>Cliente</InputLabel>
-                  <Select
-                    onChange={handleSelectClients}
-                    value={clientId}
-                    label="Cliente"
-                  >
-                    {selectClients.map((clients) => (
-                      <MenuItem value={clients._id} key={clients._id}>{clients.nomeCliente}</MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
 
-                {/* <Autocomplete
-                  options={options.sort((a, b) => -b.firstLetter.localeCompare(a.firstLetter))}
-                  groupBy={(option) => option.firstLetter}
-                  getOptionLabel={(option) => option.nomeCliente}
-                  value={value}
-                  onInputChange={(_, newValue) => setValue(newValue)}
-                  sx={{ width: 300 }}
-                  renderInput={(params) => <TextField {...params} label="Cliente" />}
-                  renderGroup={(params) => (
-                    <li key={params.key}>
-                      <GroupHeader>{params.group}</GroupHeader>
-                      <GroupItems>{params.children}</GroupItems>
-                    </li>
-                  )}
-                /> */}
+          <Box
+            sx={{
+              padding: 2,
+              borderRadius: '10px',
+              border: "1px solid #E0E1E0",
+              boxShadow: "0px 2px 4px 0 rgba(0, 0, 0, .2)",
+            }}>
+            <form onSubmit={handleSubmit(submitForm)}>
+              <Grid container spacing={2}>
+                <Grid item xs={12} sm={12} md={12}>
+                  <Controller
+                    name="idCliente"
+                    control={control}
+                    render={({ field }) => (
+                      <Autocomplete
+                        options={clients}
+                        groupBy={(option) => option.group}
+                        getOptionLabel={(option) => getNomeExibido(option)}
+                        isOptionEqualToValue={(option, value) => option._id === value?._id}
+                        value={clients.find((c) => c._id === field.value) || null}
+                        onChange={(event, newValue) => {
+                          field.onChange(newValue?._id || ''); // Aqui você salva apenas o ID no form
+                          setValue("idCliente", newValue?._id);
+                          setCurrentClient(newValue);    // Aqui salva o objeto para seu estado
+                        }}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            label="Cliente"
+                            placeholder="Selecione um cliente"
+                            variant="outlined"
+                            fullWidth
+                            error={!!errors.idCliente}
+                            helperText={errors.idCliente?.message}
+                          />
+                        )}
+                        renderGroup={(params) => (
+                          <li key={params.key}>
+                            <CustomGroupHeader>{params.group}</CustomGroupHeader>
+                            {params.children}
+                          </li>
+                        )}
+                        noOptionsText="Não há resultados"
+                        loadingText="Carregando..."
+                      />
+                    )}
+                  />
+                </Grid>
 
-                {/* <Autocomplete
-                  openText="Abrir"
-                  closeText="Fechar"
-                  noOptionsText="Não há resultados"
-                  loadingText="Carregando..."
+                {currentClient && (
+                  <Grid item xs={12} sm={12} md={12}>
+                    <FormControl fullWidth>
+                      <FormLabel>Escolha o endereço</FormLabel>
+                      <RadioGroup
+                        row
+                        value={usarNovoEndereco ? 'novo' : 'atual'}
+                        onChange={handleChangeAddress}
+                      >
+                        <FormControlLabel value="atual" control={<Radio />} label="Endereço atual" />
+                        <FormControlLabel value="novo" control={<Radio />} label="Novo endereço" />
+                      </RadioGroup>
+                    </FormControl>
+                  </Grid>
+                )}
 
-                  options={selectClients}
-                  getOptionLabel={(option) => option.nomeCliente}
-                  value={autoCompleteSelectedOption}
-                  onInputChange={(_, newValue) => setValue(newValue)}
-                  onChange={(_, newValue) => { setSelectedId(newValue?.idCliente); setValue(''); }}
-                  sx={{ width: 300 }}
-                  renderInput={(params) => <TextField {...params} label="Cliente" />}
-                /> */}
+                {usarNovoEndereco ? (
+                  <Grid item xs={12}>
+                    <BuscarCEP onFieldChange={handleEnderecoFieldChange} initialData={dadosEndereco} />
+                  </Grid>
+                ) : currentClient?.logradouro ? (
+                  <Grid item xs={12}>
+                    <Box sx={{
+                      padding: 2,
+                      borderRadius: '10px',
+                      border: "2px solid #00AB55",
+                      boxShadow: "0px 2px 4px 0 hsla(0, 0.00%, 0.00%, 0.20)",
+                    }}>
 
-                <FormControl>
-                  <FormLabel></FormLabel>
-                  <RadioGroup
-                    row
-                    value={enderecoAtual}
-                    onChange={handleChangeAddress}
-                  >
-                    <FormControlLabel value="atual" control={<Radio style={{ color: '#00AB55' }} />} label="Endereço atual" />
-                    <FormControlLabel value="novo" control={<Radio style={{ color: '#00AB55' }} />} label="Novo endereço" />
-                  </RadioGroup>
-                </FormControl>
+                      <Grid container spacing={2}>
+                        <Grid item xs={12} sm={7} md={9}>
+                          <h2 style={{ color: '#00AB55', marginBottom: 16 }}>Endereço de entrega</h2>
 
-                {enderecoAtual == 'novo' ? <BuscarCEP onUpdate={handleSearchCEP} initialData={dadosEndereco} /> :
-                  currentClient.nomeCliente != null ?
-                    <div className='container'>
-                      <div className="card">
-                        <div className='left-column'>
-                          <div>
-                            <h4>Endereço de entrega</h4>
-                          </div>
+                          <Box sx={{ fontSize: 18, fontWeight: 700, color: '#3B4251' }}>
+                            <p>{currentClient?.logradouro || ''}, Nº {currentClient?.numero || ''}</p>
+                            <p>Bairro: {currentClient?.bairro || ''} - {currentClient?.cidade || ''}</p>
+                            <p>Complemento: {currentClient?.complemento || ''}</p>
+                            <p>CEP: {currentClient?.cep || ''}</p>
+                          </Box>
+                        </Grid>
 
-                          <p>{currentClient.logradouro}, Nº {currentClient.numero}</p>
-                          <p>Bairro: {currentClient.bairro} - {currentClient.cidade}</p>
-                          <p>CEP: {currentClient.cep}</p>
-                        </div>
+                        <Grid item xs={12} sm={5} md={3}>
+                          <Box
+                            sx={{
+                              display: { xs: 'none', sm: 'flex' }, justifyContent: 'center',
+                              alignItems: 'center',
+                              height: '100%',
+                            }}>
+                            <img src={ImageDirection} height={180} alt="Mapa" />
+                          </Box>
+                        </Grid>
+                      </Grid>
+                    </Box>
+                  </Grid>
+                ) : null}
 
-                        <div className='right-column'>
-                          <img className="img" src={ImageDirection} width={200} height={160} />
-                        </div>
-                      </div>
-                    </div> : ""
-                }
-
-                <div style={{ marginTop: '10px', marginBottom: '10px' }}>
+                <Grid item xs={12} sm={12} md={12}>
                   <ListaProdutos produtos={produtos} addProduto={handleAddProduto} deleteProduto={handleDeleteProduto} />
-                </div>
+                  {errors.products && (
+                    <FormHelperText error
+                      sx={{
+                        border: '1px solid #FF5B5B',
+                        background: '#FFE1E1',
+                        borderRadius: 2,
+                        padding: 1,
+                        marginTop: 1,
+                        fontSize: 14,
+                        fontWeight: 600
+                      }}>
+                      {errors.products.message}
+                    </FormHelperText>
+                  )}
+                </Grid>
 
-                <div className={classes.twoInputs}>
-                  <DatePicker
-                    label='Data entrega'
-                    size='small'
-                    autoOk
-                    inputVariant='outlined'
-                    format="dd/MM/yyyy"
-                    cancelLabel="CANCELAR"
-                    value={dataEntrega}
-                    onChange={handleDateDeliveryChange}
+                <Grid item xs={12} sm={6} md={6}>
+                  <Controller
+                    name="dataEntrega"
+                    control={control}
+                    defaultValue={null}
+                    render={({ field: { onChange, value }, fieldState: { error } }) => (
+                      <DatePicker
+                        label="Data de entrega*"
+                        value={value}
+                        onChange={onChange}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            fullWidth
+                            error={!!error}
+                            helperText={error?.message}
+                            InputProps={{
+                              ...params.InputProps,
+                              inputProps: {
+                                ...params.inputProps,
+                                placeholder: "DD/MM/AAAA",
+                              },
+                            }}
+                          />
+                        )}
+                      />
+                    )}
                   />
+                </Grid>
 
-                  <DatePicker
-                    label='Data devolução'
-                    size='small'
-                    autoOk
-                    inputVariant='outlined'
-                    format="dd/MM/yyyy"
-                    cancelLabel="CANCELAR"
-                    value={dataDevolucao}
-                    onChange={handleDateDevolutionChange}
+                <Grid item xs={12} sm={6} md={6}>
+                  <Controller
+                    name="dataDevolucao"
+                    control={control}
+                    defaultValue={null}
+                    render={({ field: { onChange, value }, fieldState: { error } }) => (
+                      <DatePicker
+                        label="Data de devolução*"
+                        value={value}
+                        onChange={onChange}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            fullWidth
+                            error={!!error}
+                            helperText={error?.message}
+                            InputProps={{
+                              ...params.InputProps,
+                              inputProps: {
+                                ...params.inputProps,
+                                placeholder: "DD/MM/AAAA",
+                              },
+                            }}
+                          />
+                        )}
+                      />
+                    )}
                   />
-                </div>
+                </Grid>
 
-                <div className={classes.twoInputs}>
-                  <TextField
-                    variant="outlined"
-                    size="small"
-                    disabled
-                    label="Total parcial"
-                    className={classes.bold}
-                    getInputRef={inputRef}
-                    InputProps={{
-                      inputComponent: NumberFormatCustom,
-                    }}
-                    value={totalParcial}
-                    onChange={(event) => setTotalParcial(event.target.value)}
+                <Grid item xs={12} sm={6} md={4}>
+                  <Controller
+                    name="totalParcial"
+                    control={control}
+                    render={({ field, fieldState: { error } }) => (
+                      <TextField
+                        {...field}
+                        fullWidth
+                        variant="outlined"
+                        size="medium"
+                        disabled
+                        label="Total parcial"
+                        error={!!error}
+                        helperText={error?.message}
+                        InputProps={{
+                          inputComponent: NumberFormatCustom,
+                          startAdornment: <InputAdornment position="start">R$</InputAdornment>,
+                        }}
+                      />
+                    )}
                   />
-                  <TextField
-                    variant="outlined"
-                    size="small"
-                    label="Desconto"
-                    getInputRef={inputRef}
-                    InputProps={{
-                      inputComponent: NumberFormatCustom,
-                    }}
-                    value={desconto}
-                    onChange={(event) => setDesconto(event.target.value)}
-                  />
-                  <TextField
-                    variant="outlined"
-                    size="small"
-                    label="Total geral"
-                    className={classes.bold}
-                    getInputRef={inputRef}
-                    InputProps={{
-                      inputComponent: NumberFormatCustom,
-                    }}
-                    value={totalGeral}
-                    onChange={(event) => setTotalGeral(event.target.value)}
-                  />
-                </div>
+                </Grid>
 
-                <TextField
-                  variant="outlined"
-                  label="Observação"
-                  multiline
-                  rows={4}
-                  value={observacao}
-                  onChange={e => setObservacao(e.target.value)}
-                />
-              </CardContent>
-              <CardActions style={{ justifyContent: 'flex-end', marginRight: 15 }}>
-                <Button variant="contained" size="large" className={classes.btnDefaultGreen} type="submit" startIcon={<SaveIcon />}>Salvar</Button>
-              </CardActions>
+                <Grid item xs={12} sm={6} md={4}>
+                  <Controller
+                    name="desconto"
+                    control={control}
+                    render={({ field, fieldState: { error } }) => (
+                      <TextField
+                        {...field}
+                        fullWidth
+                        variant="outlined"
+                        size="medium"
+                        label="Desconto"
+                        error={!!error}
+                        helperText={error?.message}
+                        InputProps={{
+                          inputComponent: NumberFormatCustom,
+                          startAdornment: <InputAdornment position="start">R$</InputAdornment>,
+                          max: totalParcial //Avisa q o valor não pode ser maior q o totalParcial
+                        }}
+                      />
+                    )}
+                  />
+                </Grid>
+
+                <Grid item xs={12} sm={6} md={4}>
+                  <Controller
+                    name="totalGeral"
+                    control={control}
+                    render={({ field, fieldState: { error } }) => (
+                      <TextField
+                        {...field}
+                        fullWidth
+                        variant="outlined"
+                        size="medium"
+                        disabled
+                        label="Total geral"
+                        error={!!error}
+                        helperText={error?.message}
+                        InputProps={{
+                          inputComponent: NumberFormatCustom,
+                          startAdornment: <InputAdornment position="start">R$</InputAdornment>,
+                        }}
+                      />
+                    )}
+                  />
+                </Grid>
+
+                <Grid item xs={12} sm={12} md={12}>
+                  <Controller
+                    name="observacao"
+                    control={control}
+                    defaultValue=""
+                    render={({ field, fieldState }) => (
+                      <TextField
+                        {...field}
+                        label="Observação"
+                        fullWidth
+                        multiline
+                        minRows={4}
+                        variant="outlined"
+                        size="medium"
+                        error={!!fieldState.error}
+                        helperText={fieldState.error?.message}
+                      />
+                    )}
+                  />
+                </Grid>
+              </Grid>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 16 }}>
+                <Button variant="contained" size="large" type="submit">Salvar</Button>
+              </div>
             </form>
-          </Card>
+          </Box>
         </Container>
       </main>
-    </div>
+    </div >
   );
 }
-
-const useStyles = makeStyles((theme) => ({
-  root: {
-    display: 'flex',
-  },
-  content: {
-    flexGrow: 1,
-    height: '100vh',
-    overflow: 'auto',
-  },
-  cardHeader: {
-    "& .MuiCardHeader-title": {
-      fontWeight: 700,
-      color: '#212B36',
-      marginBottom: theme.spacing(1),
-    },
-  },
-  container: {
-    paddingTop: theme.spacing(4),
-    paddingBottom: theme.spacing(4),
-  },
-
-  inputs: {
-    display: 'flex',
-    overflow: 'auto',
-    flexDirection: 'column',
-    '& .MuiTextField-root': {
-      margin: theme.spacing(1),
-    },
-
-    '& label.Mui-focused': {
-      color: '#00AB55',
-    },
-    '& .MuiOutlinedInput-root': {
-      '& fieldset': {
-        borderColor: '#dce0e4',
-      },
-      '&:hover fieldset': {
-        borderColor: '#3d3d3d',
-      },
-      '&.Mui-focused fieldset': {
-        borderColor: '#00AB55',
-      },
-    },
-  },
-
-  twoInputs: {
-    display: 'flex',
-    '& .MuiTextField-root': {
-      margin: theme.spacing(1),
-      width: '50%',
-    },
-  },
-  formControl: {
-    margin: theme.spacing(1),
-    minWidth: '50%',
-  },
-  button: {
-    margin: theme.spacing(0.5),
-  },
-  btnDefaultGreen: {
-    background: '#00AB55',
-    color: '#FFF',
-    borderRadius: '5px',
-    border: 'none',
-    textTransform: 'none',
-    boxShadow: 'none',
-
-    '&:hover': {
-      backgroundColor: '#007B55',
-      color: '#FFF',
-    },
-  },
-  bold: {
-    '& .MuiInputBase-input': {
-      fontWeight: 700
-    }
-  },
-}));

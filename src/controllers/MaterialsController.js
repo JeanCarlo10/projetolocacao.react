@@ -35,10 +35,19 @@ module.exports = {
 
     //GET MATERIALS
     async details(req, res) {
-        const { _id } = req.params;
+        try {
+            const { _id } = req.params;
+            const material = await Material.findOne({ _id });
 
-        const material = await Material.findOne({ _id });
-        res.json(material);
+            if (!material) {
+                return res.status(404).json({ error: 'Material não encontrado.' });
+            }
+
+            res.json(material);
+        } catch (error) {
+            console.error('Erro ao buscar material:', error);
+            res.status(500).json({ error: 'Erro interno no servidor.' });
+        }
     },
 
     //DELETE MATERIAL

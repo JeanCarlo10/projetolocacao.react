@@ -10,7 +10,7 @@ async function updateToExpired() {
     });
 }
 
-//Executa todos os dias as 09:00 AM
+//Executa todos os dias as 09:00 da manhã
 const job = nodeSchedule.scheduleJob('0 0 9 * * *', async (req, res) => {
     updateToExpired();
     //console.log('Verificando qual pedido não foi devolvido');

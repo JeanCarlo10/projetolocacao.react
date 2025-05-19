@@ -1,54 +1,40 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { withStyles, makeStyles } from '@material-ui/core/styles';
-import Container from '@material-ui/core/Container';
-import Table from '@material-ui/core/Table';
+import Container from '@mui/material/Container';
+import Table from '@mui/material/Table';
 import TablePagination from '@mui/material/TablePagination';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableContainer from '@material-ui/core/TableContainer';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
 import Tooltip from '@mui/material/Tooltip';
-import Button from '@material-ui/core/Button';
-import AddCircleRoundedIcon from '@material-ui/icons/AddCircleRounded';
-import Card from '@material-ui/core/Card';
-import Breadcrumbs from '@material-ui/core/Breadcrumbs';
-import Link from '@material-ui/core/Link';
-import Typography from '@material-ui/core/Typography';
-import CardHeader from '@material-ui/core/CardHeader';
+import Button from '@mui/material/Button';
+import Grid from '@mui/material/Grid';
+import AddCircleRoundedIcon from '@mui/icons-material/AddCircleRounded';
+import Card from '@mui/material/Card';
+import Breadcrumbs from '@mui/material/Breadcrumbs';
+import Link from '@mui/material/Link';
+import Typography from '@mui/material/Typography';
+import CardHeader from '@mui/material/CardHeader';
 import TextField from '@mui/material/TextField';
-import CardContent from '@mui/material/CardContent';
 import InputAdornment from '@mui/material/InputAdornment';
 import Box from '@mui/material/Box';
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
+import FilterAltRoundedIcon from '@mui/icons-material/FilterAltRounded';
 import IconButton from '@mui/material/IconButton';
-import DeleteIcon from '@material-ui/icons/Delete';
-import EditIcon from '@material-ui/icons/Edit';
-
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
+import Swal from 'sweetalert2';
 import MenuAdmin from '../../../components/menu-admin';
 import api from '../../../services/api';
 import lottie from 'lottie-web';
-import Swal from 'sweetalert2';
-
-const StyledTableRow = withStyles((theme) => ({
-  root: {
-    '&:nth-of-type(odd)': {
-      backgroundColor: theme.palette.action.hover,
-    },
-  },
-}))(TableRow);
 
 export default function IndexMaterial() {
-  const classes = useStyles();
   const container = useRef(null);
-  const ref = useRef(null);
 
   const [materials, setMaterials] = useState([]);
   const [keyword, setKeyword] = useState("");
-
   const [loading, setLoading] = useState(true);
-  const [open, setOpen] = useState(false);
-  const [isOpenMenu, setIsOpenMenu] = useState(false);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
@@ -58,38 +44,43 @@ export default function IndexMaterial() {
       renderer: 'svg',
       loop: true,
       autoplay: true,
-      animationData: require('../../../assets/search2.json'),
+      animationData: require('../../../assets/img/lottie/search.json'),
     })
   }, []);
 
   useEffect(() => {
-    async function getMaterials() {
+    async function fetchMaterials() {
       var filter = `keyword=${keyword}`;
       const results = await api.get(`api/materials/index?${filter}`);
 
       setMaterials(results.data);
       setLoading(false);
     }
-    getMaterials();
+    fetchMaterials();
   }, [keyword]);
 
-  const handleDelete = (id) => {
+  const handleDelete = (material) => {
     Swal.fire({
       icon: 'warning',
       title: 'Exclusão',
-      text: 'Deseja realmente excluir este material?',
+      html: `Deseja realmente excluir o material <strong>${material.nomeMaterial}<strong>?`,
       showCloseButton: true,
       confirmButtonText: 'Sim, excluir!',
-      confirmButtonColor: '#d33333',
+      confirmButtonColor: '#D33333',
       showCancelButton: true,
       cancelButtonText: 'Não',
       reverseButtons: true,
-    }).then((result) => {
+    }).then(async (result) => {
       if (result.isConfirmed) {
-        api.delete('api/materials/' + id)
+        try {
+          const response = await api.delete(`api/materials/${material._id}`);
 
-        if (result.status = 200) {
-          window.location.href = '/admin/materiais';
+          if (response.status === 200) {
+            Swal.fire('Excluído!', 'Material removido com sucesso.', 'success');
+            setMaterials((prev) => prev.filter((m) => m._id !== material._id));
+          }
+        } catch (error) {
+          Swal.fire('Erro!', 'Não foi possível excluir o material.', 'error');
         }
       }
     })
@@ -105,11 +96,20 @@ export default function IndexMaterial() {
   };
 
   return (
-    <div className={classes.root}>
+    <div style={{ display: 'flex' }}>
       <MenuAdmin />
-      <main className={classes.content}>
-        <Container maxWidth="xl" className={classes.container}>
-          <CardHeader className={classes.cardHeader}
+      <main style={{ flexGrow: 1, height: '100vh', overflow: 'auto' }}>
+        <Container maxWidth="xl">
+          <CardHeader
+            sx={{
+              padding: 0,
+
+              "& .MuiCardHeader-title": {
+                fontWeight: 700,
+                color: '#212B36',
+                marginBottom: '8px',
+              },
+            }}
             title="Materiais"
             subheader={
               <Breadcrumbs style={{ fontSize: 14 }} separator="•" aria-label="breadcrumb">
@@ -122,7 +122,6 @@ export default function IndexMaterial() {
             action={
               <div style={{ paddingTop: 10 }}>
                 <Button
-                  className={classes.btnDefaultGreen}
                   variant="contained"
                   size="large"
                   color='primary'
@@ -134,10 +133,21 @@ export default function IndexMaterial() {
             }
           />
 
-          <Box sx={{ mt: 2, mb: 2 }}>
-            <Card>
-              <CardContent>
-                <Box sx={{ maxWidth: 500 }}>
+          <Box sx={{
+            borderRadius: '10px',
+            padding: 2,
+            margin: '24px 0',
+            border: "1px solid #E0E1E0",
+            boxShadow: "0px 2px 4px 0 rgba(0, 0, 0, .2)",
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', marginBottom: 8, color: '#616161' }}>
+              <FilterAltRoundedIcon />
+              <span style={{ fontSize: '18px', fontWeight: 600 }}>Filtros</span>
+            </div>
+
+            <Grid container spacing={2}>
+              <Grid item row xs={12} sm={9} md={10}>
+                <Box>
                   <TextField
                     fullWidth
                     InputProps={{
@@ -155,14 +165,31 @@ export default function IndexMaterial() {
                     variant="outlined"
                   />
                 </Box>
-              </CardContent>
-            </Card>
+              </Grid>
+
+              <Grid item row xs={12} sm={3} md={2}>
+                <Button variant="contained" fullWidth style={{ height: '56px' }} onClick={() => setKeyword("")}>
+                  Limpar filtros
+                </Button>
+              </Grid>
+            </Grid>
+
           </Box>
 
           {loading ? (<div style={{ width: 450, margin: '0 auto' }} ref={container} />) : (
             <Card style={{ borderRadius: 8 }}>
               <TableContainer>
-                <Table className={classes.table} size="small">
+                <Table size="small"
+                  sx={{
+                    minWidth: 750,
+
+                    '& .MuiTableCell-head': {
+                      fontWeight: 700,
+                      fontSize: 16,
+                      backgroundColor: '#D2D2D2',
+                      color: '#3B4251'
+                    },
+                  }}>
                   <TableHead>
                     <TableRow>
                       <TableCell>Nome</TableCell>
@@ -176,13 +203,8 @@ export default function IndexMaterial() {
                         <TableRow hover key={row._id}>
                           <TableCell>{row.nomeMaterial}</TableCell>
                           <TableCell component="th" scope="row" align="right">
-                            {/* <IconButton onClick={() => setIsOpenMenu(true)}>
-                        <MoreVertIcon
-                          className={classes.buttonTable}
-                        />
-                    </IconButton> */}
                             <Tooltip title="Excluir">
-                              <IconButton onClick={() => handleDelete(row._id)}>
+                              <IconButton onClick={() => handleDelete(row)}>
                                 <DeleteIcon />
                               </IconButton>
                             </Tooltip>
@@ -192,39 +214,13 @@ export default function IndexMaterial() {
                               </IconButton>
                             </Tooltip>
                           </TableCell>
-                          {/* <Menu
-                            open={isOpenMenu}
-                            anchorEl={ref.current}
-                            onClose={() => setIsOpenMenu(false)}
-                            PaperProps={{
-                              sx: { width: 200, maxWidth: '100%' }
-                            }}
-                            anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-                            transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-                          >
-                            <MenuItem>
-                              <ListItemIcon>
-                                <IconButton onClick={() => handleDelete(row._id)}>
-                                  <DeleteIcon />
-                                </IconButton>
-                              </ListItemIcon>
-                              <ListItemText primary="Excluir" />
-                            </MenuItem>
-
-                            <MenuItem >
-                              <ListItemIcon >
-                                <IconButton href={'/admin/materiais/edit/' + row._id}>
-                                  <EditIcon />
-                                </IconButton>
-                              </ListItemIcon>
-                              <ListItemText primary="Editar" />
-                            </MenuItem>
-                          </Menu> */}
                         </TableRow>
                       ))}
                   </TableBody>
                 </Table>
-                {materials.length > 0 ? null : <div className={classes.noRegisters}>Nenhum registro encontrado</div>}
+                {materials.length > 0 ? null : <div style={{ textAlign: 'center', paddingTop: 20, fontWeight: 700, fontSize: 16, color: '#3B4251' }}>
+                  Nenhum registro encontrado.
+                </div>}
               </TableContainer>
               <TablePagination
                 rowsPerPageOptions={[5, 10, 25]}
@@ -243,85 +239,9 @@ export default function IndexMaterial() {
               />
             </Card>
           )}
+
         </Container>
       </main>
     </div>
   );
 }
-
-const useStyles = makeStyles((theme) => ({
-  root: {
-    display: 'flex',
-
-    '& label.Mui-focused': {
-      color: '#00AB55',
-    },
-    '& .MuiOutlinedInput-root': {
-      borderRadius: 8,
-      fontWeight: 500,
-      fontFamily: 'Public Sans',
-
-      '& fieldset': {
-        borderColor: '#dce0e4',
-      },
-      '&:hover fieldset': {
-        borderColor: '#3d3d3d',
-      },
-      '&.Mui-focused fieldset': {
-        borderColor: '#00AB55',
-      },
-    },
-
-    '& .MuiPaper-elevation1': {
-      borderRadius: '8px',
-      boxShadow: 'rgb(100 116 139 / 6%) 0px 1px 1px, rgb(100 116 139 / 10%) 0px 1px 2px'
-    },
-  },
-  content: {
-    flexGrow: 1,
-    height: '100vh',
-    overflow: 'auto',
-  },
-  container: {
-    paddingTop: theme.spacing(4),
-    paddingBottom: theme.spacing(4),
-  },
-
-  table: {
-    minWidth: 750,
-    '& .MuiTableCell-head': {
-      fontWeight: 'bold',
-      fontSize: 16,
-      padding: 16,
-      backgroundColor: '#F3F4F6',
-      color: '#374151'
-    },
-  },
-  noRegisters: {
-    textAlign: 'center',
-    paddingTop: 10,
-    fontWeight: 700,
-    fontSize: 16,
-    color: '#595A4A'
-  },
-  btnDefaultGreen: {
-    background: '#00AB55',
-    color: '#FFF',
-    borderRadius: '5px',
-    border: 'none',
-    textTransform: 'none',
-    boxShadow: 'none',
-
-    '&:hover': {
-      backgroundColor: '#007B55',
-      color: '#FFF',
-    },
-  },
-  cardHeader: {
-    "& .MuiCardHeader-title": {
-      fontWeight: 700,
-      color: '#212B36',
-      marginBottom: theme.spacing(1),
-    },
-  },
-}));

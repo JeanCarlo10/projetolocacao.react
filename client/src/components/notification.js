@@ -1,9 +1,8 @@
 import React from 'react';
 import Snackbar from '@mui/material/Snackbar';
-import Alert from '@material-ui/lab/Alert';
+import Alert from '@mui/material/Alert';
 
 export default function Notification(props) {
-    
     const { notify, setNotify } = props;
 
     const handleClose = (event, reason) => {
@@ -14,13 +13,16 @@ export default function Notification(props) {
     }
 
     return (
-        <Snackbar 
+        <Snackbar
             open={notify.isOpen}
-            autoHideDuration={5000}
-            anchorOrigin={{vertical: 'top', horizontal: 'right'}}
+            anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
             onClose={handleClose}
         >
-            <Alert 
+            <Alert
+                style={{
+                    fontSize: 16,
+                    fontWeight: 600
+                }}
                 severity={notify.type} /*se eu quiser o X para fechar tenho que habilitar isso => onClose={handleClose}*/>
                 {notify.message}
             </Alert>

@@ -1,34 +1,81 @@
-.card-container {
-    justify-content: space-between;
-    flex-direction: row;
+.card__container {
+    border-radius: 10px !important;
+    box-shadow: 0px 2px 4px 0px #00000026 !important;
+}
+
+.card__content {
     display: flex;
-    padding: 10px;
-    border-radius: 15px !important;
-    background: #FFF;
-    box-shadow: '2px 2px 6px #8888';
+    align-items: center;
+    justify-content: space-between
 }
 
-.locacao-ativas {
-    border-left-style: solid;
-    border-left-width: 10px;
-    color: #00AB55;
-    border-left-color: #00AB55;
+.card__ativas .content__title {
+    font-family: 'Nunito';
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    text-align: center;
+    padding: 8px 16px;
+    font-weight: 700;
+    font-size: 18px;
+    background: #00AB55;
+    color: #FFF;
 }
 
-.locacoes-pendentes {
-    border-left-style: solid;
-    border-left-width: 10px;
-    color: #FF6700 !important;
-    border-left-color: #FF6700 !important;
+.container__icon__ativas {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #E9FAE0;
+    min-height: 60px;
+    min-width: 60px;
+    border-radius: 10px;
 }
 
-.locacoes-nao-devolvidas {
-    border-left-style: solid;
-    border-left-width: 10px;
-    color: #FF5252;
-    border-left-color: #FF5252;
+.card__pendentes .content__title {
+    font-family: 'Nunito';
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    text-align: center;
+    padding: 8px 16px;
+    font-weight: 700;
+    font-size: 18px;
+    background: #FF6700;
+    color: #FFF;
 }
 
-.size-icon {
-    font-size: 50px !important;
+.container__icon__pendentes {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #FFEBDD;
+    min-height: 60px;
+    min-width: 60px;
+    border-radius: 10px;
+}
+
+.card__atrasadas .content__title {
+    font-family: 'Nunito';
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    text-align: center;
+    padding: 8px 16px;
+    font-weight: 700;
+    font-size: 18px;
+    background: #FF5252;
+    color: #FFF;
+}
+
+.container__icon__atrasadas {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #FFE1E1;
+    min-height: 60px;
+    min-width: 60px;
+    border-radius: 10px;
+}
+
+.size__icon {
+    width: 40px !important;
+    height: 40px !important;
 }

@@ -1,3 +1,11 @@
+*{
+    padding: 0;
+    margin: 0;
+    text-decoration: none;
+    box-sizing: border-box;
+    border: none;
+}
+
 .card-info {
     border-radius: 15px !important;
     margin-bottom: 10px;
@@ -27,28 +35,25 @@
     }
 }
 
-.subTitleAddress {
-    font-family: 'Public Sans';
-}
-
 .title {
-    font-size: 18px;
-    font-family: 'Public Sans';
-    font-weight: bold;
-    color: #2d2a26;
+    font-size: 20px;
+    font-family: 'Nunito';
+    font-weight: 700;
+    color: #2D2A26;
     text-transform: uppercase;
 }
 
 .subTitle-Address {
     font-size: 14px;
     font-weight: 400;
-    color: #666;
+    font-family: 'Nunito';
+    color: #7C7C7C;
 }
 
 .info-data-devolucao {
     font-size: 14px;
     font-weight: bold;
-    color: #2d2a26;
+    color: #2D2A26;
 }
 
 /* #region Info Default */
@@ -107,36 +112,6 @@
     font-size: 14px;
     font-weight: 400;
     color: #666;
-}
-
-.status-pendente {
-    font-size: 18px;
-    font-weight: 600;
-    color: #FF6700;
-}
-
-.status-cancelado {
-    font-size: 18px;
-    font-weight: 600;
-    color: #e71a3b;
-}
-
-.status-entregue {
-    font-size: 18px;
-    font-weight: 600;
-    color: #1c7e2e;
-}
-
-.status-devolvido {
-    font-size: 18px;
-    font-weight: 600;
-    color: #0033c6;
-}
-
-.btn-arrow {
-    background: #00AB55;
-    color: #06e877;
-    border-radius: 5px;
 }
 
 .containerTitle {

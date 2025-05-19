@@ -1,71 +1,189 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';
-import { ThemeProvider, createTheme } from '@material-ui/core/styles';
-
-import { MuiPickersUtilsProvider } from '@material-ui/pickers';
-import DateFnsUtils from '@date-io/date-fns';
-import 'date-fns';
-import { ptBR } from 'date-fns/locale'
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import ptBR from 'date-fns/locale/pt-BR';
 
 const theme = createTheme({
   typography: {
-    fontFamily: 'Public Sans, sans-serif',
+    fontFamily: 'Nunito, sans-serif',
   },
 
-  overrides: {
-    MuiPickersToolbar: {
-      toolbar: {
-        backgroundColor: '#00AB55',
-      },
-    },
-    MuiPickersDay: {
-      day: {
-        color: 'black',
-      },
-      daySelected: {
-        backgroundColor: '#00AB55',
-        '&:hover': {
-          backgroundColor: '#007B55'
-        },
-      },
-      dayDisabled: {
-        color: '#ccc',
-      },
-      current: {
-        color: '#00AB55',
-      },
-    },
-    MuiTypography: {
-      colorPrimary: {
-        color: '#00AB55',
+  components: {
+    MuiContainer: {
+      styleOverrides: {
+        root: {
+          padding: '24px 32px !important'
+        }
       }
     },
+
+    MuiOutlinedInput: {
+      styleOverrides: {
+        root: {
+          borderRadius: 6,
+          backgroundColor: '#FFF',
+
+          '& .MuiOutlinedInput-notchedOutline': {
+            borderColor: '#BCBCBC',
+          },
+
+          '&:hover .MuiOutlinedInput-notchedOutline': {
+            borderColor: '#007B55',
+          },
+
+          '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+            borderColor: '#00AB55',
+            borderWidth: 2,
+          },
+        },
+
+        input: {
+          fontSize: '16px',
+          color: '#3B4251',
+          fontWeight: 600,
+        },
+      },
+    },
+
+    MuiInputLabel: {
+      styleOverrides: {
+        root: {
+          color: '#3B4251',
+          fontWeight: 500,
+
+          '&.Mui-focused': {
+            color: '#00AB55',
+          },
+
+          '&.Mui-error': {
+            color: '#F44336',
+          },
+
+          '&.Mui-error.Mui-focused': {
+            color: '#F44336',
+          },
+        },
+      },
+    },
+
+    MuiFormHelperText: {
+      styleOverrides: {
+        root: {
+          color: '#F44336 !important',
+
+          '&.MuiFormHelperText-contained': {
+            marginLeft: '0px',
+          },
+        },
+      },
+    },
+
     MuiButton: {
-      textPrimary: {
-        color: '#00AB55 !important',
-        '&:hover': {
-          backgroundColor: '#00ab5514 !important'
+      styleOverrides: {
+        contained: {
+          backgroundColor: '#00AB55 !important',
+          color: '#FFF !important',
+          border: 'none !important',
+          textTransform: 'none',
+          boxShadow: 'none !important',
+          fontWeight: 700,
+          fontSize: 16,
+
+          '&:hover': {
+            backgroundColor: "#08690A !important",
+          },
+        },
+
+        outlined: {
+          backgroundColor: 'tranparent',
+          borderColor: '#00AB55',
+          color: '#00AB55',
+          textTransform: 'none',
+          fontWeight: 700,
+          fontSize: 16,
+
+          '&:hover': {
+            borderColor: '#08690A',
+            backgroundColor: 'rgba(45, 206, 137, 0.1)',
+          },
+        }
+      },
+    },
+
+    MuiTableCell: {
+      styleOverrides: {
+        sizeSmall: {
+          padding: '6px 16px !important',
         },
       }
     },
+
+    MuiPickersDay: {
+      styleOverrides: {
+        root: {
+          fontWeight: 500,
+
+          '&.Mui-selected': {
+            backgroundColor: '#00AB55 !important',
+            color: '#FFF',
+          },
+
+          '&.Mui-selected:hover': {
+            backgroundColor: '#08690A',
+          },
+
+          '&:hover': {
+            backgroundColor: '#F0F0F0',
+          }
+        },
+
+        today: {
+          border: '1px solid #00AB55 !important',
+
+          '&:hover': {
+            backgroundColor: '#E9FAE0 !important',
+          }
+        },
+      },
+    },
+
+    MuiFormLabel: {
+      styleOverrides: {
+        root: {
+          color: '#3B4251',
+          fontWeight: 700,
+
+          '&.Mui-focused': {
+            color: '#00AB55', 
+          },
+        },
+      },
+    },
+
+    MuiRadio: {
+      styleOverrides: {
+        root: {
+          color: '#00AB55',
+
+          '&.Mui-checked': {
+            color: '#00AB55',
+          },
+        },
+      },
+    },
+
   }
-  // palette: {
-  //   primary: {
-  //     main: '#DCF1D7',
-  //   },
-  //   secondary: {
-  //     main: '#F7DBDB',
-  //   }
-  // },
 });
 
 ReactDOM.render(
   <React.StrictMode>
     <ThemeProvider theme={theme}>
-      <MuiPickersUtilsProvider utils={DateFnsUtils} locale={ptBR}>
+      <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ptBR}>
         <App />
-      </MuiPickersUtilsProvider>
+      </LocalizationProvider>
     </ThemeProvider>
   </React.StrictMode>,
   document.getElementById('root')

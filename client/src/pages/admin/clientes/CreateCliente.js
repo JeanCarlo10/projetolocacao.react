@@ -1,237 +1,222 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { makeStyles } from '@material-ui/core/styles';
-import { TextField, InputLabel, FormControl, Select } from '@material-ui/core';
-import Button from '@material-ui/core/Button';
-import Container from '@material-ui/core/Container';
-import Breadcrumbs from '@material-ui/core/Breadcrumbs';
-import Link from '@material-ui/core/Link';
-import Typography from '@material-ui/core/Typography';
-import Card from '@material-ui/core/Card';
-import CardActions from '@material-ui/core/CardActions';
-import CardContent from '@material-ui/core/CardContent';
-import CardHeader from '@material-ui/core/CardHeader';
-import MenuItem from '@material-ui/core/MenuItem';
-import SaveIcon from '@material-ui/icons/Save';
-
-import FormData from "form-data";
+import React, { useState, useEffect } from 'react';
+import { TextField, FormHelperText, InputLabel, FormControl, Select } from '@mui/material';
+import Button from '@mui/material/Button';
+import Container from '@mui/material/Container';
+import Breadcrumbs from '@mui/material/Breadcrumbs';
+import Link from '@mui/material/Link';
+import Typography from '@mui/material/Typography';
+import Box from '@mui/material/Box';
+import Grid from '@mui/material/Grid';
+import CardHeader from '@mui/material/CardHeader';
+import MenuItem from '@mui/material/MenuItem';
 import api from '../../../services/api';
 import { mask, unMask } from 'remask';
+import Swal from 'sweetalert2';
 import MenuAdmin from '../../../components/menu-admin';
 import BuscarCEP from '../../../components/buscar-cep';
 import ListaContatos from '../../../components/lista-contatos';
 import Notification from '../../../components/notification';
-import { useForm } from "react-hook-form";
+import CameraCapture from '../../../components/camera-capture';
+import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 
 const schema = yup.object({
-  nomeCliente: yup.string().when("tipo", {
+  nomeCliente: yup.string().when("tipoPessoa", {
     is: 'Fisica',
     then: () => yup.string().required("Nome do cliente obrigatório!"),
   }),
-  nomeFantasia: yup.string().when("tipo", {
+
+  nomeFantasia: yup.string().when("tipoPessoa", {
     is: 'Juridica',
     then: () => yup.string().required("Nome fantasia obrigatório!"),
   }),
 
-  cpf: yup.string().when("tipo", {
+  cpf: yup.string().when("tipoPessoa", {
     is: 'Fisica',
-    then: () => yup.string().required("CPF obrigatório!"),
+    then: () => yup
+      .string()
+      .required("CPF obrigatório!")
+      .test("len", "CPF deve conter 11 dígitos", (val) => val?.length === 11),
   }),
 
-  cnpj: yup.string().when("tipo", {
+  cnpj: yup.string().when("tipoPessoa", {
     is: "Juridica",
-    then: () => yup.string().required("CNPJ obrigatório!"),
+    then: () => yup
+      .string()
+      .required("CNPJ obrigatório!")
+      .test("len", "CNPJ deve conter 14 dígitos", (val) => val?.length === 14),
   }),
+
+  contacts: yup.array().min(1, 'Informe pelo menos um contato.').required("Informe pelo menos um contato."),
 })
 
 export default function CreateCliente() {
-  const classes = useStyles();
+  const [notify, setNotify] = useState({ isOpen: false, message: '', type: '' });
+  const [contacts, setContacts] = useState([]);
+  const [dadosEndereco, setDadosEndereco] = useState({
+    logradouro: '',
+    numero: '',
+    complemento: '',
+    bairro: '',
+    cidade: '',
+    uf: '',
+    cep: ''
+  });
+
+  const [photo, setPhoto] = useState();
+  const [photoRemoved, setPhotoRemoved] = useState(false);
+  const [fotoBase64, setFotoBase64] = useState(null);
 
   const {
-    register,
+    control,
     handleSubmit,
+    watch,
+    setValue,
     formState: { errors }
   } = useForm({
+    defaultValues: {
+      tipoPessoa: 'Fisica',
+    },
     resolver: yupResolver(schema)
   });
 
-  const videoRef = useRef(null);
-  const photoRef = useRef(null);
-
-  const [notify, setNotify] = useState({ isOpen: false, message: '', type: '' });
-  const [nome, setNome] = useState('');
-  const [sexo, setSexo] = useState('');
-  const [tipo, setTipo] = useState('Fisica');
-  const [cpf, setCpf] = useState('');
-  const [rg, setRg] = useState('');
-  const [ie, setIe] = useState('');
-  const [cnpj, setCnpj] = useState('');
-  const [nascimento, setNascimento] = useState('');
-  const [email, setEmail] = useState('');
-  const [contatos, setContatos] = useState([]);
-  const [dadosEndereco, setDadosEndereco] = useState({});
-  const [file, setFile] = useState(null);
-  const [photoId, setPhotoId] = useState(null);
-  const [hasPhoto, setHasPhoto] = useState(false);
-
-  useEffect(() => {
-    if (tipo == 'Fisica') {
-      setCnpj("");
-      setIe("");
-    } else {
-      setNome("");
-      setCpf("");
-      setRg("");
-      setSexo("");
-      setNascimento("");
-    }
-  }, [tipo])
-
-  const getVideo = () => {
-    navigator.mediaDevices
-      .getUserMedia({
-        video: { width: 450, height: 400 }
-      }).then(stream => {
-        let video = videoRef.current;
-
-        video.srcObject = stream;
-        video.play();
-      }).catch(err => {
-        console.error(err);
-      })
-  }
-
-  const takePhoto = () => {
-    const width = 400;
-    const height = width / (16 / 9);
-
-    let video = videoRef.current;
-    let photo = photoRef.current;
-
-    photo.width = width;
-    photo.height = height;
-
-    let ctx = photo.getContext('2d');
-    ctx.drawImage(video, 0, 0, width, height);
-    setHasPhoto(true);
-  }
-
-  const closePhoto = () => {
-    let photo = photoRef.current;
-    let ctx = photo.getContext('2d');
-
-    ctx.clearRect(0, 0, photo.width, photo.height);
-
-    setHasPhoto(false);
-  }
-
-  // useEffect(() => {
-  //   getVideo();
-  // }, [videoRef]);
+  const tipoPessoa = watch("tipoPessoa");
 
   const handleTipoPessoaChange = (e) => {
-    setTipo(e.target.value);
+    const newType = e.target.value;
+
+    if (newType === 'Fisica') {
+      setValue("nomeFantasia", "");
+      setValue("cnpj", "");
+      setValue("ie", "");
+    } else if (newType === "Juridica") {
+      setValue("nomeCliente", "");
+      setValue("cpf", "");
+      setValue("rg", "");
+      setValue("sexo", "");
+      setValue("dataNascimento", "");
+    }
   };
 
-  const handleSexoChange = (e) => {
-    setSexo(e.target.value);
+  const handleEnderecoFieldChange = (field, value) => {
+    setDadosEndereco((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleSearchCEP = (data) => {
-    setDadosEndereco(data);
-  }
+  const handleAddContact = (contact) => {
+    const isDuplicate = contacts.some(c => c.numero === contact.numero);
 
-  const handleAddContato = (contato) => {
-    setContatos([...contatos, contato]);
-  }
-
-  const handleDeleteContato = (contato) => {
-    const updatedContacts = contatos.filter((item) => item.id !== contato);
-
-    setContatos(updatedContacts);
-  }
-
-  const handleChangeCPF = (event) => {
-    setCpf(mask(unMask(event.target.value), ['999.999.999-99']));
-  }
-
-  const handleChangeCNPJ = (event) => {
-    setCnpj(mask(unMask(event.target.value), ['99.999.999/9999-99']));
-  }
-
-  const handleChangeDataNascimento = (event) => {
-    setNascimento(mask(unMask(event.target.value), ['99/99/9999']));
-  }
-
-  const onUploadImage = async () => {
-    const formdata = new FormData();
-    formdata.append("avatar", file);
-
-    const results = await api.post('api/clients/upload-avatar', formdata, {
-      method: "POST",
-      body: formdata,
-    });
-    setPhotoId(results.data._id);
-    console.log(results);
-  }
-
-  const deleteImage = (e) => {
-    e.preventDefault();
-    //Criar codigo para excluir do banco 
-    setPhotoId(null);
-  }
-
-  async function submitForm() {
-
-    const data = {
-      nomeCliente: nome,
-      sexo: sexo,
-      tipoPessoa: tipo,
-      cpf: cpf,
-      rg: rg,
-      ie: ie,
-      cnpj: cnpj,
-      dataNascimento: nascimento,
-      email: email,
-      avatar: photoId,
-
-      //Dados Endereço
-      numero: dadosEndereco.numero,
-      complemento: dadosEndereco.complemento,
-      logradouro: dadosEndereco.logradouro,
-      bairro: dadosEndereco.bairro,
-      cidade: dadosEndereco.cidade,
-      uf: dadosEndereco.uf,
-      cep: dadosEndereco.cep,
-
-      //Lista de Contatos
-      contacts: contatos,
+    if (isDuplicate) {
+      Swal.fire('Atenção!', 'Contato já adicionado.', 'warning');
+      return;
     }
 
+    const newContacts = [...contacts, contact];
+    setContacts(newContacts);
+  }
 
-    const response = await api.post('/api/clients', data);
+  const handleDeleteContact = (idContact) => {
+    setContacts((prevContacts) =>
+      prevContacts.filter((contact) => contact.id !== idContact)
+    );
+  }
 
-    if (response.status == 200) {
+  const handleRemovePhoto = () => {
+    setFotoBase64(null);
+    setPhoto(null);
+    setPhotoRemoved(true);
+  };
+
+  useEffect(() => {
+    setValue('contacts', contacts);
+  }, [contacts, setValue]);
+
+  async function submitForm(dataForm) {
+    const cleanedContacts = contacts.map(({ id, tipoTelefone, numero, observacao }) => ({
+      id,
+      tipoTelefone,
+      numero,
+      observacao,
+    }));
+
+    const formData = new FormData();
+
+    // Adiciona campos principais
+    formData.append('tipoPessoa', dataForm.tipoPessoa);
+    formData.append('nomeCliente', dataForm.nomeCliente);
+    formData.append('sexo', dataForm.sexo);
+    formData.append('cpf', dataForm.cpf);
+    formData.append('rg', dataForm.rg);
+    formData.append('dataNascimento', dataForm.dataNascimento);
+    formData.append('nomeFantasia', dataForm.nomeFantasia);
+    formData.append('cnpj', dataForm.cnpj);
+    formData.append('ie', dataForm.ie);
+    formData.append('email', dataForm.email);
+
+    // Adiciona os dados de endereço
+    formData.append('logradouro', dadosEndereco.logradouro);
+    formData.append('numero', dadosEndereco.numero);
+    formData.append('complemento', dadosEndereco.complemento);
+    formData.append('bairro', dadosEndereco.bairro);
+    formData.append('cidade', dadosEndereco.cidade);
+    formData.append('uf', dadosEndereco.uf);
+    formData.append('cep', dadosEndereco.cep);
+
+    // Adiciona os contatos (array para string JSON)
+    formData.append('contacts', JSON.stringify(cleanedContacts));
+
+    if (photoRemoved) {
+      formData.append('removePhoto', 'true');
+    }
+
+    // Adiciona a imagem (se houver)
+    if (fotoBase64) {
+      const blob = await fetch(fotoBase64).then(res => res.blob());
+      const file = new File([blob], `avatar-${Date.now()}.jpg`, { type: 'image/jpeg' });
+
+      formData.append('foto', file);
+    }
+
+    try {
+      const response = await api.post('/api/clients', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      if (response.status === 200) {
+        setNotify({
+          isOpen: true,
+          message: 'Cadastro realizado com sucesso.',
+          type: 'success'
+        });
+
+        setTimeout(() => {
+          window.location.href = '/admin/clientes'
+        }, 2500);
+      } else {
+        setNotify({
+          isOpen: true,
+          message: 'Erro ao cadastrar cliente. Tente novamente.',
+          type: 'error'
+        });
+      }
+    } catch (error) {
       setNotify({
         isOpen: true,
-        message: 'Cadastro realizado com sucesso',
-        type: 'success'
+        message: 'Erro no servidor. Contate o administrador.',
+        type: 'error'
       });
-      window.location.href = '/admin/clientes'
-    } else {
-      alert('Erro! contate o administrador do sistema');
     }
   }
 
   return (
-    <div className={classes.root}>
+    <div style={{ display: 'flex' }}>
       <Notification notify={notify} setNotify={setNotify} />
       <MenuAdmin />
-      <main className={classes.content}>
+      <main style={{ flexGrow: 1, height: '100vh', overflow: 'auto' }}>
 
-        <Container maxWidth="lg" component="main" className={classes.container}>
-
+        <Container maxWidth="lg" component="main">
           <CardHeader
             title="Cadastrar cliente"
             subheader={
@@ -244,328 +229,274 @@ export default function CreateCliente() {
             }
             titleTypographyProps={{ align: 'left' }}
             subheaderTypographyProps={{ align: 'left' }}
-            className={classes.cardHeader}
           />
 
-          <Card style={{ borderRadius: 15 }}>
+          <Box sx={{
+            padding: 2,
+            borderRadius: '10px',
+            border: "1px solid #E0E1E0",
+            boxShadow: "0px 2px 4px 0 rgba(0, 0, 0, .2)",
+          }}>
             <form onSubmit={handleSubmit(submitForm)}>
-              <CardContent className={classes.inputs}>
-                {/*<Box className={classes.containerAvatar}>
+              <Grid container spacing={2}>
+                <Grid item xs={12} sm={6} md={6}>
+                  <CameraCapture
+                    onCapture={(base64) => {
+                      setPhoto(base64);
+                      setFotoBase64(base64);
+                      setPhotoRemoved(false);
+                    }}
+                    onRemove={handleRemovePhoto}
+                    defaultPhoto={null}
+                  />
+                </Grid>
 
-                  <Grid container spacing={4}>
-                    <Grid item xs={12} sm={6} md={2}>
-                      <div className={classes.customAvatar}>
-                        {photoId == null &&
-                          <Avatar
-                            sx={{ width: 126, height: 126 }}
-                          />
-                        }
-                        {photoId != null &&
-                          <Avatar
-                            // src={'api/clients/thumbnail-avatar/' + photoId}
-                            src={file === '' ? '' : URL.createObjectURL(file)}
-                            sx={{ width: 126, height: 126, objectFit: 'cover' }}
-                          />
-                        }
+                <Grid item xs={12} sm={12} md={12}>
+                  <Controller
+                    name="tipoPessoa"
+                    control={control}
+                    defaultValue="Fisica"
+                    render={({ field, fieldState }) => (
+                      <FormControl
+                        fullWidth
+                        variant="outlined"
+                        size="medium"
+                        error={!!fieldState.error}
+                      >
+                        <InputLabel>Tipo de pessoa</InputLabel>
+                        <Select
+                          label="Tipo de pessoa"
+                          value={field.value}
+                          onChange={(e) => { field.onChange(e); handleTipoPessoaChange(e) }}
+                        >
+                          <MenuItem value="Fisica">Pessoa física</MenuItem>
+                          <MenuItem value="Juridica">Pessoa jurídica</MenuItem>
+                        </Select>
+                      </FormControl>
+                    )}
+                  />
+                </Grid>
 
-                      </div>
-                      <Typography className={classes.textAvatar}>
-                        Permitido *.jpeg, *.jpg, *.png
-                        máximo 4 MB
-                      </Typography>
+                <Grid item xs={12} sm={12} md={12}>
+                  {tipoPessoa === 'Fisica' &&
+                    <Controller
+                      name="nomeCliente"
+                      control={control}
+                      defaultValue=""
+                      render={({ field, fieldState }) => (
+                        <TextField
+                          {...field}
+                          label="Nome do cliente*"
+                          fullWidth
+                          variant="outlined"
+                          size="medium"
+                          error={!!fieldState.error}
+                          helperText={fieldState.error?.message}
+                        />
+                      )}
+                    />
+                  }
+
+                  {tipoPessoa === 'Juridica' &&
+                    <Controller
+                      name="nomeFantasia"
+                      control={control}
+                      defaultValue=""
+                      render={({ field, fieldState }) => (
+                        <TextField
+                          {...field}
+                          label="Nome fantasia*"
+                          fullWidth
+                          variant="outlined"
+                          size="medium"
+                          error={!!fieldState.error}
+                          helperText={fieldState.error?.message}
+                        />
+                      )}
+                    />
+                  }
+                </Grid>
+
+                {tipoPessoa === 'Fisica' &&
+                  <>
+                    <Grid item xs={12} sm={6} md={6}>
+                      <Controller
+                        name="cpf"
+                        control={control}
+                        defaultValue=""
+                        render={({ field, fieldState }) => (
+                          <TextField
+                            {...field}
+                            error={!!fieldState.error}
+                            helperText={fieldState.error?.message}
+                            variant="outlined"
+                            label="CPF*"
+                            fullWidth
+                            value={mask(field.value ?? '', ['999.999.999-99'])}
+                            onChange={(e) => {
+                              let raw = unMask(e.target.value).slice(0, 11);
+                              field.onChange(raw);
+                            }}
+                          />
+                        )}
+                      />
                     </Grid>
 
-                   <Grid item xs={12} sm={6} md={4}>
-                      <div className={classes.containerOptions}>
-                        <div style={{ marginBottom: 10 }}>
-                          <Button size="large" variant="contained" component="label" startIcon={<InsertPhotoIcon className={classes.colorIcon} />}>
-                            Selecionar foto
-                            <input hidden accept="image/jpeg, image/png" name="avatar" type="file" onChange={e => setFile(e.target.files[0])} />
-                          </Button>
-                        </div>
+                    <Grid item xs={12} sm={6} md={6}>
+                      <Controller
+                        name="rg"
+                        control={control}
+                        defaultValue=""
+                        render={({ field }) => (
+                          <TextField
+                            {...field}
+                            label="RG"
+                            fullWidth
+                            variant="outlined"
+                            size="medium"
+                          />
+                        )}
+                      />
+                    </Grid>
+                  </>
+                }
 
-                        <div style={{ marginBottom: 10 }}>
-                          <Button onClick={getVideo} size="large" variant="contained" component="label" startIcon={<PhotoCameraIcon className={classes.colorIcon} />}>
-                            Abrir câmera
-                          </Button>
-                        </div>
-                        <div className={classes.btnOption}>
-                          <Button size="small" variant="outlined" onClick={onUploadImage} >
-                            Carregar foto
-                          </Button>
-                          {photoId != null &&
-                            <Button size="small" variant="outlined" onClick={deleteImage} >
-                              Excluir foto
-                            </Button>
-                          }
+                {tipoPessoa === 'Fisica' &&
+                  <>
+                    <Grid item xs={12} sm={6} md={6}>
+                      <Controller
+                        name="dataNascimento"
+                        control={control}
+                        defaultValue=""
+                        render={({ field }) => (
+                          <TextField
+                            {...field}
+                            label="Data de nascimento"
+                            fullWidth
+                            variant="outlined"
+                            size="medium"
+                            value={mask(unMask(field.value || ""), ["99/99/9999"])}
+                            onChange={(e) => field.onChange(unMask(e.target.value))}
+                          />
+                        )}
+                      />
+                    </Grid>
 
-                        </div>
-                      </div>
-                    </Grid> */}
+                    <Grid item xs={12} sm={6} md={6}>
+                      <Controller
+                        name="sexo"
+                        control={control}
+                        defaultValue=""
+                        render={({ field }) => (
+                          <FormControl fullWidth variant="outlined" size="medium">
+                            <InputLabel>Sexo</InputLabel>
+                            <Select
+                              label="Sexo"
+                              value={field.value}
+                              onChange={field.onChange}
+                            >
+                              <MenuItem value="" />
+                              <MenuItem value="Feminino">Feminino</MenuItem>
+                              <MenuItem value="Masculino">Masculino</MenuItem>
+                            </Select>
+                          </FormControl>
+                        )}
+                      />
+                    </Grid>
+                  </>
+                }
 
-                {/* <Grid item xs={12} sm={6} md={6}>
-                      <div className='camera'>
-                        <video ref={videoRef}></video>
-                        <IconButton onClick={takePhoto} aria-label="delete">
-                          <PhotoCameraIcon />
-                        </IconButton>
-                      </div>
-                      <div>
-                        <canvas ref={photoRef}></canvas>
-                        <button onClick={closePhoto}>Excluir foto</button>
-                      </div>
-                    </Grid> 
-                  </Grid>
-                </Box>*/}
+                {tipoPessoa === 'Juridica' &&
+                  <>
+                    <Grid item xs={12} sm={6} md={6}>
+                      <Controller
+                        name="cnpj"
+                        control={control}
+                        defaultValue=""
+                        render={({ field, fieldState }) => (
+                          <TextField
+                            {...field}
+                            error={!!fieldState.error}
+                            helperText={fieldState.error?.message}
+                            variant="outlined"
+                            label="CNPJ*"
+                            fullWidth
+                            value={mask(field.value ?? '', ['99.999.999/9999-99'])}
+                            onChange={(e) => {
+                              let raw = unMask(e.target.value).slice(0, 14);
+                              field.onChange(raw);
+                            }}
+                          />
+                        )}
+                      />
+                    </Grid>
 
-                <FormControl variant="outlined" size="small" className={classes.formControl}>
-                  <InputLabel>Tipo</InputLabel>
-                  <Select
-                    {...register("tipo")}
-                    value={tipo}
-                    onChange={handleTipoPessoaChange}
-                    label="Tipo de pessoa"
-                  >
-                    <MenuItem value={'Fisica'}>Pessoa Física</MenuItem>
-                    <MenuItem value={'Juridica'}>Pessoa Jurídica</MenuItem>
-                  </Select>
-                </FormControl>
+                    <Grid item xs={12} sm={6} md={6}>
+                      <Controller
+                        name="ie"
+                        control={control}
+                        defaultValue=""
+                        render={({ field }) => (
+                          <TextField
+                            {...field}
+                            label="IE"
+                            fullWidth
+                            variant="outlined"
+                            size="medium"
+                          />
+                        )}
+                      />
+                    </Grid>
+                  </>
+                }
 
-                {tipo == 'Fisica' &&
-                  <TextField
-                    {...register("nomeCliente")}
-                    error={!!errors.nomeCliente}
-                    helperText={errors.nomeCliente?.message}
-                    variant="outlined"
-                    label="Nome cliente*"
-                    size="small"
-                    autoFocus
-                    value={nome}
-                    onChange={e => setNome(e.target.value)}
+                <Grid item xs={12} sm={12} md={12}>
+                  <Controller
+                    name="email"
+                    control={control}
+                    defaultValue=""
+                    render={({ field }) => (
+                      <TextField
+                        {...field}
+                        label="Email"
+                        fullWidth
+                        variant="outlined"
+                        size="medium"
+                      />
+                    )}
                   />
-                }
+                </Grid>
 
-                {tipo == 'Juridica' &&
-                  <TextField
-                    {...register("nomeFantasia")}
-                    error={!!errors.nomeFantasia}
-                    helperText={errors.nomeFantasia?.message}
-                    variant="outlined"
-                    label="Nome fantasia*"
-                    size="small"
-                    autoFocus
-                    value={nome}
-                    onChange={e => setNome(e.target.value)}
-                  />
-                }
+                <Grid item xs={12} sm={12} md={12}>
+                  <BuscarCEP onFieldChange={handleEnderecoFieldChange} initialData={dadosEndereco} />
+                </Grid>
 
-                {tipo == 'Fisica' &&
-                  <div className={classes.twoInputs}>
-                    <TextField
-                      variant="outlined"
-                      size="small"
-                      label="Data de nascimento"
-                      value={nascimento}
-                      onChange={handleChangeDataNascimento}
-                    />
-                    <FormControl variant="outlined" size="small" className={classes.formControl}>
-                      <InputLabel>Sexo</InputLabel>
-                      <Select
-                        value={sexo}
-                        onChange={handleSexoChange}
-                        label="Sexo"
-                      >
-                        <MenuItem value="" />
-                        <MenuItem value={'Feminino'}>Feminino</MenuItem>
-                        <MenuItem value={'Masculino'}>Masculino</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </div>
-                }
+                <Grid item xs={12} sm={12} md={12}>
+                  <ListaContatos contacts={contacts} addContact={handleAddContact} deleteContact={handleDeleteContact} />
+                  {errors.contacts && (
+                    <FormHelperText error
+                      sx={{
+                        border: '1px solid #FF5B5B',
+                        background: '#FFE1E1',
+                        borderRadius: 2,
+                        padding: 1,
+                        marginTop: 1,
+                        fontSize: 14,
+                        fontWeight: 600
+                      }}>
+                      {errors.contacts.message}
+                    </FormHelperText>
+                  )}
+                </Grid>
+              </Grid>
 
-                <div className={classes.twoInputs}>
-                  {tipo == 'Fisica' &&
-                    <TextField
-                      {...register("cpf")}
-                      error={!!errors.cpf}
-                      helperText={errors.cpf?.message}
-                      variant="outlined"
-                      size="small"
-                      label="CPF*"
-                      value={cpf}
-                      onChange={handleChangeCPF}
-                    />
-                  }
-
-                  {tipo == 'Juridica' &&
-                    <TextField
-                      {...register("cnpj")}
-                      error={!!errors.cnpj}
-                      helperText={errors.cnpj?.message}
-                      variant="outlined"
-                      size="small"
-                      label="CNPJ*"
-                      value={cnpj}
-                      onChange={handleChangeCNPJ}
-                    />
-                  }
-
-                  {tipo == 'Fisica' &&
-                    <TextField
-                      className={classes.formControl}
-                      variant="outlined"
-                      size="small"
-                      label="RG"
-                      value={rg}
-                      onChange={e => setRg(e.target.value)}
-                    />
-                  }
-                  {tipo == 'Juridica' &&
-                    <TextField
-                      className={classes.formControl}
-                      variant="outlined"
-                      size="small"
-                      label="IE"
-                      value={ie}
-                      onChange={e => setIe(e.target.value)}
-                    />
-                  }
-                </div>
-
-                <TextField
-                  size="small"
-                  variant="outlined"
-                  label="Email"
-                  value={email}
-                  onChange={e => setEmail(e.target.value)}
-                />
-                <div style={{
-                  marginBottom: '10px'
-                }}>
-                  <BuscarCEP onUpdate={handleSearchCEP} initialData={dadosEndereco} />
-                </div>
-                <ListaContatos contatos={contatos} addContato={handleAddContato} deleteContato={handleDeleteContato} />
-              </CardContent>
-              <CardActions style={{ justifyContent: 'flex-end', marginRight: 15 }}>
-                <Button variant="contained" size="large" className={classes.btnDefaultGreen} type="submit" startIcon={<SaveIcon />}>Salvar</Button>
-              </CardActions>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 16 }}>
+                <Button variant="contained" size="large" type="submit">Salvar</Button>
+              </div>
             </form>
-          </Card>
+          </Box>
         </Container>
       </main>
     </div>
   );
 }
-
-const useStyles = makeStyles((theme) => ({
-  root: {
-    display: 'flex',
-
-    '& .MuiFormHelperText-contained': {
-      marginLeft: '0px'
-    }
-  },
-  containerAvatar: {
-    width: "100%",
-    padding: 16,
-    marginBottom: 10,
-    borderRadius: 10,
-    borderStyle: "solid",
-    borderWidth: 1,
-    borderColor: '#919eab52'
-  },
-  customAvatar: {
-    width: 144,
-    height: 144,
-    borderRadius: '50%',
-    padding: 8,
-    borderStyle: "dashed",
-    borderWidth: 2,
-    borderColor: '#919eab52'
-  },
-  textAvatar: {
-    textAlign: 'center',
-    fontSize: 12,
-    marginTop: 5,
-    color: '#595A4A'
-  },
-  colorIcon: {
-    color: '#595A4A',
-  },
-  containerOptions: {
-    display: 'flex',
-    flexDirection: 'column',
-  },
-  btnOption: {
-    marginTop: 45,
-  },
-  content: {
-    flexGrow: 1,
-    height: '100vh',
-    overflow: 'auto',
-  },
-  cardHeader: {
-    "& .MuiCardHeader-title": {
-      fontWeight: 700,
-      color: '#212B36',
-      marginBottom: theme.spacing(1),
-    },
-  },
-  container: {
-    paddingTop: theme.spacing(4),
-    paddingBottom: theme.spacing(4),
-  },
-  inputs: {
-    display: 'flex',
-    overflow: 'auto',
-    flexDirection: 'column',
-    '& .MuiTextField-root': {
-      margin: theme.spacing(1),
-    },
-
-    '& label.Mui-focused': {
-      color: '#00AB55',
-    },
-    '& .MuiOutlinedInput-root': {
-      '& fieldset': {
-        borderColor: '#dce0e4',
-      },
-      '&:hover fieldset': {
-        borderColor: '#3d3d3d',
-      },
-      '&.Mui-focused fieldset': {
-        borderColor: '#00AB55',
-      },
-    },
-  },
-
-  twoInputs: {
-    display: 'flex',
-    '& .MuiTextField-root': {
-      margin: theme.spacing(1),
-      width: '50%',
-    },
-  },
-  formControl: {
-    margin: theme.spacing(1),
-    minWidth: '50%',
-  },
-  button: {
-    margin: theme.spacing(0.5),
-  },
-  btnDefaultGreen: {
-    background: '#00AB55',
-    color: '#FFF',
-    borderRadius: '5px',
-    border: 'none',
-    textTransform: 'none',
-    boxShadow: 'none',
-
-    '&:hover': {
-      backgroundColor: '#007B55',
-      color: '#FFF',
-    },
-  },
-
-  // appBarSpacer: theme.mixins.toolbar,
-}));

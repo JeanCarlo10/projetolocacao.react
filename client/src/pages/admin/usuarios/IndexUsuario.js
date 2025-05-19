@@ -1,52 +1,33 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { withStyles, makeStyles } from '@material-ui/core/styles';
-import Container from '@material-ui/core/Container';
+import Container from '@mui/material/Container';
 import TablePagination from '@mui/material/TablePagination';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableContainer from '@material-ui/core/TableContainer';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
-import Tooltip from '@material-ui/core/Tooltip';
-import Chip from '@material-ui/core/Chip';
-import Button from '@material-ui/core/Button';
-import Card from '@material-ui/core/Card';
-import Breadcrumbs from '@material-ui/core/Breadcrumbs';
-import Link from '@material-ui/core/Link';
-import Typography from '@material-ui/core/Typography';
-import CardHeader from '@material-ui/core/CardHeader';
-import Avatar from '@material-ui/core/Avatar';
-import Divider from '@material-ui/core/Divider';
-import FormGroup from '@material-ui/core/FormGroup';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Chip from '@mui/material/Chip';
+import Button from '@mui/material/Button';
+import Card from '@mui/material/Card';
+import Breadcrumbs from '@mui/material/Breadcrumbs';
+import Link from '@mui/material/Link';
+import Typography from '@mui/material/Typography';
+import CardHeader from '@mui/material/CardHeader';
 import { Menu, MenuItem, IconButton, ListItemIcon, ListItemText } from '@mui/material';
-import Checkbox from '@material-ui/core/Checkbox';
-import InputBase from '@material-ui/core/InputBase';
-
-import DeleteIcon from '@material-ui/icons/Delete';
-import EditIcon from '@material-ui/icons/Edit';
-import FilterListRoundedIcon from '@material-ui/icons/FilterListRounded';
-import SearchIcon from '@material-ui/icons/Search';
+import InputBase from '@mui/material/InputBase';
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
+import SearchIcon from '@mui/icons-material/Search';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import AddCircleRoundedIcon from '@material-ui/icons/AddCircleRounded';
-
+import AddCircleRoundedIcon from '@mui/icons-material/AddCircleRounded';
 import lottie from 'lottie-web';
 import api from '../../../services/api';
 import MenuAdmin from '../../../components/menu-admin';
 import { getTypeUser, getTypeUserLabel } from '../../../functions/static_data';
 import Swal from 'sweetalert2';
 
-const StyledTableRow = withStyles((theme) => ({
-  root: {
-    '&:nth-of-type(odd)': {
-      backgroundColor: theme.palette.action.hover,
-    },
-  },
-}))(TableRow);
-
 export default function IndexUsuario() {
-  const classes = useStyles();
   const container = useRef(null);
   const ref = useRef(null);
 
@@ -65,7 +46,7 @@ export default function IndexUsuario() {
       renderer: 'svg',
       loop: true,
       autoplay: true,
-      animationData: require('../../../assets/search2.json'),
+      animationData: require('../../../assets/img/lottie/search.json'),
     })
   }, []);
 
@@ -137,14 +118,18 @@ export default function IndexUsuario() {
   }
 
   return (
-    <div className={classes.root}>
+    <div style={{ display: 'flex' }}>
       <MenuAdmin />
 
-      <main className={classes.content}>
-        <div className={classes.appBarSpacer} />
-
-        <Container maxWidth="lg" className={classes.container}>
-          <CardHeader className={classes.cardHeader}
+      <main style={{ flexGrow: 1, height: '100vh', overflow: 'auto' }}>
+        <Container maxWidth="lg">
+          <CardHeader sx={{
+            "& .MuiCardHeader-title": {
+              fontWeight: 700,
+              color: '#212B36',
+              marginBottom: '8px'
+            },
+          }}
             title="Usuários"
             subheader={
               <Breadcrumbs style={{ fontSize: 14 }} separator="•" aria-label="breadcrumb">
@@ -157,7 +142,6 @@ export default function IndexUsuario() {
             action={
               <div style={{ paddingTop: 10 }}>
                 <Button
-                  className={classes.btnDefaultGreen}
                   variant="contained"
                   size="large"
                   href={'/admin/usuarios/create'}
@@ -170,8 +154,6 @@ export default function IndexUsuario() {
 
           {loading ? (<div style={{ width: 450, margin: '0 auto' }} ref={container} />) : (
             <Card style={{ borderRadius: 15 }}>
-              <div className={classes.twoElements}>
-                <div className={classes.iconButton}>
                   <IconButton>
                     <SearchIcon />
                   </IconButton>
@@ -180,11 +162,9 @@ export default function IndexUsuario() {
                     onChange={handleChangeSearch}
                     placeholder="Buscar..."
                   />
-                </div>
-              </div>
 
               <TableContainer>
-                <Table className={classes.table} size="small" >
+                <Table size="small" >
                   <TableHead>
                     <TableRow>
                       <TableCell>Data de cadastro</TableCell>
@@ -205,7 +185,12 @@ export default function IndexUsuario() {
                         <TableCell component="th" scope="row" align="right">
                           <IconButton onClick={() => setIsOpenMenu(true)}>
                             <MoreVertIcon
-                              className={classes.buttonTable}
+                              sx={{
+                                borderRadius: 10,
+                                borderColor: '#BCBCBC',
+                                borderStyle: 'solid',
+                                borderWidth: 2
+                              }}
                             />
                           </IconButton>
                         </TableCell>
@@ -265,72 +250,3 @@ export default function IndexUsuario() {
     </div>
   );
 }
-
-const useStyles = makeStyles((theme) => ({
-  root: {
-    display: 'flex',
-  },
-  iconButton: {
-    borderRadius: 10,
-    borderColor: '#BCBCBC',
-    borderStyle: 'solid',
-    borderWidth: 2
-  },
-  content: {
-    flexGrow: 1,
-    height: '100vh',
-    overflow: 'auto',
-  },
-  avatarFilter: {
-    color: '#4DB4C6',
-    backgroundColor: '#E7F7F9',
-    marginRight: theme.spacing(2),
-  },
-  container: {
-    paddingTop: theme.spacing(4),
-    paddingBottom: theme.spacing(4),
-  },
-
-  table: {
-    minWidth: 750,
-    '& .MuiTableCell-head': {
-      fontWeight: 'bold',
-      fontSize: 14
-    },
-  },
-
-  buttonTable: {
-    // margin: theme.spacing(0.5)
-  },
-  btnDefaultGreen: {
-    background: '#00AB55',
-    color: '#FFF',
-    borderRadius: 10,
-    border: 'none',
-    textTransform: 'none',
-    boxShadow: 'none',
-
-    '&:hover': {
-      backgroundColor: '#007B55',
-      color: '#FFF',
-    },
-  },
-  twoElements: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    margin: theme.spacing(1),
-
-    '& .MuiTextField-root': {
-      margin: theme.spacing(1),
-    },
-  },
-  cardHeader: {
-    "& .MuiCardHeader-title": {
-      fontWeight: 700,
-      color: '#212B36',
-      marginBottom: theme.spacing(1),
-    },
-  },
-
-  appBarSpacer: theme.mixins.toolbar,
-}));

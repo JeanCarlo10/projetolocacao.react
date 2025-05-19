@@ -1,29 +1,18 @@
-import React, { useState } from 'react';
-import { styled } from '@mui/material/styles';
-import { makeStyles } from '@material-ui/core/styles';
-import TextField from '@mui/material/TextField';
+import React from 'react';
 import InputAdornment from '@mui/material/InputAdornment';
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
-import IconButton from '@material-ui/core/IconButton';
-import {
-  Grid, Card, Checkbox, Tooltip, FormControl, OutlinedInput,
-  InputLabel, MenuItem, ListItemText, Select
-} from '@mui/material';
 import ArrowBackIosRoundedIcon from '@mui/icons-material/ArrowBackIosRounded';
 import ArrowForwardIosRoundedIcon from '@mui/icons-material/ArrowForwardIosRounded';
+import FilterAltRoundedIcon from '@mui/icons-material/FilterAltRounded';
+import IconButton from '@mui/material/IconButton';
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
+import {
+  Grid, Checkbox, Tooltip, FormControl, OutlinedInput,
+  InputLabel, MenuItem, ListItemText, Select, Box
+} from '@mui/material';
 import { formatCurrentMonth } from '../helpers/dateFilter';
 import { statusFilterDashboard } from '../../src/functions/static_data';
-
-const RootStyle = styled(Card)(({ theme }) => ({
-  flexDirection: 'row',
-  display: 'flex',
-  padding: theme.spacing(2),
-  backgroundColor: '#FFF',
-  borderRadius: 15,
-  marginBottom: 10,
-  boxShadow: 'rgb(100 116 139 / 6%) 0px 1px 1px, rgb(100 116 139 / 10%) 0px 1px 2px'
-
-}));
 
 const ITEM_HEIGHT = 70;
 const ITEM_PADDING_TOP = 8;
@@ -31,9 +20,10 @@ const MenuProps = {
   MenuListProps: {
     sx: {
       "&& .Mui-selected": {
-        backgroundColor: "#00ab5514",
+        backgroundColor: "#00AB5514",
+
         '&: hover': {
-          backgroundColor: "#00ab5514"
+          backgroundColor: "#00AB5514"
         }
       },
       "&& .Mui-checked": {
@@ -41,27 +31,17 @@ const MenuProps = {
       }
     }
   },
-  
+
   PaperProps: {
     style: {
       maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
       width: 250,
-
     },
   },
 };
 
 export default function FilterDashboard(props) {
-  const classes = useStyles();
-  const { currentMonth, onMonthChange, onChecked, onChangeKeyword } = props;
-
-  const [search, setSearch] = useState("");
-  const [status, setStatus] = useState([]);
-
-  const onChangeSearch = (text) => {
-    setSearch(text);
-    onChangeKeyword(text);
-  }
+  const { currentMonth, onMonthChange, onResetFilters, search, onChangeSearch, status, onChangeStatus } = props;
 
   const handlePrevMonth = () => {
     var newCurrentMonth = new Date(currentMonth.valueOf());
@@ -77,40 +57,77 @@ export default function FilterDashboard(props) {
     onMonthChange(newCurrentMonth);
   }
 
-  const handleChange = (event) => {
-    const {
-      target: { value },
-    } = event;
-
-    setStatus(value);
-    onChecked(value);
-  };
-
   return (
-    <RootStyle>
-      <Grid container spacing={3}>
-        <Grid item xs={12} sm={4} md={4}>
-          <div className={classes.containerFilterDate}>
+    <Box sx={{
+      borderRadius: '10px',
+      padding: 2,
+      margin: '16px 0',
+      border: "1px solid #E0E1E0",
+      boxShadow: "0px 2px 4px 0 rgba(0, 0, 0, .2)",
+    }}>
+      <div style={{ display: 'flex', alignItems: 'center', marginBottom: 8, color: '#616161' }}>
+        <FilterAltRoundedIcon />
+        <span style={{ fontSize: '18px', fontWeight: 600 }}>Filtros</span>
+      </div>
+
+      <Grid container spacing={2}>
+        <Grid item xs={12} sm={6} md={4}>
+          <div style={{
+            flexDirection: 'row',
+            display: 'flex',
+            alignItems: 'center',
+            textAlign: 'center',
+            gap: '8px',
+            justifyContent: 'space-between',
+          }}>
             <Tooltip title="Anterior">
-              <IconButton className={classes.btnPrevMonth} onClick={handlePrevMonth}>
+              <IconButton
+                sx={{
+                  padding: 0,
+                  borderRadius: '10px',
+                  width: 55,
+                  height: 55,
+                  color: '#FFF',
+                  backgroundColor: '#00AB55',
+
+                  '&:hover': {
+                    backgroundColor: '#08690A',
+                  },
+                }}
+                onClick={handlePrevMonth}>
                 <ArrowBackIosRoundedIcon />
               </IconButton>
             </Tooltip>
 
-            <div style={{ fontWeight: 'bold', color: '#2d2a26', fontSize: 20 }}>
+            <div style={{ fontWeight: 700, color: '#2d2a26', fontSize: 20 }}>
               {formatCurrentMonth(currentMonth)}
             </div>
+
             <Tooltip title="Próximo">
-              <IconButton className={classes.btnNextMonth} onClick={handleNextMonth}>
+              <IconButton
+                sx={{
+                  padding: 0,
+                  borderRadius: '10px',
+                  width: 55,
+                  height: 55,
+                  color: '#FFF',
+                  backgroundColor: '#00AB55',
+
+                  '&:hover': {
+                    backgroundColor: '#08690A',
+                  },
+                }}
+                onClick={handleNextMonth}>
                 <ArrowForwardIosRoundedIcon />
               </IconButton>
             </Tooltip>
           </div>
         </Grid>
 
-        <Grid item xs={12} sm={4} md={4}>
-          <TextField className={classes.input}
+        <Grid item xs={12} sm={6} md={3}>
+          <TextField
             fullWidth
+            size='medium'
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
@@ -121,19 +138,45 @@ export default function FilterDashboard(props) {
               )
             }}
             value={search}
-            onChange={({ target }) => onChangeSearch(target.value)}
+            onChange={(e) => onChangeSearch(e.target.value)}
             placeholder="Buscar cliente"
             variant="outlined"
           />
         </Grid>
 
-        <Grid item row xs={12} sm={4} md={4} >
-          <FormControl fullWidth className={classes.select}>
+        <Grid item row xs={12} sm={6} md={3} >
+          <FormControl fullWidth
+            sx={{
+              '& .MuiInputLabel-root': {
+                '&.Mui-focused': {
+                  color: '#00AB55',
+                },
+              },
+
+              '& .MuiOutlinedInput-root': {
+                fontWeight: 500,
+                fontFamily: 'Nunito',
+                height: '56px',
+
+                '& fieldset': {
+                  borderRadius: '6px',
+                  borderColor: '#BCBCBC',
+                  borderStyle: 'solid',
+                },
+
+                '&:hover fieldset': {
+                  borderColor: '#00AB55',
+                },
+                '&.Mui-focused fieldset': {
+                  borderColor: '#00AB55',
+                },
+              }
+            }}>
             <InputLabel>Status</InputLabel>
             <Select
               multiple
               value={status}
-              onChange={handleChange}
+              onChange={(e) => onChangeStatus(e.target.value)}
               input={<OutlinedInput label="Status" />}
               renderValue={(selected) => selected.join(', ')}
               MenuProps={MenuProps}
@@ -147,97 +190,80 @@ export default function FilterDashboard(props) {
             </Select>
           </FormControl>
         </Grid>
+
+        <Grid item row xs={12} sm={6} md={2}>
+          <Button variant="contained" style={{ height: '56px', borderRadius: 6 }} fullWidth onClick={onResetFilters}>
+            Limpar filtros
+          </Button>
+        </Grid>
       </Grid>
-    </RootStyle>
+
+    </Box>
   );
 }
 
-const useStyles = makeStyles((theme) => ({
-  containerFilterDate: {
-    flexDirection: 'row',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginTop: 6,
-  },
-  select: {
-    '& .MuiSelect-select': {
-      padding: '14.5px !important',
-    },
+// const useStyles = makeStyles((theme) => ({
+//   boxFilter: {
+//     borderRadius: 10,
+//     padding: 16,
+//     margin: '16px 0',
+//     border: "1px solid #E0E1E0",
+//     boxShadow: "0px 2px 4px 0 rgba(0, 0, 0, .2)",
+//   },
 
+//   textFilter: {
+//     display: 'flex',
+//     alignItems: 'center',
+//     marginBottom: 8,
+//     color: '#616161'
+//   },
 
+//   containerFilterDate: {
+//     flexDirection: 'row',
+//     display: 'flex',
+//     alignItems: 'center',
+//     textAlign: 'center',
+//     gap: '8px',
+//     justifyContent: 'space-between',
+//   },
 
-    '& .MuiInputLabel-root': {
-      '&.Mui-focused': {
-        color: '#00AB55',
-      },
-    },
+//   select: {
+//     '& .MuiInputLabel-root': {
+//       '&.Mui-focused': {
+//         color: '#00AB55',
+//       },
+//     },
 
-    '& .MuiOutlinedInput-root': {
-      fontWeight: 500,
-      fontFamily: 'Public Sans',
+//     '& .MuiOutlinedInput-root': {
+//       fontWeight: 500,
+//       fontFamily: 'Nunito',
+//       height: '56px',
 
-      '& fieldset': {
-        borderRadius: 8,
-        borderColor: '#BCBCBC',
-        borderStyle: 'solid',
-        borderWidth: 2,
-      },
+//       '& fieldset': {
+//         borderRadius: 6,
+//         borderColor: '#BCBCBC',
+//         borderStyle: 'solid',
+//       },
 
-      '&:hover fieldset': {
-        borderColor: '#00AB55',
-      },
-      '&.Mui-focused fieldset': {
-        borderColor: '#00AB55',
-      },
-    }
-  },
-  input: {
-    '& label.Mui-focused': {
-      color: '#00AB55',
-    },
-    '& .MuiOutlinedInput-root': {
-      fontWeight: 500,
-      fontFamily: 'Public Sans',
-      height: '52px',
+//       '&:hover fieldset': {
+//         borderColor: '#00AB55',
+//       },
+//       '&.Mui-focused fieldset': {
+//         borderColor: '#00AB55',
+//       },
+//     }
+//   },
 
-      '& fieldset': {
-        borderRadius: 8,
-        borderColor: '#BCBCBC',
-        borderStyle: 'solid',
-        borderWidth: 2,
+//   btnMonth: {
+//     padding: 0,
+//     borderRadius: 8,
+//     width: 55,
+//     height: 55,
+//     color: '#FFF',
+//     backgroundColor: '#00ab55',
 
-      },
-      '&:hover fieldset': {
-        borderColor: '#00AB55',
-      },
-      '&.Mui-focused fieldset': {
-        borderColor: '#00AB55',
-      },
-    },
-  },
-  btnPrevMonth: {
-    padding: 0,
-    borderRadius: 10,
-    width: 35,
-    height: 35,
-    color: '#FFF',
-    backgroundColor: '#00ab55',
-    '&:hover': {
-      backgroundColor: '#1D7874',
-      color: '#FFF',
-    },
-  },
-  btnNextMonth: {
-    padding: 0,
-    borderRadius: 10,
-    width: 35,
-    height: 35,
-    color: '#FFF',
-    backgroundColor: '#00ab55',
-    '&:hover': {
-      backgroundColor: '#1D7874',
-      color: '#FFF',
-    },
-  },
-}));
+//     '&:hover': {
+//       backgroundColor: '#08690A',
+//     },
+//   }
+// }));

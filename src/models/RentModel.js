@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+
 const DataSchema = new mongoose.Schema({
     status: { type: String, default: 'Pendente' }, //Pendente, Entregue, Devolvido, Não Devolvido ou Cancelado
     dataPedido: { type: Date, default: Date.now },
@@ -8,10 +9,9 @@ const DataSchema = new mongoose.Schema({
     totalGeral: Number,
     desconto: Number,
     observacao: String,
-    numeroPedido: Number,
+    numeroPedido: { type: Number, required: true, unique: true },
 
-    idCliente: { type: mongoose.Schema.ObjectId },
-    nomeCliente: { type: String },
+    idCliente: { type: mongoose.Schema.ObjectId, ref: 'Client'  },
     tipoEndereco: { type: String },
     
     //DADOS NOVO ENDEREÇO

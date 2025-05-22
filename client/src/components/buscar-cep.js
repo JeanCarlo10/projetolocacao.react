@@ -1,15 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import Box from '@mui/material/Box';
-import Grid from '@mui/material/Grid';
+import { Box, Grid, TextField, InputLabel, FormControl, IconButton, InputAdornment } from '@mui/material';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
-import TextField from '@mui/material/TextField';
-import InputLabel from '@mui/material/InputLabel';
-import FormControl from '@mui/material/FormControl';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import CircularProgress from '@mui/material/CircularProgress';
-import IconButton from '@mui/material/IconButton';
-import InputAdornment from '@mui/material/InputAdornment';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import apiCEP from '../services/apiCEP';
 import Notification from '../components/notification';

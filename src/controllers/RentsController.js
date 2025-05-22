@@ -198,5 +198,27 @@ module.exports = {
         const rent = await Rent.findOneAndUpdate({ _id: model._id }, model, { new: true });
 
         return res.json(rent);
-    }
+    },
+
+    async updateDate(req, res) {
+        const { _id } = req.params;
+        const { dataDevolucao } = req.body;
+
+        try {
+            const rent = await Rent.findByIdAndUpdate(
+                _id,
+                { dataDevolucao },
+                { new: true }
+            );
+
+            if (!rent) {
+                return res.status(404).json({ message: 'Pedido não encontrado.' });
+            }
+
+            res.status(200).json(rent);
+        } catch (error) {
+            console.error('Erro ao atualizar data de devolução:', error);
+            res.status(500).json({ message: 'Erro interno do servidor.' });
+        }
+    },
 }

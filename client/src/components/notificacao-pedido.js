@@ -1,40 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import { styled } from '@mui/material/styles';
-import Button from '@mui/material/Button';
+import { Typography, Grid, Stack, Chip, Tooltip, Box, Button, IconButton, Collapse, TextField } from '@mui/material';
 import Card from '@mui/material/Card';
 import CardHeader from '@mui/material/CardHeader';
 import CardContent from '@mui/material/CardContent';
 import CardActions from '@mui/material/CardActions';
-import Collapse from '@mui/material/Collapse';
-import IconButton from '@mui/material/IconButton';
-import Box from '@mui/material/Box';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import ReplayCircleFilledRoundedIcon from '@mui/icons-material/ReplayCircleFilledRounded';
-import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
-import CancelRoundedIcon from '@mui/icons-material/CancelRounded';
-import EventBusyRoundedIcon from '@mui/icons-material/EventBusyRounded';
-import Tooltip from '@mui/material/Tooltip';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell, { tableCellClasses } from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Chip from '@mui/material/Chip';
-import Stack from '@mui/material/Stack';
-import PhoneIcon from '@mui/icons-material/Phone';
-import PhoneAndroidIcon from '@mui/icons-material/PhoneAndroid';
-import TextField from '@mui/material/TextField';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { set, differenceInHours } from 'date-fns';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ReplayCircleFilledRoundedIcon from '@mui/icons-material/ReplayCircleFilledRounded';
+import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
+import CancelRoundedIcon from '@mui/icons-material/CancelRounded';
+import PhoneIcon from '@mui/icons-material/Phone';
+import PhoneAndroidIcon from '@mui/icons-material/PhoneAndroid';
+import VerifiedRoundedIcon from '@mui/icons-material/VerifiedRounded';
+import EditCalendarRoundedIcon from '@mui/icons-material/EditCalendarRounded';
+
+import { set, differenceInHours, differenceInCalendarDays } from 'date-fns';
 import api from '../services/api';
 import Avatar from '@mui/material/Avatar';
 import '../assets/css/notificacao-pedido.css';
-import IconCalendar from '../assets/img/calendar-green.svg';
 import EmptyState from './empty-state';
 
 const ExpandMore = styled((props) => {
@@ -48,72 +36,12 @@ const ExpandMore = styled((props) => {
     }),
 }));
 
-const StyledTableCell = styled(TableCell)(({ theme }) => ({
-    fontFamily: 'Nunito',
-    marginTop: '10px',
-
-    [`&.${tableCellClasses.head}`]: {
-        fontWeight: 700,
-        color: '#2d2a26',
-        paddingTop: 6,
-        paddingBottom: 6,
-    },
-    [`&.${tableCellClasses.body}`]: {
-        fontSize: 14,
-        color: '#3B4251',
-        fontWeight: 700
-    },
-}));
-
-const StyledTableRow = styled(TableRow)(({ theme }) => ({
-    '&:nth-of-type(odd)': {
-        backgroundColor: theme.palette.action.hover,
-    },
-    // hide last border
-    '&:last-child td, &:last-child th': {
-        border: 0,
-    },
-}));
-
-const StyledTableCellLate = styled(TableCell)(({ theme }) => ({
-    fontFamily: 'Nunito',
-    borderBottom: '1px solid #ad0000',
-    marginTop: '10px',
-
-    [`&.${tableCellClasses.head}`]: {
-        fontWeight: 700,
-        color: '#FFF',
-        backgroundColor: '#BD1E1E',
-        paddingTop: 6,
-        paddingBottom: 6,
-    },
-    [`&.${tableCellClasses.body}`]: {
-        fontSize: 14,
-        color: '#6a1100',
-        fontWeight: 700,
-    },
-}));
-
-const StyledTableRowLate = styled(TableRow)(({ theme }) => ({
-    '&:nth-of-type(odd)': {
-        backgroundColor: '#fd5959',
-    },
-    '&:nth-of-type(even)': {
-        backgroundColor: "#f9d9dc",
-    },
-    // hide last border
-    '&:last-child td, &:last-child th': {
-        border: 0,
-    },
-}));
-
 export default function NotificacaoPedido(props) {
     const { currentMonth, statuses, keyword } = props;
     const unidadeMedidaMap = { 'Unidade': 'unidade(s)', 'Metro': 'metro(s)' };
 
     const [listaPedidos, setListaPedidos] = useState([]);
-    const [observacaoUpdated, setObservacaoUpdated] = useState();
-    const [dataDevolucao, setDataDevolucao] = useState(null);
+    const [pedidoSelecionado, setPedidoSelecionado] = useState(null);
     const [open, setOpen] = useState(false);
 
     useEffect(() => {
@@ -175,369 +103,459 @@ export default function NotificacaoPedido(props) {
         setListaPedidos([...listaPedidos]);
     };
 
-    const handleClickOpen = () => {
-        setOpen(true);
+    const handleClickOpen = (pedido) => {
+        if (pedido.status !== 'Devolvido' && pedido.status !== 'Não Devolvido') {
+            setOpen(true);
+            setPedidoSelecionado(pedido);
+        }
     };
 
-    const handleClose = () => {
-        setOpen(false);
+    const handleDateDevolutionChange = (date) => {
+        setPedidoSelecionado((prev) => ({
+            ...prev,
+            dataDevolucao: date
+        }));
     };
 
-    const handleDateDevolutionChange = (date, id) => {
-        setListaPedidos(prev =>
-            prev.map(item =>
-                item._id === id ? { ...item, dataDevolucao: date } : item
-            )
-        );
-    }
+    const handleDateUpdated = async () => {
+        try {
+            const response = await api.put(`/api/rents/${pedidoSelecionado._id}/data-devolucao`, {
+                dataDevolucao: pedidoSelecionado.dataDevolucao
+            });
 
-    const handleDateUpdated = () => {
+            // Atualiza a lista local com a nova data
+            setListaPedidos((prev) =>
+                prev.map((item) =>
+                    item._id === pedidoSelecionado._id
+                        ? { ...item, dataDevolucao: pedidoSelecionado.dataDevolucao }
+                        : item
+                )
+            );
 
-    }
+            setOpen(false);
+        } catch (error) {
+            console.error('Erro ao atualizar data de devolução:', error);
+            alert('Erro ao atualizar a data. Tente novamente.');
+        }
+    };
 
     return (
-        <RootContainer>
-            {listaPedidos.length === 0 ? (
-                <EmptyState />
-            ) : (
-                listaPedidos
-                    .map((info) => {
-                        var classname = "card-info";
-                        var dataDevolucao = new Date(info.dataDevolucao);
-                        set(dataDevolucao, {
-                            hours: 0,
-                            minutes: 0,
-                            seconds: 0,
-                            milliseconds: 0
-                        });
+        <div style={{ display: 'flex' }}>
+            <main style={{ flexGrow: 1, height: '100vh' }}>
+                {listaPedidos.length === 0 ? (
+                    <EmptyState />
+                ) : (
+                    listaPedidos
+                        .map((info) => {
+                            var classname = "card-info";
+                            var dataDevolucao = new Date(info.dataDevolucao);
 
-                        var hours = differenceInHours(dataDevolucao, new Date());
+                            // Zera hora para considerar só a data
+                            set(dataDevolucao, {
+                                hours: 0,
+                                minutes: 0,
+                                seconds: 0,
+                                milliseconds: 0
+                            });
 
-                        if (info.status === "Não Devolvido" || (hours < 24 && info.status === "Pendente" || info.status === "Entregue")) {
-                            classname += " animation"
-                        }
+                            var hours = differenceInHours(dataDevolucao, new Date());
 
-                        return (
-                            <Card key={info._id} elevation={0} className={classname}>
-                                <CardHeader
-                                    avatar={
-                                        <Avatar
-                                            {...stringAvatar(`${info.pedido_cliente?.tipoPessoa === 'Fisica' ?
-                                                info.pedido_cliente?.nomeCliente : info.pedido_cliente?.nomeFantasia}`
-                                            )}
-                                        />
-                                    }
-                                    action={
-                                        <div>
-                                            {info.status === "Pendente" &&
-                                                <Tooltip title="Entregar">
-                                                    <IconButton style={{ color: '#1c7e2e' }} onClick={() => handleChangeStatus(info._id, "Entregue")}>
-                                                        <CheckCircleRoundedIcon fontSize='large' />
-                                                    </IconButton>
-                                                </Tooltip>
-                                            }
-                                            {info.status === "Pendente" &&
-                                                <Tooltip title="Cancelar">
-                                                    <IconButton style={{ color: '#e71a3b' }} onClick={() => handleChangeStatus(info._id, "Cancelado")}>
-                                                        <CancelRoundedIcon fontSize='large' />
-                                                    </IconButton>
-                                                </Tooltip>
-                                            }
-                                            {info.status === "Entregue" &&
-                                                <Tooltip title="Devolvido">
-                                                    <IconButton style={{ color: '#0033c6' }} onClick={() => handleChangeStatus(info._id, "Devolvido")}>
-                                                        <ReplayCircleFilledRoundedIcon fontSize='large' />
-                                                    </IconButton>
-                                                </Tooltip>
-                                            }
-                                            {info.status === "Não Devolvido" &&
-                                                <Tooltip title="Devolvido">
-                                                    <IconButton style={{ color: '#0033c6' }} onClick={() => handleChangeStatus(info._id, "Devolvido")}>
-                                                        <ReplayCircleFilledRoundedIcon fontSize='large' />
-                                                    </IconButton>
-                                                </Tooltip>
-                                            }
-                                        </div>
-                                    }
-                                    title={
-                                        <div className="containerTitle">
-                                            <div className="title">
-                                                {info.pedido_cliente?.tipoPessoa === 'Fisica' ? info.pedido_cliente?.nomeCliente : info.pedido_cliente?.nomeFantasia}
-                                            </div>
+                            //ANIMAÇÃO SE ATRASADO
+                            if (
+                                info.status === "Não Devolvido" ||
+                                (info.status === "Pendente" && hours >= 0 && hours < 24)
+                            ) {
+                                classname += " animation"
+                            }
 
-                                            {info?.pedido_cliente?.contacts?.length > 0 &&
-                                                info.pedido_cliente.contacts.map((item, index) => (
-                                                    <Stack key={item.id} mb={0.5}>
-                                                        <Chip
-                                                            style={{ fontFamily: 'Nunito' }}
-                                                            icon={item.tipoTelefone === "Celular" ? <PhoneAndroidIcon /> : <PhoneIcon />}
-                                                            label={item.numero}
-                                                        />
-                                                    </Stack>
-                                                ))
-                                            }
-                                        </div>
-                                    }
-                                    subheader={
-                                        <div className='subTitle-Address'>
-                                            {info.logradouro}, Nº {info.numero} - Bairro: {info.bairro} - {info.complemento}
-                                        </div>
-                                    }>
-                                </CardHeader>
-                                <CardContent>
-                                    {info.status === 'Pendente' &&
-                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                            <span style={{ fontSize: 18, fontWeight: 700 }}>Status:</span>
-                                            <Chip sx={{
-                                                background: '#FFC107',
-                                                color: '#FFF',
-                                                fontWeight: 700,
-                                                fontSize: 16,
-                                                minWidth: 114
-                                            }}
-                                                label={info.status}
+                            //DIAS RESTANTES
+                            const dataValida = info.dataDevolucao ? new Date(info.dataDevolucao) : null;
+
+                            let diasRestantes = null;
+                            let mensagem = 'Data inválida';
+
+                            if (dataValida && !isNaN(dataValida)) {
+                                diasRestantes = differenceInCalendarDays(dataValida, new Date());
+
+                                mensagem = diasRestantes < 0
+                                    ? `Atrasado em ${Math.abs(diasRestantes)} dia(s)`
+                                    : `Faltam ${diasRestantes} dia(s)`;
+                            }
+
+                            return (
+                                <Card key={info._id} elevation={0} className={classname}>
+                                    <CardHeader sx={{ padding: '0 0 16px 0px' }}
+                                        avatar={
+                                            <Avatar
+                                                src={process.env.REACT_APP_API_URL + info.pedido_cliente?.foto || undefined}
+                                                {...(!info.pedido_cliente?.foto && stringAvatar(
+                                                    info.pedido_cliente?.tipoPessoa === 'Fisica'
+                                                        ? info.pedido_cliente?.nomeCliente
+                                                        : info.pedido_cliente?.nomeFantasia
+                                                ))}
                                             />
-                                        </Box>
-                                    }
-                                    {info.status === 'Cancelado' &&
-                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                            <span style={{ fontSize: 18, fontWeight: 700 }}>Status:</span>
-                                            <Chip sx={{
-                                                background: '#E71A3B',
-                                                color: '#FFF',
-                                                fontWeight: 700,
-                                                fontSize: 16,
-                                                minWidth: 114
-                                            }}
-                                                label={info.status}
-                                            />
-                                        </Box>
-                                    }
-                                    {info.status === 'Entregue' &&
-                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                            <span style={{ fontSize: 18, fontWeight: 700 }}>Status:</span>
-                                            <Chip sx={{
-                                                background: '#00AB55',
-                                                color: '#FFF',
-                                                fontWeight: 700,
-                                                fontSize: 16,
-                                                minWidth: 114
-                                            }}
-                                                label={info.status}
-                                            />
-                                        </Box>
-                                    }
-                                    {info.status === 'Devolvido' &&
-                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                            <span style={{ fontSize: 18, fontWeight: 700 }}>Status:</span>
-                                            <Chip sx={{
-                                                background: '#0033C6',
-                                                color: '#FFF',
-                                                fontWeight: 700,
-                                                fontSize: 16,
-                                                minWidth: 114
-                                            }}
-                                                label={info.status}
-                                            />
-                                        </Box>
-                                    }
-                                    {info.status === 'Não Devolvido' &&
-                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                            <span style={{ fontSize: 18, fontWeight: 700 }}>Status:</span>
-                                            <Chip sx={{
-                                                background: '#FF5722',
-                                                color: '#FFF',
-                                                fontWeight: 700,
-                                                fontSize: 16,
-                                                minWidth: 114
-                                            }}
-                                                label={info.status}
-                                            />
-                                        </Box>
-                                    }
-                                </CardContent>
-                                <CardActions disableSpacing>
-                                    <div className='info-data-devolucao'>
-                                        <p style={{ marginLeft: 8 }}>Data de devolução</p>
-                                        <div style={{ display: 'flex', alignItems: 'center' }} onClick={handleClickOpen}>
-                                            <IconButton>
-                                                <EventBusyRoundedIcon style={{ color: '#e71a3b' }} />
-                                            </IconButton>
-                                            <div style={{ color: '#e71a3b', fontWeight: 700 }}>
-                                                {new Date(info.dataDevolucao).toLocaleDateString('pt-br')}
-                                            </div>
-                                        </div>
-                                        <Dialog open={open} onClose={handleClose}>
-                                            {/* <DialogTitle>Alteração Data de devolução</DialogTitle> */}
-                                            <DialogContent>
-                                                <DialogContentText style={{ fontWeight: 700, paddingBottom: "20px", display: "flex", alignItems: "center" }}>
-                                                    <img src={IconCalendar} width={35} height={35} />
-                                                    Por favor, informe a nova data de devolução do pedido!
-                                                </DialogContentText>
-                                                <DatePicker
-                                                    label='Data devolução'
-                                                    size='small'
-                                                    autoOk
-                                                    fullWidth
-                                                    inputVariant='outlined'
-                                                    format="dd/MM/yyyy"
-                                                    cancelLabel="CANCELAR"
-                                                    value={info.dataDevolucao}
-                                                    onChange={(date) => handleDateDevolutionChange(date, info._id)}
-                                                />
-                                            </DialogContent>
-                                            <DialogActions>
-                                                <Button onClick={handleClose}>Cancelar</Button>
-                                                <Button onClick={handleDateUpdated}>Salvar</Button>
-                                            </DialogActions>
-                                        </Dialog>
-                                    </div>
-
-                                    <ExpandMore
-                                        expand={info.expanded}
-                                        onClick={() => handleExpandClick(info._id)}
-                                    ><ExpandMoreIcon />
-                                    </ExpandMore>
-                                </CardActions>
-                                <Collapse in={info.expanded} timeout={'auto'} unmountOnExit>
-                                    <CardContent>
-                                        {info.status === "Não Devolvido" || (hours < 24 && info.status === "Pendente" || info.status === "Entregue") ?
-                                            <>
-                                                <div className='info-atrasado'>
-                                                    <span>
-                                                        Nº Pedido: {info.numeroPedido}
-                                                    </span>
-                                                    <span>
-                                                        Data do pedido: {new Date(info.dataPedido).toLocaleDateString('pt-br')}
-                                                    </span>
-                                                </div>
-                                                <div>
-                                                    <span className='titulo-atrasado'>Lista de produto(s)</span>
-                                                    <TableContainer>
-                                                        <Table>
-                                                            <TableHead>
-                                                                <TableRow>
-                                                                    <StyledTableCellLate align="left">Material</StyledTableCellLate>
-                                                                    <StyledTableCellLate align="center">Quantidade</StyledTableCellLate>
-                                                                </TableRow>
-                                                            </TableHead>
-                                                            <TableBody>
-                                                                {info.products.map((item) => (
-                                                                    <StyledTableRowLate key={item._id}>
-                                                                        <StyledTableCellLate align="left">{item.nomeMaterial}</StyledTableCellLate>
-                                                                        <StyledTableCellLate align="center">{item.qtde + " " + unidadeMedidaMap[(item.unidadeMedida)]} </StyledTableCellLate>
-                                                                    </StyledTableRowLate>
-                                                                ))}
-                                                            </TableBody>
-                                                        </Table>
-                                                    </TableContainer>
-                                                </div>
-                                            </> :
-                                            <>
-                                                <div className='info-default'>
-                                                    <span>
-                                                        Nº Pedido: {info.numeroPedido}
-                                                    </span>
-                                                    <span>
-                                                        Data do pedido: {new Date(info.dataPedido).toLocaleDateString('pt-br')}
-                                                    </span>
-                                                </div>
-
-                                                <label className='titulo-default'>Lista de produto(s)</label>
-                                                <TableContainer>
-                                                    <Table>
-                                                        <TableHead>
-                                                            <TableRow>
-                                                                <StyledTableCell align="left">Material</StyledTableCell>
-                                                                <StyledTableCell align="center">Quantidade</StyledTableCell>
-                                                            </TableRow>
-                                                        </TableHead>
-                                                        <TableBody>
-                                                            {info.products.map((item) => (
-                                                                <StyledTableRow key={item._id}>
-                                                                    <StyledTableCell align="left">{item.nomeMaterial}</StyledTableCell>
-                                                                    <StyledTableCell align="center">{item.qtde + " " + unidadeMedidaMap[(item.unidadeMedida)]} </StyledTableCell>
-                                                                </StyledTableRow>
-                                                            ))}
-                                                        </TableBody>
-                                                    </Table>
-                                                </TableContainer>
-                                            </>
                                         }
 
-                                        <TextField style={{ marginTop: '15px' }}
-                                            fullWidth
-                                            disabled
-                                            variant="outlined"
-                                            label="Observação"
-                                            multiline
-                                            rows={4}
-                                            value={info.observacao}
-                                        />
-                                    </CardContent>
-                                </Collapse>
-                            </Card>
-                        )
-                    })
-            )}
-        </RootContainer>
+                                        title={
+                                            <Typography sx={{ fontSize: 24, fontWeight: 700, color: '#2D2A26', textTransform: 'uppercase' }}>
+                                                {info.pedido_cliente?.tipoPessoa === 'Fisica' ? info.pedido_cliente?.nomeCliente : info.pedido_cliente?.nomeFantasia}
+                                            </Typography>
+                                        }
+
+                                        subheader={
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                                                <Typography fontWeight={600}>
+                                                    {info.logradouro}, Nº {info.numero} - Bairro: {info.bairro} - Complemento: {info.complemento}
+                                                </Typography>
+                                            </Box>
+                                        }>
+                                    </CardHeader>
+
+                                    <Box sx={{
+                                        borderRadius: '16px',
+                                        padding: 2,
+                                        backgroundColor: '#FFF',
+                                        boxShadow: '0 4px 10px rgba(0, 0, 0, 0.15)'
+                                    }}>
+                                        <CardContent sx={{ padding: '0px' }}>
+                                            <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', marginBottom: '24px' }}>
+                                                <Typography style={{ fontSize: 18, fontWeight: 600, marginRight: '50px' }}>
+                                                    Status:
+                                                </Typography>
+
+                                                {info.status === 'Pendente' &&
+                                                    <Chip sx={{
+                                                        background: '#FFC107',
+                                                        color: '#FFF',
+                                                        fontWeight: 700,
+                                                        fontSize: 16,
+                                                        minWidth: 114
+                                                    }}
+                                                        label={info.status}
+                                                    />
+                                                }
+                                                {info.status === 'Cancelado' &&
+                                                    <Chip sx={{
+                                                        background: '#E71A3B',
+                                                        color: '#FFF',
+                                                        fontWeight: 700,
+                                                        fontSize: 16,
+                                                        minWidth: 114
+                                                    }}
+                                                        label={info.status}
+                                                    />
+                                                }
+                                                {info.status === 'Entregue' &&
+                                                    <Chip sx={{
+                                                        background: '#00AB55',
+                                                        color: '#FFF',
+                                                        fontWeight: 700,
+                                                        fontSize: 16,
+                                                        minWidth: 114
+                                                    }}
+                                                        label={info.status}
+                                                    />
+                                                }
+                                                {info.status === 'Devolvido' &&
+                                                    <Chip sx={{
+                                                        background: '#0033C6',
+                                                        color: '#FFF',
+                                                        fontWeight: 700,
+                                                        fontSize: 16,
+                                                        minWidth: 114
+                                                    }}
+                                                        label={info.status}
+                                                    />
+                                                }
+                                                {info.status === 'Não Devolvido' &&
+                                                    <Chip sx={{
+                                                        background: '#FF5722',
+                                                        color: '#FFF',
+                                                        fontWeight: 700,
+                                                        fontSize: 16,
+                                                        minWidth: 114
+                                                    }}
+                                                        label={info.status}
+                                                    />
+                                                }
+                                            </Box>
+
+                                            <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 1, marginBottom: 2 }}>
+                                                <Typography style={{ fontSize: 18, fontWeight: 600, marginRight: '10px' }}>
+                                                    Contato(s):
+                                                </Typography>
+
+                                                {info?.pedido_cliente?.contacts?.length > 0 &&
+                                                    info.pedido_cliente.contacts.map((item) => (
+                                                        <Stack key={item.id}>
+                                                            <Chip
+                                                                style={{ fontFamily: 'Nunito' }}
+                                                                icon={item.tipoTelefone === "Celular" ? <PhoneAndroidIcon /> : <PhoneIcon />}
+                                                                label={item.numero}
+                                                            />
+                                                        </Stack>
+                                                    ))
+                                                }
+                                            </Box>
+                                        </CardContent>
+
+                                        <CardActions sx={{ padding: '0' }} disableSpacing>
+
+                                            <Box
+                                                style={{
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    flexWrap: 'wrap',
+                                                    gap: '8px',
+                                                    cursor: info.status === 'Devolvido' || info.status === 'Não Devolvido' || info.status === 'Cancelado' ? 'not-allowed' : 'pointer'
+                                                }}
+                                                onClick={() => {
+                                                    if (info.status !== 'Devolvido' && info.status !== 'Não Devolvido' && info.status !== 'Cancelado') {
+                                                        handleClickOpen(info);
+                                                    }
+                                                }}
+                                            >
+
+                                                <Typography style={{ fontSize: 18, fontWeight: 600 }}>Data de devolução:</Typography>
+
+                                                <Tooltip
+                                                    title={
+                                                        info.status === 'Devolvido'
+                                                            ? 'Indisponível para edição, pedido já devolvido.'
+                                                            : info.status === 'Não Devolvido'
+                                                                ? 'Indisponível para edição, pedido não devolvido.'
+                                                                : info.status === 'Cancelado'
+                                                                    ? 'Indisponível para edição, pedido cancelado.'
+                                                                    : 'Clique para editar a data de devolução'
+                                                    }
+                                                >
+                                                    <Button
+                                                        variant='outlined'
+                                                        startIcon={<EditCalendarRoundedIcon style={{ color: '#E71A3B', marginRight: '5px' }} />}
+                                                        sx={{
+                                                            borderColor: '#E71A3B !important',
+                                                            borderRadius: '16px',
+
+                                                            '&:hover': {
+                                                                borderColor: '#C21631',
+                                                                backgroundColor: 'rgba(231, 26, 59, 0.1)',
+                                                            },
+
+                                                            '& .MuiTouchRipple-root': {
+                                                                color: '#C21631',
+                                                            }
+                                                        }}>
+
+                                                        <Typography style={{ color: '#E71A3B', fontWeight: 700 }}>
+                                                            {new Date(info.dataDevolucao).toLocaleDateString('pt-br')}
+                                                        </Typography>
+                                                    </Button>
+                                                </Tooltip>
+
+                                                {info.status !== 'Cancelado' && info.status !== 'Devolvido' &&
+                                                    <Typography fontSize={14} fontWeight={600} color={
+                                                        diasRestantes !== null && !isNaN(diasRestantes)
+                                                            ? diasRestantes < 0
+                                                                ? '#E71A3B'
+                                                                : '#666'
+                                                            : '#999'
+                                                    }>
+                                                        {mensagem}
+                                                    </Typography>
+                                                }
+                                            </Box>
+
+                                            <Dialog sx={{ marginTop: '-150px' }} open={open && info.status !== 'Devolvido'} onClose={() => setOpen(false)}>
+                                                <DialogContent>
+                                                    <DialogContentText style={{ display: 'flex', alignItems: 'center', fontWeight: 700, gap: '8px', marginBottom: "24px" }}>
+                                                        <EditCalendarRoundedIcon style={{ color: '#00AB55' }} />
+                                                        Informe a nova data de devolução do pedido!
+                                                    </DialogContentText>
+
+                                                    {pedidoSelecionado && (
+                                                        <DatePicker
+                                                            label='Data de devolução'
+                                                            size='medium'
+                                                            autoOk
+                                                            fullWidth
+                                                            inputVariant='outlined'
+                                                            value={pedidoSelecionado.dataDevolucao}
+                                                            onChange={handleDateDevolutionChange}
+                                                            renderInput={(params) => <TextField fullWidth {...params} />}
+                                                        />
+                                                    )}
+                                                </DialogContent>
+
+                                                <DialogActions sx={{ padding: '0px 24px 12px 24px' }}>
+                                                    <Button variant='' onClick={() => setOpen(false)}>Cancelar</Button>
+                                                    <Button onClick={handleDateUpdated}>Salvar</Button>
+                                                </DialogActions>
+                                            </Dialog>
+
+                                            <ExpandMore expand={info.expanded} onClick={() => handleExpandClick(info._id)}>
+                                                <Tooltip title='Ver produtos'>
+                                                    <ExpandMoreIcon />
+                                                </Tooltip>
+                                            </ExpandMore>
+                                        </CardActions>
+                                    </Box>
+
+                                    <Collapse in={info.expanded} timeout={'auto'} unmountOnExit>
+                                        <CardContent sx={{
+                                            padding: '16px 0',
+
+                                            '&:last-child': {
+                                                paddingBottom: 0,
+                                            },
+                                        }}>
+                                            <Box sx={{
+                                                borderRadius: '16px',
+                                                padding: 2,
+                                                backgroundColor: '#FFF',
+                                                boxShadow: '0 4px 10px rgba(0, 0, 0, 0.15)'
+                                            }}>
+                                                <Grid container spacing={1}>
+                                                    <Grid item xs={12} sm={12} md={12}>
+                                                        <Box sx={{ display: 'flex', flexWrap: "wrap", alignItems: 'center', gap: 2, marginBottom: 2 }}>
+                                                            <Typography style={{ fontSize: 20, fontWeight: 600 }}>
+                                                                Nº Pedido: #{info.numeroPedido}
+                                                            </Typography>
+
+                                                            <Typography style={{ fontSize: 20, fontWeight: 600 }}>
+                                                                Data do pedido: {new Date(info.dataPedido).toLocaleDateString('pt-br')}
+                                                            </Typography>
+                                                        </Box>
+                                                    </Grid>
+
+                                                    <Grid item xs={12} sm={12} md={12}>
+                                                        <Typography sx={{ fontSize: 22, fontWeight: 700, marginBottom: 2 }}>
+                                                            Produto(s)
+                                                        </Typography>
+
+                                                        <Box sx={{
+                                                            display: "flex",
+                                                            alignItems: "center",
+                                                            flexWrap: "wrap",
+                                                            gap: '16px',
+                                                            marginBottom: 1,
+                                                        }} >
+                                                            {info.products.map((item) => (
+                                                                <Box
+                                                                    key={item._id}
+                                                                    sx={{
+                                                                        display: "flex",
+                                                                        alignItems: "center",
+                                                                        gap: 1.5,
+                                                                        padding: 1.5,
+                                                                        borderRadius: 2,
+                                                                        bgcolor: "#F0F0F0",
+                                                                        minWidth: 200,
+                                                                    }}
+                                                                >
+                                                                    <VerifiedRoundedIcon sx={{ fontSize: 42, color: '#5E5E5E' }} />
+
+                                                                    <Box>
+                                                                        <Typography fontWeight={700}>{item.nomeMaterial}</Typography>
+                                                                        <Typography fontSize={15}>
+                                                                            {item.qtde + " " + unidadeMedidaMap[item.unidadeMedida]}
+                                                                        </Typography>
+                                                                    </Box>
+                                                                </Box>
+                                                            ))}
+                                                        </Box>
+                                                    </Grid>
+
+                                                    <Grid item xs={12} sm={12} md={12}>
+                                                        <Box sx={{ bgcolor: '#F0F0F0', borderRadius: 2, padding: 1.5 }} >
+                                                            <Typography sx={{ fontSize: 18, fontWeight: 600 }}>
+                                                                Observação: {info.observacao || 'Não há observação.'}
+                                                            </Typography>
+                                                        </Box>
+                                                    </Grid>
+
+                                                    <Grid item xs={12} sm={12} md={12}>
+                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: '16px', marginTop: 1 }}>
+                                                            {info.status === "Pendente" &&
+                                                                <Button
+                                                                    onClick={() => handleChangeStatus(info._id, "Entregue")}
+                                                                    variant='outlined'
+                                                                    size='large'
+                                                                    title="Entregar"
+                                                                    startIcon={<CheckCircleRoundedIcon />}
+
+                                                                    sx={{
+                                                                        backgroundColor: '#1C7E2E !important',
+                                                                        border: '#1C7E2E !important',
+                                                                        color: '#FFF',
+                                                                        minWidth: 150
+                                                                    }}>
+                                                                    Entregue
+                                                                </Button>
+                                                            }
+
+                                                            {info.status === "Pendente" &&
+                                                                <Button
+                                                                    onClick={() => handleChangeStatus(info._id, "Cancelado")}
+                                                                    variant='outlined'
+                                                                    size='large'
+                                                                    title="Cancelado"
+                                                                    startIcon={<CancelRoundedIcon />}
+
+                                                                    sx={{
+                                                                        backgroundColor: '#E71A3B !important',
+                                                                        border: '#E71A3B !important',
+                                                                        color: '#FFF',
+                                                                        minWidth: 150
+                                                                    }}>
+                                                                    Cancelar
+                                                                </Button>
+                                                            }
+
+                                                            {info.status === "Entregue" &&
+                                                                <Button
+                                                                    onClick={() => handleChangeStatus(info._id, "Devolvido")}
+                                                                    variant='outlined'
+                                                                    size='large'
+                                                                    title="Devolvido"
+                                                                    startIcon={<ReplayCircleFilledRoundedIcon />}
+
+                                                                    sx={{
+                                                                        backgroundColor: '#0033C6 !important',
+                                                                        border: '#0033C6 !important',
+                                                                        color: '#FFF',
+                                                                        minWidth: 150
+                                                                    }}>
+                                                                    Devolvido
+                                                                </Button>
+                                                            }
+                                                            {info.status === "Não Devolvido" &&
+                                                                <Button
+                                                                    onClick={() => handleChangeStatus(info._id, "Devolvido")}
+                                                                    variant='outlined'
+                                                                    size='large'
+                                                                    title="Devolvido"
+                                                                    startIcon={<ReplayCircleFilledRoundedIcon />}
+
+                                                                    sx={{
+                                                                        backgroundColor: '#0033C6 !important',
+                                                                        border: '#0033C6 !important',
+                                                                        color: '#FFF',
+                                                                        minWidth: 150
+                                                                    }}>
+                                                                    Devolvido
+                                                                </Button>
+                                                            }
+                                                        </Box>
+                                                    </Grid>
+                                                </Grid>
+                                            </Box>
+                                        </CardContent>
+                                    </Collapse>
+                                </Card>
+                            )
+                        })
+                )}
+            </main>
+        </div>
     );
 }
-
-export const RootContainer = styled('div')({
-    width: '100%',
-});
-
-// export const InputStyle = {
-//     '& label.Mui-focused': {
-//         color: '#00AB55',
-//     },
-//     '& .MuiOutlinedInput-root': {
-//         '& fieldset': {
-//             borderColor: '#dce0e4',
-//         },
-//         '&:hover fieldset': {
-//             borderColor: '#3d3d3d',
-//         },
-//         '&.Mui-focused fieldset': {
-//             borderColor: '#00AB55',
-//         },
-//     },
-// };
-
-// export const InputLateStyle = {
-//     '& label.Mui-focused': {
-//         color: '#6a1100',
-//     },
-//     '& .MuiOutlinedInput-root': {
-//         '& fieldset': {
-//             borderColor: '#BD1E1E',
-//         },
-//         '&:hover fieldset': {
-//             borderColor: '#3d3d3d',
-//         },
-//         '&.Mui-focused fieldset': {
-//             borderColor: '#00AB55',
-//         },
-//     },
-// };
-
-// export const TableDefaultStyle = styled(Table)(({ theme }) => ({
-//     minWidth: 700,
-//     borderRadius: 5,
-//     background: '#F3F4F6',
-
-//     '& .MuiTableHead-root': {
-//         fontFamily: 'Nunito, sans-serif',
-//     },
-// }));
-
-
-// export const TableAtrasadoStyle = styled(Table)(({ theme }) => ({
-//     minWidth: 700,
-//     borderRadius: 5,
-
-//     '& .MuiTableHead-root': {
-//         fontFamily: 'Nunito, sans-serif',
-//     },
-// }));

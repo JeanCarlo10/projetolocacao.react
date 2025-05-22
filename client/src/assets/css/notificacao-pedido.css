@@ -1,4 +1,4 @@
-*{
+* {
     padding: 0;
     margin: 0;
     text-decoration: none;
@@ -7,13 +7,15 @@
 }
 
 .card-info {
-    border-radius: 15px !important;
-    margin-bottom: 10px;
-    border: 2px solid #D4D4D4;
+    padding: 16px;
+    border-radius: 16px !important;
+    margin-bottom: 16px;
+    border: 2px solid #E0E1E0;
+    box-shadow: 0px 2px 4px 0 rgba(0, 0, 0, .2);
 }
 
 .animation {
-    background: #f500560d !important; 
+    background: #f500560d !important;
     border: 2px solid #dc3545 !important;
     animation: pulse 2s infinite;
 }
@@ -33,90 +35,4 @@
         -moz-box-shadow: 0 0 0 0 rgba(255, 0, 0, 0);
         box-shadow: 0 0 0 0 rgba(255, 0, 0, 0);
     }
-}
-
-.title {
-    font-size: 20px;
-    font-family: 'Nunito';
-    font-weight: 700;
-    color: #2D2A26;
-    text-transform: uppercase;
-}
-
-.subTitle-Address {
-    font-size: 14px;
-    font-weight: 400;
-    font-family: 'Nunito';
-    color: #7C7C7C;
-}
-
-.info-data-devolucao {
-    font-size: 14px;
-    font-weight: bold;
-    color: #2D2A26;
-}
-
-/* #region Info Default */
-.info-default {
-    flex-direction: row;
-    display: flex;
-    background: #F3F4F6;
-    border-top-right-radius: 5px;
-    border-top-left-radius: 5px;
-    border-bottom: 2px dashed #BCBCBC;
-    margin-bottom: 10px;
-    padding: 6px;
-}
-
-.info-default span {
-    font-size: 14px;
-    font-weight: bold;
-    color: #2d2a26;
-    margin-right: 15px;
-}
-
-.titulo-default {
-    font-size: 18px;
-    font-weight: bold;
-    color: #2d2a26;
-}
-/* #endregion */
-
-/* #region Info Atrasado */
-.info-atrasado {
-    flex-direction: row;
-    display: flex;
-    background: #fd595914;
-    border-top-right-radius: 5px;
-    border-top-left-radius: 5px;
-    border-bottom: 2px dashed #FE3030;
-    margin-bottom: 10px;
-    padding: 6px;
-}
-
-.info-atrasado span {
-    font-size: 14px;
-    font-weight: bold;
-    color: #FE3030;
-    margin-right: 15px;
-}
-
-.titulo-atrasado {
-    font-size: 18px;
-    font-weight: bold;
-    color: #6a1100;
-}
-/* #endregion */
-
-.status p {
-    font-size: 14px;
-    font-weight: 400;
-    color: #666;
-}
-
-.containerTitle {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 15px;
 }

@@ -2,40 +2,36 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 
 const DataSchema = new mongoose.Schema({
-    nmUsuario:String,
-    dsEmail:String,
-    flUsuario:{type: Number, default: 1},
-    senha:String,
-},{
+    nmUsuario: String,
+    dsEmail: String,
+    flUsuario: { type: Number, default: 1 },
+    senha: String,
+}, {
     timestamps: true
 });
 
 //Quando a senha chegar aqui, antes de salvar. O código já criptografa automaticamente
-DataSchema.pre('save', function(next){
-    if(!this.isModified("senha")){
-        return next();
-    }
-    this.senha = bcrypt.hashSync(this.senha, 10);
-    next();
+DataSchema.pre('save', async function () {
+    if (!this.isModified("senha")) return;
+    this.senha = await bcrypt.hash(this.senha, 10);
 });
 
-DataSchema.pre('findOneAndUpdate', function (next){
-    var password = this.getUpdate().senha+'';
-    if (password.length < 55){
-        this.getUpdate().senha = bcrypt.hashSync(password, 10);
+DataSchema.pre('findOneAndUpdate', async function () {
+    const update = this.getUpdate();
+    if (update.senha && update.senha.length < 55) {
+        update.senha = await bcrypt.hash(update.senha, 10);
+        this.setUpdate(update); // garantir que update seja alterado
     }
-    next();
-})
+});
 
-DataSchema.methods.isCorrectPassword = function (password, callback){
-    bcrypt.compare(password, this.senha, function(err, same){
-        if (err){
-            callback(err);
-        }else{
-            callback(err, same);
-        }
-    })
-}
+DataSchema.methods.isCorrectPassword = async function (password) {
+    try {
+        const same = await bcrypt.compare(password, this.senha);
+        return same;
+    } catch (err) {
+        throw err;
+    }
+};
 
 const users = mongoose.model('users', DataSchema);
 

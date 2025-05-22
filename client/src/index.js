@@ -83,6 +83,16 @@ const theme = createTheme({
 
     MuiButton: {
       styleOverrides: {
+        //Botão dentro do dialog
+        textPrimary: {
+          backgroundColor: '#00AB55',
+          color: '#fff',
+
+          '&:hover': {
+            backgroundColor: '#08690A',
+          },
+        },
+
         contained: {
           backgroundColor: '#00AB55 !important',
           color: '#FFF !important',
@@ -121,6 +131,14 @@ const theme = createTheme({
       }
     },
 
+    MuiCssBaseline: {
+      styleOverrides: {
+        '.MuiDayPicker-slideTransition': {
+          minHeight: '205px !important',
+        },
+      },
+    },
+
     MuiPickersDay: {
       styleOverrides: {
         root: {
@@ -157,7 +175,7 @@ const theme = createTheme({
           fontWeight: 700,
 
           '&.Mui-focused': {
-            color: '#00AB55', 
+            color: '#00AB55',
           },
         },
       },

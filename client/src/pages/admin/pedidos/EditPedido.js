@@ -216,6 +216,7 @@ export default function EditPedido() {
 
     const totalParcial = watch("totalParcial");
     const desconto = watch("desconto");
+    const statusAtual = watch('status');
 
     //Faz a subtração do total geral com desconto e mostra no campo total geral
     useEffect(() => {
@@ -596,6 +597,7 @@ export default function EditPedido() {
                                                         fullWidth
                                                         error={!!error}
                                                         helperText={error?.message}
+                                                        disabled={statusAtual === 'Não Devolvido' || statusAtual === 'Devolvido' || statusAtual === 'Cancelado'}
                                                         InputProps={{
                                                             ...params.InputProps,
                                                             inputProps: {

@@ -41,6 +41,7 @@ routes.get('/api/rents/search', Rent.search);
 routes.get('/api/rents.details/:_id', Rent.details);
 routes.get('/api/rents/overview/:_id', Rent.overview);
 routes.put('/api/rents', Rent.update);
+routes.put('/api/rents/:_id/data-devolucao', Rent.updateDate);
 routes.get('/api/rents/status', Rent.status);
 routes.post('/api/rents/change-status', Rent.changeStatus);
 

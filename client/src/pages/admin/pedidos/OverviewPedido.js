@@ -278,7 +278,7 @@ export default function OverviewPedido() {
                                             <Box sx={{ fontSize: 18, fontWeight: 700, color: '#3B4251' }}>
                                                 <p>{endereco?.logradouro || ''}, Nº {endereco?.numero || ''}</p>
                                                 <p>Bairro: {endereco?.bairro || ''} - Cidade: {endereco?.cidade || ''}</p>
-                                                <p>Complemento: {endereco?.complemento || ''}</p>
+                                                <p>{endereco?.complemento && `Complemento: ${endereco.complemento}`}</p>
                                                 <p>CEP: {endereco?.cep || ''}</p>
                                             </Box>
                                         </Grid>

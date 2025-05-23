@@ -176,7 +176,7 @@ export default function IndexPedido() {
                   }}
                   value={keyword}
                   onChange={e => setKeyword(e.target.value)}
-                  placeholder="Buscar"
+                  placeholder="Buscar cliente ou Nº pedido"
                   variant="outlined"
                 />
               </Grid>

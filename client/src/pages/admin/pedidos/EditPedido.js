@@ -519,7 +519,7 @@ export default function EditPedido() {
                                                     <Box sx={{ fontSize: 18, fontWeight: 700, color: '#3B4251' }}>
                                                         <p>{currentClient?.logradouro || ''}, Nº {currentClient?.numero || ''}</p>
                                                         <p>Bairro: {currentClient?.bairro || ''} - {currentClient?.cidade || ''}</p>
-                                                        <p>Complemento: {currentClient?.complemento || ''}</p>
+                                                        <p>{currentClient?.complemento && `Complemento: ${currentClient.complemento}`}</p>
                                                         <p>CEP: {currentClient?.cep || ''}</p>
                                                     </Box>
                                                 </Grid>

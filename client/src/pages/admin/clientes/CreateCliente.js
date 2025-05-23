@@ -48,7 +48,9 @@ const schema = yup.object({
       .test("len", "CNPJ deve conter 14 dígitos", (val) => val?.length === 14),
   }),
 
-  contacts: yup.array().min(1, 'Informe pelo menos um contato.').required("Informe pelo menos um contato."),
+  contacts: yup.array()
+  .min(1, 'Informe pelo menos um contato.')
+  .required("Informe pelo menos um contato."),
 })
 
 export default function CreateCliente() {

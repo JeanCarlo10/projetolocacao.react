@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { styled } from '@mui/material/styles';
 import { Box, Card, CardContent } from '@mui/material';
-import { TextField, InputLabel, FormControl, Select, IconButton, Chip, Button } from '@mui/material';
+import { TextField, InputLabel, FormControl, Select, IconButton, Chip, Button, FormHelperText } from '@mui/material';
 import Tooltip from '@mui/material/Tooltip';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -49,6 +49,11 @@ export default function ListaContatos(props) {
   const [numero, setNumero] = useState('');
   const [observacao, setObservacao] = useState('');
 
+  const [errors, setErrors] = useState({
+    tipoTelefone: false,
+    numero: false,
+  });
+
   const handleChangeNumber = (e) => {
     setNumero(mask(unMask(e.target.value), ['(99) 9999-9999', '(99) 9 9999-9999']));
   }
@@ -58,17 +63,28 @@ export default function ListaContatos(props) {
   };
 
   const handleAddContact = () => {
-    if (numero !== '') {
-      addContact({
-        id: new Date().getTime(),
-        tipoTelefone: tipoTelefone,
-        numero: numero,
-        observacao: observacao
-      });
-    }
+    const hasErrors = {
+      tipoTelefone: tipoTelefone === '',
+      numero: numero === '',
+    };
+
+    setErrors(hasErrors);
+
+    const isValid = !hasErrors.tipoTelefone && !hasErrors.numero;
+
+    if (!isValid) return;
+
+    addContact({
+      id: new Date().getTime(),
+      tipoTelefone: tipoTelefone,
+      numero: numero,
+      observacao: observacao
+    });
+
     setTipoTelefone('Celular');
     setNumero('');
     setObservacao('');
+    setErrors({ tipoTelefone: false, numero: false });
   }
 
   return (
@@ -92,7 +108,12 @@ export default function ListaContatos(props) {
           <Grid container spacing={2}>
 
             <Grid item xs={12} sm={6} md={6}>
-              <FormControl variant="outlined" size="medium" fullWidth>
+              <FormControl
+                variant="outlined"
+                size="medium"
+                error={errors.tipoTelefone}
+                fullWidth
+              >
                 <InputLabel>Tipo</InputLabel>
                 <Select
                   value={tipoTelefone}
@@ -102,6 +123,9 @@ export default function ListaContatos(props) {
                   <MenuItem value={'Celular'}>Celular</MenuItem>
                   <MenuItem value={'Fixo'}>Fixo</MenuItem>
                 </Select>
+                {errors.tipoTelefone && (
+                  <FormHelperText>Selecione o tipo de telefone</FormHelperText>
+                )}
               </FormControl>
             </Grid>
 
@@ -112,6 +136,8 @@ export default function ListaContatos(props) {
                 size="medium"
                 label="Número"
                 value={numero}
+                error={errors.numero}
+                helperText={errors.numero ? "Informe o número" : ""}
                 onChange={handleChangeNumber}
               />
             </Grid>

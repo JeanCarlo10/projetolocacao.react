@@ -49,7 +49,9 @@ const schema = yup.object({
             .test("len", "CNPJ deve conter 14 dígitos", (val) => val?.length === 14),
     }),
 
-    contacts: yup.array().min(1, 'Informe pelo menos um contato.'),
+    contacts: yup.array()
+        .min(1, 'Informe pelo menos um contato.')
+        .required('Informe pelo menos um contato.'),
 })
 
 export default function EditCliente() {
@@ -88,7 +90,8 @@ export default function EditCliente() {
             nomeFantasia: '',
             cnpj: '',
             ie: '',
-            email: ''
+            email: '',
+            contacts: []
         },
         resolver: yupResolver(schema)
     });
@@ -170,6 +173,10 @@ export default function EditCliente() {
             prevContacts.filter((contact) => contact.id !== idContact)
         );
     }
+
+    useEffect(() => {
+        setValue('contacts', contacts);
+    }, [contacts, setValue]);
 
     const handleRemovePhoto = () => {
         setFotoBase64(null);
@@ -517,15 +524,16 @@ export default function EditCliente() {
                                 <Grid item xs={12} sm={12} md={12}>
                                     <ListaContatos contacts={contacts} addContact={handleAddContact} deleteContact={handleDeleteContact} />
                                     {errors.contacts && (
-                                        <FormHelperText error sx={{
-                                            border: '1px solid #ff5b5b',
-                                            background: '#FFE1E1',
-                                            borderRadius: 8,
-                                            padding: 8,
-                                            marginTop: 6,
-                                            fontSize: 14,
-                                            fontWeight: 600
-                                        }}>
+                                        <FormHelperText error
+                                            sx={{
+                                                border: '1px solid #FF5B5B',
+                                                background: '#FFE1E1',
+                                                borderRadius: 2,
+                                                padding: 1,
+                                                marginTop: 1,
+                                                fontSize: 14,
+                                                fontWeight: 600
+                                            }}>
                                             {errors.contacts.message}
                                         </FormHelperText>
                                     )}

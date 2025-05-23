@@ -139,39 +139,13 @@ export default function FilterDashboard(props) {
             }}
             value={search}
             onChange={(e) => onChangeSearch(e.target.value)}
-            placeholder="Buscar cliente"
+            placeholder="Buscar cliente ou Nº pedido"
             variant="outlined"
           />
         </Grid>
 
         <Grid item row xs={12} sm={6} md={3} >
-          <FormControl fullWidth
-            sx={{
-              '& .MuiInputLabel-root': {
-                '&.Mui-focused': {
-                  color: '#00AB55',
-                },
-              },
-
-              '& .MuiOutlinedInput-root': {
-                fontWeight: 500,
-                fontFamily: 'Nunito',
-                height: '56px',
-
-                '& fieldset': {
-                  borderRadius: '6px',
-                  borderColor: '#BCBCBC',
-                  borderStyle: 'solid',
-                },
-
-                '&:hover fieldset': {
-                  borderColor: '#00AB55',
-                },
-                '&.Mui-focused fieldset': {
-                  borderColor: '#00AB55',
-                },
-              }
-            }}>
+          <FormControl fullWidth>
             <InputLabel>Status</InputLabel>
             <Select
               multiple
@@ -201,69 +175,3 @@ export default function FilterDashboard(props) {
     </Box>
   );
 }
-
-// const useStyles = makeStyles((theme) => ({
-//   boxFilter: {
-//     borderRadius: 10,
-//     padding: 16,
-//     margin: '16px 0',
-//     border: "1px solid #E0E1E0",
-//     boxShadow: "0px 2px 4px 0 rgba(0, 0, 0, .2)",
-//   },
-
-//   textFilter: {
-//     display: 'flex',
-//     alignItems: 'center',
-//     marginBottom: 8,
-//     color: '#616161'
-//   },
-
-//   containerFilterDate: {
-//     flexDirection: 'row',
-//     display: 'flex',
-//     alignItems: 'center',
-//     textAlign: 'center',
-//     gap: '8px',
-//     justifyContent: 'space-between',
-//   },
-
-//   select: {
-//     '& .MuiInputLabel-root': {
-//       '&.Mui-focused': {
-//         color: '#00AB55',
-//       },
-//     },
-
-//     '& .MuiOutlinedInput-root': {
-//       fontWeight: 500,
-//       fontFamily: 'Nunito',
-//       height: '56px',
-
-//       '& fieldset': {
-//         borderRadius: 6,
-//         borderColor: '#BCBCBC',
-//         borderStyle: 'solid',
-//       },
-
-//       '&:hover fieldset': {
-//         borderColor: '#00AB55',
-//       },
-//       '&.Mui-focused fieldset': {
-//         borderColor: '#00AB55',
-//       },
-//     }
-//   },
-
-//   btnMonth: {
-//     padding: 0,
-//     borderRadius: 8,
-//     width: 55,
-//     height: 55,
-//     color: '#FFF',
-//     backgroundColor: '#00ab55',
-
-//     '&:hover': {
-//       backgroundColor: '#08690A',
-//     },
-//   }
-// }));

@@ -366,7 +366,7 @@ export default function OverviewCliente() {
                       <Box sx={{ fontSize: 18, fontWeight: 700, color: '#3B4251' }}>
                         <p>{cliente?.logradouro || ''}, Nº {cliente?.numero || ''}</p>
                         <p>Bairro: {cliente?.bairro || ''} - Cidade: {cliente?.cidade || ''}</p>
-                        <p>Complemento: {cliente?.complemento || ''}</p>
+                        <p>{cliente.complemento && `Complemento: ${cliente.complemento}`}</p>
                         <p>CEP: {cliente?.cep || ''}</p>
                       </Box>
                     </Grid>

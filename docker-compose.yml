@@ -1,27 +1,25 @@
 version: '3.8'
+
 services:
-  mongo:
-    image: mongo:latest
-    container_name: mongo
+  backend:
+    build: .
     ports:
-      - "27017:27017"
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: useradmin
-      MONGO_INITDB_ROOT_PASSWORD: passwordadmin
+      - "5000:5000"
     volumes:
-      - ./mongodb:/data/db
-volumes:
-  mongodata:
-    driver: local
-    
+      - .:/app
+      - /app/node_modules
+      - ./uploads:/app/uploads
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+    env_file:
+      - .env
+
   frontend:
     build:
       context: ./client
     ports:
-      - "3000:3000"
-
-  backend:
-    build:
-      context: ./
-    ports:
-      - "5000:5000"
+      - "3000:80"
+    depends_on:
+      - backend
+    restart: unless-stopped

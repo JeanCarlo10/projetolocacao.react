@@ -205,7 +205,7 @@ export default function NotificacaoPedido(props) {
                                         subheader={
                                             <Box sx={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
                                                 <Typography fontWeight={600}>
-                                                    {info.logradouro}, Nº {info.numero} - Bairro: {info.bairro} - Complemento: {info.complemento}
+                                                    {info.logradouro}, Nº {info.numero} - Bairro: {info.bairro} - Cidade: {info.cidade} {info.complemento && ` - Complemento: ${info.complemento}`}
                                                 </Typography>
                                             </Box>
                                         }>

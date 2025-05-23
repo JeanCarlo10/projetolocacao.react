@@ -19,6 +19,9 @@
     font-size: 18px;
     background: #00AB55;
     color: #FFF;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
 }
 
 .container__icon__ativas {
@@ -41,6 +44,9 @@
     font-size: 18px;
     background: #FF6700;
     color: #FFF;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
 }
 
 .container__icon__pendentes {
@@ -63,6 +69,9 @@
     font-size: 18px;
     background: #FF5252;
     color: #FFF;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
 }
 
 .container__icon__atrasadas {

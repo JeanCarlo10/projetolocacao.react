@@ -74,13 +74,6 @@ module.exports = {
                 },
             ];
 
-            // Keyword para buscar no nome do cliente (que está em pedido_cliente depois do lookup)
-            const keyword = req.query.keyword;
-            if (keyword && keyword.trim() !== "") {
-                // Não dá pra filtrar diretamente aqui, porque cliente ainda não foi carregado
-                // Vamos filtrar depois no pipeline com $match no campo 'pedido_cliente.nomeCliente'
-            }
-
             // Status
             if (req.query.statuses && req.query.statuses.trim() !== "") {
                 const st = req.query.statuses.split(",");
@@ -101,7 +94,9 @@ module.exports = {
                 { $unwind: "$pedido_cliente" }, // desestrutura para facilitar filtro e acesso
             ];
 
-            // Se tem keyword, adiciona filtro no nomeCliente ou nomeFantasia do cliente
+            // Se tem keyword, adiciona filtro no nomeCliente ou nomeFantasia do cliente e numeroPedido
+            const keyword = req.query.keyword;
+
             if (keyword && keyword.trim() !== "") {
                 const regex = new RegExp(keyword, "i");
                 pipeline.push({
@@ -109,6 +104,7 @@ module.exports = {
                         $or: [
                             { "pedido_cliente.nomeCliente": regex },
                             { "pedido_cliente.nomeFantasia": regex },
+                            { $expr: { $regexMatch: { input: { $toString: "$numeroPedido" }, regex: regex } } }
                         ],
                     },
                 });

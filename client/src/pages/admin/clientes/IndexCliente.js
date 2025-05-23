@@ -177,7 +177,7 @@ export default function IndexCliente() {
                     }}
                     value={keyword}
                     onChange={e => setKeyword(e.target.value)}
-                    placeholder="Buscar cliente"
+                    placeholder="Buscar nome ou cpf/cnpj"
                     variant="outlined"
                   />
                 </Box>

@@ -427,6 +427,7 @@ export default function EditPedido() {
                                                 <Select
                                                     label="Status"
                                                     value={field.value}
+                                                    disabled={statusAtual === 'Não Devolvido' || statusAtual === 'Devolvido' || statusAtual === 'Cancelado'}
                                                     onChange={(e) => { field.onChange(e) }}
                                                 >
                                                     <MenuItem value="Pendente">Pendente</MenuItem>
@@ -591,18 +592,19 @@ export default function EditPedido() {
                                                 label="Data de devolução*"
                                                 value={value}
                                                 onChange={onChange}
+                                                disabled={statusAtual === 'Não Devolvido' || statusAtual === 'Devolvido' || statusAtual === 'Cancelado'}
                                                 renderInput={(params) => (
                                                     <TextField
                                                         {...params}
                                                         fullWidth
                                                         error={!!error}
                                                         helperText={error?.message}
-                                                        disabled={statusAtual === 'Não Devolvido' || statusAtual === 'Devolvido' || statusAtual === 'Cancelado'}
                                                         InputProps={{
                                                             ...params.InputProps,
                                                             inputProps: {
                                                                 ...params.inputProps,
                                                                 placeholder: "DD/MM/AAAA",
+                                                                
                                                             },
                                                         }}
                                                     />

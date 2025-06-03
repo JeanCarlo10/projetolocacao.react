@@ -2,9 +2,9 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 
 const DataSchema = new mongoose.Schema({
-    nmUsuario: String,
-    dsEmail: String,
-    flUsuario: { type: Number, default: 1 },
+    nomeUsuario: String,
+    email: String,
+    tipoUsuario: { type: String, default: "Administrador" }, //Administrador e Colaborador
     senha: String,
 }, {
     timestamps: true

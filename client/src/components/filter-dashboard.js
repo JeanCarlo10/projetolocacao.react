@@ -12,7 +12,6 @@ import {
   InputLabel, MenuItem, ListItemText, Select, Box
 } from '@mui/material';
 import { formatCurrentMonth } from '../helpers/dateFilter';
-import { statusFilterDashboard } from '../../src/functions/static_data';
 
 const ITEM_HEIGHT = 70;
 const ITEM_PADDING_TOP = 8;
@@ -42,6 +41,14 @@ const MenuProps = {
 
 export default function FilterDashboard(props) {
   const { currentMonth, onMonthChange, onResetFilters, search, onChangeSearch, status, onChangeStatus } = props;
+
+  const statusRent = [
+    { id: 1, label: 'Pendente' },
+    { id: 2, label: 'Entregue' },
+    { id: 3, label: 'Cancelado' },
+    { id: 4, label: 'Devolvido' },
+    { id: 5, label: 'Não Devolvido' },
+  ];
 
   const handlePrevMonth = () => {
     var newCurrentMonth = new Date(currentMonth.valueOf());
@@ -144,7 +151,7 @@ export default function FilterDashboard(props) {
           />
         </Grid>
 
-        <Grid item row xs={12} sm={6} md={3} >
+        <Grid item xs={12} sm={6} md={3} >
           <FormControl fullWidth>
             <InputLabel>Status</InputLabel>
             <Select
@@ -155,9 +162,9 @@ export default function FilterDashboard(props) {
               renderValue={(selected) => selected.join(', ')}
               MenuProps={MenuProps}
             >
-              {statusFilterDashboard.map((item) => (
+              {statusRent.map((item) => (
                 <MenuItem key={item.id} value={item.label}>
-                  <Checkbox success checked={status.indexOf(item.label) > -1} />
+                  <Checkbox checked={status.indexOf(item.label) > -1} />
                   <ListItemText primary={item.label} />
                 </MenuItem>
               ))}
@@ -165,7 +172,7 @@ export default function FilterDashboard(props) {
           </FormControl>
         </Grid>
 
-        <Grid item row xs={12} sm={6} md={2}>
+        <Grid item xs={12} sm={6} md={2}>
           <Button variant="contained" style={{ height: '56px', borderRadius: 6 }} fullWidth onClick={onResetFilters}>
             Limpar filtros
           </Button>

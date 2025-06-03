@@ -7,36 +7,26 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import Chip from '@mui/material/Chip';
-import Button from '@mui/material/Button';
-import Card from '@mui/material/Card';
-import Breadcrumbs from '@mui/material/Breadcrumbs';
-import Link from '@mui/material/Link';
-import Typography from '@mui/material/Typography';
+import TextField from '@mui/material/TextField';
 import CardHeader from '@mui/material/CardHeader';
-import { Menu, MenuItem, IconButton, ListItemIcon, ListItemText } from '@mui/material';
-import InputBase from '@mui/material/InputBase';
+import InputAdornment from '@mui/material/InputAdornment';
+import { Link, Tooltip, Chip, IconButton, Button, Card, Breadcrumbs, Typography, Box, Grid } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-import SearchIcon from '@mui/icons-material/Search';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
 import AddCircleRoundedIcon from '@mui/icons-material/AddCircleRounded';
+import FilterAltRoundedIcon from '@mui/icons-material/FilterAltRounded';
+import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
 import lottie from 'lottie-web';
 import api from '../../../services/api';
 import MenuAdmin from '../../../components/menu-admin';
-import { getTypeUser, getTypeUserLabel } from '../../../functions/static_data';
 import Swal from 'sweetalert2';
 
 export default function IndexUsuario() {
   const container = useRef(null);
-  const ref = useRef(null);
 
   const [users, setUsers] = useState([]);
-  const [filterUsers, setFilterUsers] = useState([]);
-  const [search, setSearch] = useState("");
-
+  const [keyword, setKeyword] = useState("");
   const [loading, setLoading] = useState(true);
-  const [isOpenMenu, setIsOpenMenu] = useState(false);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
@@ -51,42 +41,42 @@ export default function IndexUsuario() {
   }, []);
 
   useEffect(() => {
-    async function loadUsers() {
-      const response = await api.get("/api/users");
+    async function fetchUsers() {
+      var filter = `keyword=${keyword}`;
+      const results = await api.get(`/api/users/index?${filter}`);
 
-      setUsers(response.data);
-      setFilterUsers(response.data);
+      setUsers(results.data);
       setLoading(false);
     }
-    loadUsers();
-  }, []);
+    fetchUsers();
+  }, [keyword]);
 
-  const handleDelete = (id) => {
+  const handleDelete = (user) => {
     Swal.fire({
       icon: 'warning',
       title: 'Exclusão',
-      text: 'Deseja realmente excluir este usuário?',
+      html: `Deseja realmente excluir o usuário <strong>${user.nomeUsuario}<strong>?`,
       showCloseButton: true,
       confirmButtonText: 'Sim, excluir!',
-      confirmButtonColor: '#d33333',
+      confirmButtonColor: '#D33333',
       showCancelButton: true,
       cancelButtonText: 'Não',
       reverseButtons: true,
-    }).then((result) => {
+    }).then(async (result) => {
       if (result.isConfirmed) {
-        api.delete('api/users/' + id)
+        try {
+          const response = await api.delete(`api/users/${user._id}`);
 
-        if (result.status = 200) {
-          window.location.href = '/admin/usuarios';
+          if (response.status === 200) {
+            Swal.fire('Excluído!', 'Usuário removido com sucesso.', 'success');
+            setUsers((prev) => prev.filter((u) => u._id !== user._id));
+          }
+        } catch (error) {
+          Swal.fire('Erro!', 'Não foi possível excluir o material.', 'error');
         }
       }
     })
   }
-
-  const [selectTypeUser, setSelectTypeUser] = useState({
-    administrador: false,
-    funcionario: false,
-  });
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -97,39 +87,31 @@ export default function IndexUsuario() {
     setPage(0);
   };
 
-  const handleChange = (event) => {
-    setSelectTypeUser({ ...selectTypeUser, [event.target.name]: event.target.checked });
-  };
+  // const [selectTypeUser, setSelectTypeUser] = useState({
+  //   administrador: false,
+  //   funcionario: false,
+  // });
 
-  //Filtrar Lista
-  const handleChangeSearch = ({ target }) => {
-    setSearch(target.value);
-    filter(target.value);
-  }
-
-  const filter = (endSearch) => {
-    var resultSearch = filterUsers.filter((result) => {
-      if (result.nmUsuario.toString().toLowerCase().includes(endSearch.toLowerCase())
-      ) {
-        return result;
-      }
-    });
-    setUsers(resultSearch);
-  }
+  // const handleChange = (event) => {
+  //   setSelectTypeUser({ ...selectTypeUser, [event.target.name]: event.target.checked });
+  // };
 
   return (
     <div style={{ display: 'flex' }}>
       <MenuAdmin />
 
       <main style={{ flexGrow: 1, height: '100vh', overflow: 'auto' }}>
-        <Container maxWidth="lg">
-          <CardHeader sx={{
-            "& .MuiCardHeader-title": {
-              fontWeight: 700,
-              color: '#212B36',
-              marginBottom: '8px'
-            },
-          }}
+        <Container maxWidth="xl">
+          <CardHeader
+            sx={{
+              padding: 0,
+
+              "& .MuiCardHeader-title": {
+                fontWeight: 700,
+                color: '#212B36',
+                marginBottom: '8px'
+              },
+            }}
             title="Usuários"
             subheader={
               <Breadcrumbs style={{ fontSize: 14 }} separator="•" aria-label="breadcrumb">
@@ -152,81 +134,110 @@ export default function IndexUsuario() {
             }
           />
 
-          {loading ? (<div style={{ width: 450, margin: '0 auto' }} ref={container} />) : (
-            <Card style={{ borderRadius: 15 }}>
-                  <IconButton>
-                    <SearchIcon />
-                  </IconButton>
-                  <InputBase
-                    value={search}
-                    onChange={handleChangeSearch}
-                    placeholder="Buscar..."
-                  />
+          <Box sx={{
+            borderRadius: '10px',
+            padding: 2,
+            margin: '24px 0',
+            border: "1px solid #E0E1E0",
+            boxShadow: "0px 2px 4px 0 rgba(0, 0, 0, .2)",
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', marginBottom: 8, color: '#616161' }}>
+              <FilterAltRoundedIcon />
+              <span style={{ fontSize: '18px', fontWeight: 600 }}>Filtros</span>
+            </div>
 
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={9} md={10}>
+                <Box>
+                  <TextField
+                    fullWidth
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <IconButton>
+                            <SearchRoundedIcon />
+                          </IconButton>
+                        </InputAdornment>
+                      )
+                    }}
+                    value={keyword}
+                    onChange={e => setKeyword(e.target.value)}
+                    placeholder="Buscar nome"
+                    variant="outlined"
+                  />
+                </Box>
+              </Grid>
+
+              <Grid item xs={12} sm={3} md={2}>
+                <Button variant="contained" fullWidth style={{ height: '56px' }} onClick={() => setKeyword("")}>
+                  Limpar filtros
+                </Button>
+              </Grid>
+            </Grid>
+          </Box>
+
+          {loading ? (<div style={{ width: 450, margin: '0 auto' }} ref={container} />) : (
+            <Card style={{ borderRadius: 8 }}>
               <TableContainer>
-                <Table size="small" >
+                <Table size="small"
+                  sx={{
+                    minWidth: 750,
+
+                    '& .MuiTableCell-head': {
+                      fontWeight: 700,
+                      fontSize: 16,
+                      backgroundColor: '#D2D2D2',
+                      color: '#3B4251'
+                    },
+                  }}>
                   <TableHead>
                     <TableRow>
                       <TableCell>Data de cadastro</TableCell>
                       <TableCell>Nome</TableCell>
                       <TableCell>Email</TableCell>
-                      <TableCell align="center">Tipo</TableCell>
+                      <TableCell align="center">Tipo de usuário</TableCell>
                       <TableCell align="right">Ações</TableCell>
                     </TableRow>
                   </TableHead>
 
                   <TableBody>
-                    {users.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
-                      <TableRow hover key={row._id}>
-                        <TableCell>{new Date(row.createdAt).toLocaleDateString('pt-br')}</TableCell>
-                        <TableCell>{row.nmUsuario}</TableCell>
-                        <TableCell>{row.dsEmail}</TableCell>
-                        <TableCell align="center"><Chip label={getTypeUser(row.flUsuario)} color={getTypeUserLabel(row.flUsuario)} /></TableCell>
-                        <TableCell component="th" scope="row" align="right">
-                          <IconButton onClick={() => setIsOpenMenu(true)}>
-                            <MoreVertIcon
-                              sx={{
-                                borderRadius: 10,
-                                borderColor: '#BCBCBC',
-                                borderStyle: 'solid',
-                                borderWidth: 2
-                              }}
+                    {users &&
+                      users.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
+                        <TableRow hover key={row._id}>
+                          <TableCell>{new Date(row.createdAt).toLocaleDateString('pt-br')}</TableCell>
+                          <TableCell>{row.nomeUsuario}</TableCell>
+                          <TableCell>{row.email}</TableCell>
+                          <TableCell align="center">
+                            <Chip style={{
+                              fontSize: 14,
+                              fontWeight: 700,
+                              minWidth: 100,
+                              backgroundColor: row.tipoUsuario === 'Administrador' ? '#D32F2F' : '#7E57C2',
+                              color: '#FFF',
+                            }}
+                              label={row.tipoUsuario}
                             />
-                          </IconButton>
-                        </TableCell>
 
-                        <Menu
-                          open={isOpenMenu}
-                          anchorEl={ref.current}
-                          onClose={() => setIsOpenMenu(false)}
-                          PaperProps={{
-                            sx: { width: 200, maxWidth: '100%' }
-                          }}
-                          anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-                          transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-                        >
-                          <MenuItem>
-                            <ListItemIcon>
-                              <IconButton onClick={() => handleDelete(row._id)}>
+                          </TableCell>
+                          <TableCell component="th" scope="row" align="right">
+                            <Tooltip title="Excluir">
+                              <IconButton onClick={() => handleDelete(row)}>
                                 <DeleteIcon />
                               </IconButton>
-                            </ListItemIcon>
-                            <ListItemText primary="Excluir" />
-                          </MenuItem>
-
-                          <MenuItem >
-                            <ListItemIcon >
+                            </Tooltip>
+                            <Tooltip title="Editar">
                               <IconButton href={'/admin/usuarios/edit/' + row._id}>
                                 <EditIcon />
                               </IconButton>
-                            </ListItemIcon>
-                            <ListItemText primary="Editar" />
-                          </MenuItem>
-                        </Menu>
-                      </TableRow>
-                    ))}
+                            </Tooltip>
+                          </TableCell>
+                        </TableRow>
+                      ))}
                   </TableBody>
                 </Table>
+                {users.length > 0 ? null : <div style={{ textAlign: 'center', paddingTop: 20, fontWeight: 700, fontSize: 16, color: '#3B4251' }}>
+                  Nenhum registro encontrado.
+                </div>}
               </TableContainer>
               <TablePagination
                 rowsPerPageOptions={[5, 10, 25]}
@@ -247,6 +258,6 @@ export default function IndexUsuario() {
           )}
         </Container>
       </main>
-    </div>
+    </div >
   );
 }

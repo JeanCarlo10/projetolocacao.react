@@ -28,9 +28,8 @@ import AddCircleRoundedIcon from '@mui/icons-material/AddCircleRounded';
 import EventAvailableRoundedIcon from '@mui/icons-material/EventAvailableRounded';
 import EventBusyRoundedIcon from '@mui/icons-material/EventBusyRounded';
 import FilterAltRoundedIcon from '@mui/icons-material/FilterAltRounded';
-import { statusFilterDashboard } from '../../../functions/static_data';
-import lottie from 'lottie-web';
 import MenuAdmin from '../../../components/menu-admin';
+import lottie from 'lottie-web';
 import api from '../../../services/api';
 
 const ITEM_HEIGHT = 70;
@@ -68,6 +67,14 @@ export default function IndexPedido() {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+
+  const statusRent = [
+    { id: 1, label: 'Pendente' },
+    { id: 2, label: 'Entregue' },
+    { id: 3, label: 'Cancelado' },
+    { id: 4, label: 'Devolvido' },
+    { id: 5, label: 'Não Devolvido' },
+  ];
 
   const handleResetFilters = () => {
     setKeyword("");
@@ -180,7 +187,7 @@ export default function IndexPedido() {
                   variant="outlined"
                 />
               </Grid>
-              <Grid item row xs={12} sm={6} md={5} >
+              <Grid item xs={12} sm={6} md={5} >
                 <FormControl fullWidth>
                   <InputLabel>Status</InputLabel>
                   <Select
@@ -191,9 +198,9 @@ export default function IndexPedido() {
                     renderValue={(selected) => selected.join(', ')}
                     MenuProps={MenuProps}
                   >
-                    {statusFilterDashboard.map((item) => (
+                    {statusRent.map((item) => (
                       <MenuItem key={item.id} value={item.label}>
-                        <Checkbox success checked={statuses.indexOf(item.label) > -1} />
+                        <Checkbox checked={statuses.indexOf(item.label) > -1} />
                         <ListItemText primary={item.label} />
                       </MenuItem>
                     ))}
@@ -201,7 +208,7 @@ export default function IndexPedido() {
                 </FormControl>
               </Grid>
 
-              <Grid item row xs={12} sm={12} md={2}>
+              <Grid item xs={12} sm={12} md={2}>
                 <Button variant="contained" fullWidth style={{ height: '56px' }} onClick={handleResetFilters}>
                   Limpar filtros
                 </Button>

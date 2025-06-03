@@ -162,7 +162,7 @@ export default function IndexCliente() {
             </div>
 
             <Grid container spacing={2}>
-              <Grid item row xs={12} sm={9} md={10}>
+              <Grid item xs={12} sm={9} md={10}>
                 <Box>
                   <TextField
                     fullWidth
@@ -183,7 +183,7 @@ export default function IndexCliente() {
                 </Box>
               </Grid>
 
-              <Grid item row xs={12} sm={3} md={2}>
+              <Grid item xs={12} sm={3} md={2}>
                 <Button variant="contained" fullWidth style={{ height: '56px' }} onClick={() => setKeyword("")}>
                   Limpar filtros
                 </Button>

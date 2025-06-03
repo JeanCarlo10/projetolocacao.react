@@ -5,36 +5,34 @@ const bcrypt = require('bcrypt');
 
 module.exports = {
     async index(req, res) {
-        try {
-            const users = await User.find();
-            return res.json(users);
-        } catch (err) {
-            console.error('Erro ao buscar usuários:', err);
-            return res.status(500).json({ error: 'Erro ao buscar usuários' });
-        }
+        const keyword = String(req.query.keyword || '');
+
+        const user = await User.find({
+            nomeUsuario: { $regex: keyword, $options: "i" }
+        });
+
+        res.json(user);
     },
 
     async create(req, res) {
-        const { nmUsuario, dsEmail, flUsuario, senha } = req.body;
+        const { nomeUsuario, email, tipoUsuario, senha } = req.body;
+
         try {
             // Verifica se o usuário já existe
-            const existingUser = await User.findOne({ dsEmail });
+            //const existingUser = await User.findOne({ email });
 
-            if (existingUser) {
-                return res.status(409).json({ error: 'Usuário já cadastrado com este e-mail.' }); // 409: conflito
-            }
-
-            // Criptografa a senha antes de salvar (caso ainda não tenha feito isso no schema)
-            const hashedPassword = await bcrypt.hash(senha, 10);
+            // if (existingUser) {
+            //     return res.status(409).json({ error: 'Usuário já cadastrado com este e-mail.' }); 
+            // }
 
             const user = await User.create({
-                nmUsuario,
-                dsEmail,
-                flUsuario,
-                senha: hashedPassword
+                nomeUsuario,
+                email,
+                tipoUsuario,
+                senha
             });
 
-            return res.status(201).json(user); // 201: criado com sucesso
+            return res.status(200).json(user);
         } catch (error) {
             console.error('Erro ao criar usuário:', error);
             return res.status(500).json({ error: 'Erro interno do servidor.' });
@@ -75,9 +73,9 @@ module.exports = {
 
     async update(req, res) {
         try {
-            const { _id, nmUsuario, dsEmail, senha, flUsuario } = req.body;
+            const { _id, nomeUsuario, email, senha, tipoUsuario } = req.body;
 
-            const data = { nmUsuario, dsEmail, senha, flUsuario };
+            const data = { nomeUsuario, email, senha, tipoUsuario };
 
             const user = await User.findOneAndUpdate({ _id }, data, { new: true });
 
@@ -96,7 +94,10 @@ module.exports = {
         try {
             const { email, senha } = req.body;
 
-            const user = await User.findOne({ dsEmail: email, flUsuario: 1 });
+            const user = await User.findOne({
+                email: email,
+                tipoUsuario: { $in: ["Administrador", "Colaborador"] }
+            });
 
             if (!user) {
                 return res.status(200).json({ status: 2, error: 'Email não encontrado no banco de dados!' });
@@ -124,7 +125,7 @@ module.exports = {
                 auth: true,
                 token,
                 id_client: user._id,
-                user_name: user.nmUsuario
+                user_name: user.nomeUsuario
             });
 
         } catch (err) {
@@ -156,10 +157,13 @@ module.exports = {
 
     async destroyToken(req, res) {
         try {
-            const token = req.headers.token;
+            const authHeader = req.headers.authorization;
 
-            if (token) {
-                res.cookie('token', null, { httpOnly: true });
+            if (authHeader) {
+                const token = authHeader.split(' ')[1]; // Pega o token depois de "Bearer"
+
+                // Aqui você pode validar, blacklist, etc. Se não for usar mais, pode só limpar cookie/localStorage mesmo.
+                res.clearCookie('token', { httpOnly: true }); // opcional
                 return res.send("Sessão finalizada com sucesso!");
             } else {
                 return res.status(401).send("Logout não autorizado!");

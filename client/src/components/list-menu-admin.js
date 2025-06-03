@@ -114,7 +114,7 @@ export const mainListItems = (open) => (
 // );
 
 async function confirmSair() {
-  const result = Swal.fire({
+  const result = await Swal.fire({
     icon: 'warning',
     text: 'Deseja realmente sair do sistema?',
     showCloseButton: true,
@@ -128,7 +128,9 @@ async function confirmSair() {
   if (result.isConfirmed) {
     try {
       const response = await api.get("/api/users/destroytoken", {
-        headers: { token: getToken() }
+        headers: {
+          Authorization: `Bearer ${getToken()}`
+        }
       });
 
       if (response.status === 200) {

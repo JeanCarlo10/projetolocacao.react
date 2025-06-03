@@ -1,46 +1,74 @@
 import React, { useState } from 'react';
-import { TextField, InputLabel, FormControl, Select } from '@mui/material';
+import { TextField, InputLabel, FormControl, Select, InputAdornment, IconButton } from '@mui/material';
 import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
 import MenuAdmin from '../../../components/menu-admin';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
-import Card from '@mui/material/Card';
-import CardActions from '@mui/material/CardActions';
-import CardContent from '@mui/material/CardContent';
+import Box from '@mui/material/Box';
+import Grid from '@mui/material/Grid';
 import CardHeader from '@mui/material/CardHeader';
 import MenuItem from '@mui/material/MenuItem';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
+import Notification from '../../../components/notification';
 import api from '../../../services/api';
+import { useForm, Controller } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+
+const schema = yup.object({
+  nomeUsuario: yup.string()
+    .required("Nome do usuário obrigatório!"),
+
+  tipoUsuario: yup.string()
+    .required("Tipo de usuário obrigatório!"),
+
+  email: yup.string()
+    .required("Email obrigatório!"),
+
+  senha: yup.string()
+    .required("Senha obrigatória!"),
+})
 
 export default function CreateUsuario() {
-  const [nome, setNome] = useState('');
-  const [email, setEmail] = useState('');
-  const [senha, setSenha] = useState('');
-  const [tipo, setTipo] = useState('');
+  const [notify, setNotify] = useState({ isOpen: false, message: '', type: '' });
+  const [showPassword, setShowPassword] = useState(false);
 
-  async function handleSubmit() {
-    const data = {
-      nmUsuario: nome,
-      dsEmail: email,
-      flUsuario: tipo,
-      senha: senha
+  const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
+
+  const {
+    control,
+    handleSubmit,
+    formState: { errors }
+  } = useForm({
+    defaultValues: {
+      tipoUsuario: 'Administrador',
+    },
+    resolver: yupResolver(schema)
+  });
+
+  async function submitForm(data) {
+    const response = await api.post('/api/users', data);
+
+    if (response.status === 200) {
+      setNotify({
+        isOpen: true,
+        message: 'Cadastro realizado com sucesso.',
+        type: 'success'
+      });
+      setTimeout(() => {
+        window.location.href = '/admin/usuarios';
+      }, 2500);
     }
-    if (nome !== '' && email !== '' && tipo !== '' && senha !== '') {
-      const response = await api.post('/api/users', data);
-
-      if (response.status == 200) {
-        window.location.href = '/admin/usuarios'
-      } else {
-        alert('Erro ao cadastrar o usuário');
-      }
-    } else {
-      alert('Campos obrigatórios');
+    else {
+      alert('Erro! contate o administrador do sistema');
     }
   }
 
   return (
     <div style={{ display: 'flex', }}>
+      <Notification notify={notify} setNotify={setNotify} />
       <MenuAdmin />
       <main style={{ flexGrow: 1, height: '100vh', overflow: 'auto' }}>
 
@@ -65,75 +93,115 @@ export default function CreateUsuario() {
               }
             }}
           />
-          <Card style={{ borderRadius: 15 }}>
-            <form onSubmit={handleSubmit}>
-              <CardContent>
-                <TextField
-                  required
-                  variant="outlined"
-                  size="small"
-                  label="Nome usuário"
-                  autoFocus
-                  value={nome}
-                  onChange={e => setNome(e.target.value)}
-                />
-                <TextField
-                  required
-                  variant="outlined"
-                  size="small"
-                  label="Email"
-                  value={email}
-                  onChange={e => setEmail(e.target.value)}
-                />
-                <TextField
-                  variant="outlined"
-                  size="small"
-                  type="password"
-                  required
-                  label="Senha"
-                  value={senha}
-                  onChange={e => setSenha(e.target.value)}
-                />
-                <FormControl variant="outlined" size="small">
-                  <InputLabel>Tipo de usuário</InputLabel>
-                  <Select
-                    value={tipo}
-                    onChange={e => setTipo(e.target.value)}
-                    label="Tipo de usuário"
-                  >
-                    <MenuItem value="" />
-                    <MenuItem value={1}>Administrador</MenuItem>
-                    <MenuItem value={2}>Funcionário</MenuItem>
-                  </Select>
-                </FormControl>
-              </CardContent>
-              {/* <Divider variant="fullWidth" /> */}
-              <CardActions style={{ justifyContent: 'flex-end', marginRight: 15 }}>
-                {/* <Button variant="contained" size="small"  className={classes.button} color='primary' onClick={handleClear} startIcon={<CachedIcon />}>Limpar</Button> */}
-                <Button variant="contained" size="medium" type="submit">Salvar</Button>
-              </CardActions>
+          <Box sx={{
+            padding: 2,
+            borderRadius: '10px',
+            border: "1px solid #E0E1E0",
+            boxShadow: "0px 2px 4px 0 rgba(0, 0, 0, .2)",
+          }}>
+            <form onSubmit={handleSubmit(submitForm)}>
+              <Grid container spacing={2}>
+                <Grid item xs={12} sm={3} md={3}>
+                  <Controller
+                    name="tipoUsuario"
+                    control={control}
+                    defaultValue="Administrador"
+                    render={({ field, fieldState }) => (
+                      <FormControl
+                        fullWidth
+                        variant="outlined"
+                        size="medium"
+                        error={!!fieldState.error}
+                      >
+                        <InputLabel>Tipo de usuario</InputLabel>
+                        <Select
+                          label="Tipo de usuario*"
+                          value={field.value}
+                          onChange={(e) => { field.onChange(e); }}
+                        >
+                          <MenuItem value="Administrador">Administrador</MenuItem>
+                          <MenuItem value="Colaborador">Colaborador</MenuItem>
+                        </Select>
+                      </FormControl>
+                    )}
+                  />
+                </Grid>
+
+                <Grid item xs={12} sm={9} md={9}>
+                  <Controller
+                    name="nomeUsuario"
+                    control={control}
+                    defaultValue=""
+                    render={({ field, fieldState }) => (
+                      <TextField
+                        {...field}
+                        label="Nome do usuário*"
+                        fullWidth
+                        variant="outlined"
+                        size="medium"
+                        error={!!fieldState.error}
+                        helperText={fieldState.error?.message}
+                      />
+                    )}
+                  />
+                </Grid>
+
+                <Grid item xs={12} sm={6} md={6}>
+                  <Controller
+                    name="email"
+                    control={control}
+                    defaultValue=""
+                    render={({ field, fieldState }) => (
+                      <TextField
+                        {...field}
+                        label="Email*"
+                        fullWidth
+                        variant="outlined"
+                        size="medium"
+                        error={!!fieldState.error}
+                        helperText={fieldState.error?.message}
+                      />
+                    )}
+                  />
+                </Grid>
+
+                <Grid item xs={12} sm={6} md={6}>
+                  <Controller
+                    name="senha"
+                    control={control}
+                    defaultValue=""
+                    render={({ field, fieldState }) => (
+                      <TextField
+                        {...field}
+                        label="Senha*"
+                        fullWidth
+                        type={showPassword ? 'text' : 'password'}
+                        variant="outlined"
+                        size="medium"
+                        error={!!fieldState.error}
+                        helperText={fieldState.error?.message}
+                        InputProps={{
+                          endAdornment: (
+                            <InputAdornment position="end">
+                              <IconButton onClick={togglePasswordVisibility} edge="end">
+                                {showPassword ? <VisibilityOff /> : <Visibility />}
+                              </IconButton>
+                            </InputAdornment>
+                          )
+                        }}
+                      />
+                    )}
+                  />
+                </Grid>
+              </Grid>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 16 }}>
+                <Button variant="contained" size="large" type="submit">Salvar</Button>
+              </div>
             </form>
-          </Card>
+          </Box>
         </Container>
       </main>
     </div>
   );
 }
-
-// const useStyles = makeStyles((theme) => ({
-//   root: {
-//     display: 'flex',
-//   },
-//   content: {
-//     flexGrow: 1,
-//     height: '100vh',
-//     overflow: 'auto',
-//   },
-//   cardHeader: {
-//     "& .MuiCardHeader-title": {
-//       fontWeight: 700,
-//       color: '#212B36',
-//       marginBottom: theme.spacing(1),
-//     },
-//   },
-// }));

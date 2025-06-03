@@ -7,6 +7,7 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
+import TableSortLabel from '@mui/material/TableSortLabel';
 import Tooltip from '@mui/material/Tooltip';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
@@ -37,6 +38,25 @@ export default function IndexMaterial() {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [order, setOrder] = useState('asc');
+  const [orderBy, setOrderBy] = useState('nome');
+
+  const handleSort = (property) => {
+    const isAsc = orderBy === property && order === 'asc';
+    setOrder(isAsc ? 'desc' : 'asc');
+    setOrderBy(property);
+  };
+
+  const sortedMaterials = materials.slice().sort((a, b) => {
+  const nameA = a.nomeMaterial?.toLowerCase() || '';
+  const nameB = b.nomeMaterial?.toLowerCase() || '';
+
+  if (order === 'asc') {
+    return nameA.localeCompare(nameB);
+  } else {
+    return nameB.localeCompare(nameA);
+  }
+});
 
   useEffect(() => {
     lottie.loadAnimation({
@@ -146,7 +166,7 @@ export default function IndexMaterial() {
             </div>
 
             <Grid container spacing={2}>
-              <Grid item row xs={12} sm={9} md={10}>
+              <Grid item xs={12} sm={9} md={10}>
                 <Box>
                   <TextField
                     fullWidth
@@ -167,7 +187,7 @@ export default function IndexMaterial() {
                 </Box>
               </Grid>
 
-              <Grid item row xs={12} sm={3} md={2}>
+              <Grid item xs={12} sm={3} md={2}>
                 <Button variant="contained" fullWidth style={{ height: '56px' }} onClick={() => setKeyword("")}>
                   Limpar filtros
                 </Button>
@@ -192,14 +212,20 @@ export default function IndexMaterial() {
                   }}>
                   <TableHead>
                     <TableRow>
-                      <TableCell>Nome</TableCell>
+                      <TableCell sortDirection={orderBy === 'nome' ? order : false}><TableSortLabel
+                        active={orderBy === 'nome'}
+                        direction={order}
+                        onClick={() => handleSort('nome')}
+                      >
+                        Nome
+                      </TableSortLabel></TableCell>
                       <TableCell align="right">Ações</TableCell>
                     </TableRow>
                   </TableHead>
 
                   <TableBody>
-                    {materials &&
-                      materials.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
+                    {sortedMaterials &&
+                      sortedMaterials.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
                         <TableRow hover key={row._id}>
                           <TableCell>{row.nomeMaterial}</TableCell>
                           <TableCell component="th" scope="row" align="right">

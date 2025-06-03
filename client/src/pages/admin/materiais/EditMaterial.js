@@ -115,33 +115,3 @@ export default function EditMaterial() {
         </div>
     );
 }
-// const useStyles = makeStyles((theme) => ({
-//     root: {
-//         display: 'flex',
-
-//         '& .MuiFormHelperText-contained': {
-//             marginLeft: '0px'
-//         }
-//     },
-
-//     boxCustom: {
-//         padding: 16,
-//         borderRadius: 10,
-//         border: "1px solid #E0E1E0",
-//         boxShadow: "0px 2px 4px 0 rgba(0, 0, 0, .2)",
-//     },
-
-//     content: {
-//         flexGrow: 1,
-//         height: '100vh',
-//         overflow: 'auto',
-//     },
-
-//     cardHeader: {
-//         "& .MuiCardHeader-title": {
-//             fontWeight: 700,
-//             color: '#212B36',
-//             marginBottom: theme.spacing(1),
-//         },
-//     },
-// }));

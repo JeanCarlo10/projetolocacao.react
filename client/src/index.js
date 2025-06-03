@@ -37,13 +37,13 @@ const theme = createTheme({
           '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
             borderColor: '#00AB55',
             borderWidth: 2,
-          },
+          },          
         },
 
         input: {
           fontSize: '16px',
           color: '#3B4251',
-          fontWeight: 600,
+          fontWeight: 600,          
         },
       },
     },

@@ -54,7 +54,6 @@ export default function CreateMaterial() {
       <main style={{ flexGrow: 1, height: '100vh', overflow: 'auto' }}>
 
         <Container maxWidth="lg" component="main">
-
           <CardHeader
             title="Cadastrar materiais"
             subheader={

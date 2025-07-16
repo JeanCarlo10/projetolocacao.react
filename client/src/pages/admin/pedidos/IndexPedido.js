@@ -247,19 +247,19 @@ export default function IndexPedido() {
                         <TableRow hover key={row._id}>
                           <TableCell style={{ width: "15%" }} align="center">
                             {row.status === 'Pendente' &&
-                              <Chip label={row.status} sx={{ background: '#FFC107', color: '#FFF', fontWeight: 700, minWidth: 114 }} />
+                              <Chip label={row.status} sx={{ background: '#FFC107', color: '#FFF', fontSize: 14, fontWeight: 700, minWidth: 130 }} />
                             }
                             {row.status === 'Entregue' &&
-                              <Chip label={row.status} sx={{ background: '#00AB55', color: '#FFF', fontWeight: 700, minWidth: 114 }} />
+                              <Chip label={row.status} sx={{ background: '#00AB55', color: '#FFF', fontSize: 14, fontWeight: 700, minWidth: 130 }} />
                             }
                             {row.status === 'Cancelado' &&
-                              <Chip label={row.status} sx={{ background: '#E71A3B', color: '#FFF', fontWeight: 700, minWidth: 114 }} />
+                              <Chip label={row.status} sx={{ background: '#E71A3B', color: '#FFF', fontSize: 14, fontWeight: 700, minWidth: 130 }} />
                             }
                             {row.status === 'Devolvido' &&
-                              <Chip label={row.status} sx={{ background: '#0033C6', color: '#FFF', fontWeight: 700, minWidth: 114 }} />
+                              <Chip label={row.status} sx={{ background: '#0033C6', color: '#FFF', fontSize: 14, fontWeight: 700, minWidth: 130 }} />
                             }
                             {row.status === 'Não Devolvido' &&
-                              <Chip label={row.status} sx={{ background: '#FF5722', color: '#FFF', fontWeight: 700, minWidth: 114 }} />
+                              <Chip label={row.status} sx={{ background: '#FF5722', color: '#FFF', fontSize: 14, fontWeight: 700, minWidth: 130 }} />
                             }
                           </TableCell>
 

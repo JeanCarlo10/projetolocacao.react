@@ -27,13 +27,13 @@ export default function Dashboard() {
     setCurrentMonth(newMonth);
   };
 
-  useEffect(() => {
-    async function getDadosPedido() {
-      const results = await api.get(`api/rents/status`);
-      setListaPedidos(results.data);
-    }
+  const getKpis = async () => {
+    const results = await api.get(`api/rents/status`);
+    setListaPedidos(results.data);
+  };
 
-    getDadosPedido();
+  useEffect(() => {
+    getKpis();
   }, [statuses]);
 
   return (
@@ -106,6 +106,7 @@ export default function Dashboard() {
                 currentMonth={currentMonth}
                 statuses={statuses}
                 keyword={keyword}
+                onUpdateKpis={getKpis}
               />
             </Grid>
           </Grid>
@@ -118,7 +119,7 @@ export default function Dashboard() {
 const Root = styled('div')(({ theme }) => ({
   display: 'flex',
   backgroundColor: '#F8F8F8',
-  
+
 }));
 
 const Content = styled('main')(({ theme }) => ({

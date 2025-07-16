@@ -44,7 +44,7 @@ export default function NotificacaoPedido(props) {
     const theme = useTheme();
     const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
-    const { currentMonth, statuses, keyword } = props;
+    const { currentMonth, statuses, keyword, onUpdateKpis } = props;
     const unidadeMedidaMap = { 'Unidade': 'unidade(s)', 'Metro': 'metro(s)' };
 
     const [listaPedidos, setListaPedidos] = useState([]);
@@ -104,10 +104,19 @@ export default function NotificacaoPedido(props) {
     }
 
     const handleChangeStatus = async (_id, newStatus) => {
-        const item = listaPedidos.find(item => item._id === _id);
-        await api.post('api/rents/change-status', { _id, status: newStatus });
-        item.status = newStatus;
-        setListaPedidos([...listaPedidos]);
+        try {
+            await api.post('api/rents/change-status', { _id, status: newStatus });
+
+            const newList = listaPedidos.map(item =>
+                item._id === _id ? { ...item, status: newStatus } : item
+            );
+            setListaPedidos(newList);
+
+            //Atualizar os KPIs no Dashboard
+            if (onUpdateKpis) onUpdateKpis();
+        } catch (error) {
+            console.error("Erro ao alterar status", error);
+        }
     };
 
     const handleOpenModalReturnDate = (pedido) => {
@@ -286,7 +295,7 @@ export default function NotificacaoPedido(props) {
                                                         color: '#FFF',
                                                         fontWeight: 700,
                                                         fontSize: 16,
-                                                        minWidth: 114
+                                                        minWidth: 130
                                                     }}
                                                         label={info.status}
                                                     />
@@ -297,7 +306,7 @@ export default function NotificacaoPedido(props) {
                                                         color: '#FFF',
                                                         fontWeight: 700,
                                                         fontSize: 16,
-                                                        minWidth: 114
+                                                        minWidth: 130
                                                     }}
                                                         label={info.status}
                                                     />
@@ -308,7 +317,7 @@ export default function NotificacaoPedido(props) {
                                                         color: '#FFF',
                                                         fontWeight: 700,
                                                         fontSize: 16,
-                                                        minWidth: 114
+                                                        minWidth: 130
                                                     }}
                                                         label={info.status}
                                                     />
@@ -319,7 +328,7 @@ export default function NotificacaoPedido(props) {
                                                         color: '#FFF',
                                                         fontWeight: 700,
                                                         fontSize: 16,
-                                                        minWidth: 114
+                                                        minWidth: 130
                                                     }}
                                                         label={info.status}
                                                     />
@@ -330,7 +339,7 @@ export default function NotificacaoPedido(props) {
                                                         color: '#FFF',
                                                         fontWeight: 700,
                                                         fontSize: 16,
-                                                        minWidth: 114
+                                                        minWidth: 130
                                                     }}
                                                         label={info.status}
                                                     />
@@ -346,7 +355,7 @@ export default function NotificacaoPedido(props) {
                                                     info.pedido_cliente.contacts.map((item) => (
                                                         <Stack key={item.id}>
                                                             <Chip
-                                                                style={{ fontFamily: 'Nunito', fontSize: 15, padding: '0px 4px' }}
+                                                                style={{ fontFamily: 'Nunito', fontSize: 15, fontWeight: 700, color: '#3B4251', padding: '0px 4px' }}
                                                                 icon={item.tipoTelefone === "Celular" ? <PhoneAndroidIcon /> : <PhoneIcon />}
                                                                 label={item.numero}
                                                             />

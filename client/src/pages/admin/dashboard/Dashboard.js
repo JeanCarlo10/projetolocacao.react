@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { styled } from '@mui/material/styles';
-
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import MenuAdmin from '../../../components/menu-admin';
@@ -13,8 +12,6 @@ import IconLocacaoAtrasada from '../../../assets/img/icon-locacao-atrasada.svg';
 import api from '../../../services/api';
 
 export default function Dashboard() {
-  // const classes = useStyles();
-
   const [listaPedidos, setListaPedidos] = useState([]);
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [keyword, setKeyword] = useState("");
@@ -49,7 +46,7 @@ export default function Dashboard() {
             Painel
           </div>
 
-          <Grid container spacing={3} marginBottom={2}>
+          <Grid container spacing={2}>
             <Grid item xs={12} sm={6} md={4}>
               <CardDashboard
                 className="card__ativas card__title"
@@ -63,6 +60,7 @@ export default function Dashboard() {
                 }
               />
             </Grid>
+
             <Grid item xs={12} sm={6} md={4}>
               <CardDashboard
                 className="card__pendentes card__title"
@@ -76,6 +74,7 @@ export default function Dashboard() {
                 }
               />
             </Grid>
+
             <Grid item xs={12} sm={6} md={4}>
               <CardDashboard
                 className="card__atrasadas card__title"
@@ -89,23 +88,27 @@ export default function Dashboard() {
                 }
               />
             </Grid>
+
+            <Grid item xs={12} sm={12} md={12}>
+              <FilterDashboard
+                currentMonth={currentMonth}
+                onMonthChange={handleMonthChange}
+                search={keyword}
+                onChangeSearch={setKeyword}
+                status={statuses}
+                onChangeStatus={setStatuses}
+                onResetFilters={resetFilters}
+              />
+            </Grid>
+
+            <Grid item xs={12} sm={12} md={12}>
+              <NotificacaoPedido
+                currentMonth={currentMonth}
+                statuses={statuses}
+                keyword={keyword}
+              />
+            </Grid>
           </Grid>
-
-          <FilterDashboard
-            currentMonth={currentMonth}
-            onMonthChange={handleMonthChange}
-            search={keyword}
-            onChangeSearch={setKeyword}
-            status={statuses}
-            onChangeStatus={setStatuses}
-            onResetFilters={resetFilters}
-          />
-
-          <NotificacaoPedido
-            currentMonth={currentMonth}
-            statuses={statuses}
-            keyword={keyword}
-          />
         </Container>
       </Content>
     </Root>
@@ -115,6 +118,7 @@ export default function Dashboard() {
 const Root = styled('div')(({ theme }) => ({
   display: 'flex',
   backgroundColor: '#F8F8F8',
+  
 }));
 
 const Content = styled('main')(({ theme }) => ({

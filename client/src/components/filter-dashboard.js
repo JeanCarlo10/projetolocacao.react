@@ -68,7 +68,6 @@ export default function FilterDashboard(props) {
     <Box sx={{
       borderRadius: '10px',
       padding: 2,
-      margin: '16px 0',
       border: "1px solid #E0E1E0",
       boxShadow: "0px 2px 4px 0 rgba(0, 0, 0, .2)",
     }}>

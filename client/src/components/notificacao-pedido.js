@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { styled } from '@mui/material/styles';
-import { Typography, Grid, Stack, Chip, Tooltip, Box, Button, IconButton, Collapse, TextField } from '@mui/material';
+import {
+    Typography, Grid, Stack, Chip, Tooltip, Box, Button, IconButton,
+    Collapse, TextField, useMediaQuery, useTheme
+} from '@mui/material';
 import Card from '@mui/material/Card';
 import CardHeader from '@mui/material/CardHeader';
 import CardContent from '@mui/material/CardContent';
@@ -19,8 +22,9 @@ import PhoneAndroidIcon from '@mui/icons-material/PhoneAndroid';
 import VerifiedRoundedIcon from '@mui/icons-material/VerifiedRounded';
 import EditCalendarRoundedIcon from '@mui/icons-material/EditCalendarRounded';
 
-import { set, differenceInHours, differenceInCalendarDays } from 'date-fns';
+import { set, isValid, differenceInHours, differenceInCalendarDays } from 'date-fns';
 import api from '../services/api';
+import Swal from 'sweetalert2';
 import Avatar from '@mui/material/Avatar';
 import '../assets/css/notificacao-pedido.css';
 import EmptyState from './empty-state';
@@ -37,11 +41,15 @@ const ExpandMore = styled((props) => {
 }));
 
 export default function NotificacaoPedido(props) {
+    const theme = useTheme();
+    const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
+
     const { currentMonth, statuses, keyword } = props;
     const unidadeMedidaMap = { 'Unidade': 'unidade(s)', 'Metro': 'metro(s)' };
 
     const [listaPedidos, setListaPedidos] = useState([]);
     const [pedidoSelecionado, setPedidoSelecionado] = useState(null);
+    const [errors, setErrors] = useState({});
     const [open, setOpen] = useState(false);
 
     useEffect(() => {
@@ -69,7 +77,6 @@ export default function NotificacaoPedido(props) {
         let hash = 0;
         let i;
 
-        /* eslint-disable no-bitwise */
         for (i = 0; i < string.length; i += 1) {
             hash = string.charCodeAt(i) + ((hash << 5) - hash);
         }
@@ -103,39 +110,66 @@ export default function NotificacaoPedido(props) {
         setListaPedidos([...listaPedidos]);
     };
 
-    const handleClickOpen = (pedido) => {
-        if (pedido.status !== 'Devolvido' && pedido.status !== 'Não Devolvido') {
-            setOpen(true);
-            setPedidoSelecionado(pedido);
+    const handleOpenModalReturnDate = (pedido) => {
+        setOpen(true);
+        setPedidoSelecionado(pedido);
+    };
+
+    const handleDateDevolutionChange = (newDate) => {
+        setPedidoSelecionado((prev) => ({
+            ...prev,
+            dataDevolucao: newDate
+        }));
+
+        //Limpar o texto de erro
+        if (isValid(newDate)) {
+            setErrors({});
         }
     };
 
-    const handleDateDevolutionChange = (date) => {
-        setPedidoSelecionado((prev) => ({
-            ...prev,
-            dataDevolucao: date
-        }));
-    };
-
     const handleDateUpdated = async () => {
+        const data = pedidoSelecionado.dataDevolucao;
+        const dataObj = new Date(data);
+
+        if (!isValid(dataObj)) {
+            setErrors({ dataDevolucao: 'Data inválida' });
+            return;
+        } else {
+            setErrors({});
+        }
+
         try {
             const response = await api.put(`/api/rents/${pedidoSelecionado._id}/data-devolucao`, {
-                dataDevolucao: pedidoSelecionado.dataDevolucao
+                dataDevolucao: dataObj,
             });
 
             // Atualiza a lista local com a nova data
             setListaPedidos((prev) =>
                 prev.map((item) =>
                     item._id === pedidoSelecionado._id
-                        ? { ...item, dataDevolucao: pedidoSelecionado.dataDevolucao }
+                        ? { ...item, dataDevolucao: dataObj }
                         : item
                 )
             );
 
             setOpen(false);
+
+            await Swal.fire({
+                icon: 'success',
+                title: 'Data atualizada!',
+                text: 'A data de devolução foi atualizada com sucesso.',
+                confirmButtonColor: '#3085D6',
+            });
+
         } catch (error) {
             console.error('Erro ao atualizar data de devolução:', error);
-            alert('Erro ao atualizar a data. Tente novamente.');
+
+            await Swal.fire({
+                icon: 'error',
+                title: 'Erro ao atualizar',
+                text: 'Não foi possível atualizar a data de devolução. Tente novamente.',
+                confirmButtonColor: '#D33',
+            });
         }
     };
 
@@ -177,10 +211,33 @@ export default function NotificacaoPedido(props) {
                             if (dataValida && !isNaN(dataValida)) {
                                 diasRestantes = differenceInCalendarDays(dataValida, new Date());
 
-                                mensagem = diasRestantes < 0
-                                    ? `Atrasado em ${Math.abs(diasRestantes)} dia(s)`
-                                    : `Faltam ${diasRestantes} dia(s)`;
+                                if (diasRestantes < 0) {
+                                    mensagem = `Pedido atrasado em ${Math.abs(diasRestantes)} dia(s).`;
+                                } else {
+                                    mensagem = `Faltam ${diasRestantes} dia(s)`;
+                                }
                             }
+
+                            // Verifica motivo de bloqueio da edição
+                            let motivoBloqueio = '';
+
+                            if (info.status === 'Devolvido') {
+                                motivoBloqueio = 'Indisponível para edição, pedido já devolvido.';
+                            } else if (info.status === 'Não Devolvido') {
+                                motivoBloqueio = 'Indisponível para edição, pedido não devolvido.';
+                            } else if (info.status === 'Cancelado') {
+                                motivoBloqueio = 'Indisponível para edição, pedido cancelado.';
+                            } else if (diasRestantes !== null && diasRestantes < 0) {
+                                motivoBloqueio = 'Indisponível para edição, pedido atrasado';
+                            } else {
+                                motivoBloqueio = 'Clique para editar a data de devolução';
+                            }
+
+                            const EdicaoDataBloqueada =
+                                info.status === 'Devolvido' ||
+                                info.status === 'Não Devolvido' ||
+                                info.status === 'Cancelado' ||
+                                (diasRestantes !== null && diasRestantes < 0);
 
                             return (
                                 <Card key={info._id} elevation={0} className={classname}>
@@ -289,7 +346,7 @@ export default function NotificacaoPedido(props) {
                                                     info.pedido_cliente.contacts.map((item) => (
                                                         <Stack key={item.id}>
                                                             <Chip
-                                                                style={{ fontFamily: 'Nunito' }}
+                                                                style={{ fontFamily: 'Nunito', fontSize: 15, padding: '0px 4px' }}
                                                                 icon={item.tipoTelefone === "Celular" ? <PhoneAndroidIcon /> : <PhoneIcon />}
                                                                 label={item.numero}
                                                             />
@@ -307,49 +364,37 @@ export default function NotificacaoPedido(props) {
                                                     alignItems: 'center',
                                                     flexWrap: 'wrap',
                                                     gap: '8px',
-                                                    cursor: info.status === 'Devolvido' || info.status === 'Não Devolvido' || info.status === 'Cancelado' ? 'not-allowed' : 'pointer'
-                                                }}
-                                                onClick={() => {
-                                                    if (info.status !== 'Devolvido' && info.status !== 'Não Devolvido' && info.status !== 'Cancelado') {
-                                                        handleClickOpen(info);
-                                                    }
-                                                }}
-                                            >
+                                                }}>
 
-                                                <Typography style={{ fontSize: 18, fontWeight: 600 }}>Data de devolução:</Typography>
+                                                <Typography style={{ fontSize: 18, fontWeight: 600, marginRight: 10 }}>Devolução:</Typography>
 
-                                                <Tooltip
-                                                    title={
-                                                        info.status === 'Devolvido'
-                                                            ? 'Indisponível para edição, pedido já devolvido.'
-                                                            : info.status === 'Não Devolvido'
-                                                                ? 'Indisponível para edição, pedido não devolvido.'
-                                                                : info.status === 'Cancelado'
-                                                                    ? 'Indisponível para edição, pedido cancelado.'
-                                                                    : 'Clique para editar a data de devolução'
-                                                    }
-                                                >
-                                                    <Button
-                                                        variant='outlined'
-                                                        startIcon={<EditCalendarRoundedIcon style={{ color: '#E71A3B', marginRight: '5px' }} />}
-                                                        sx={{
-                                                            borderColor: '#E71A3B !important',
-                                                            borderRadius: '16px',
+                                                <Tooltip title={motivoBloqueio}>
+                                                    <span>
+                                                        <Button
+                                                            onClick={() => handleOpenModalReturnDate(info)}
+                                                            disabled={EdicaoDataBloqueada}
+                                                            variant='outlined'
+                                                            startIcon={<EditCalendarRoundedIcon style={{ color: '#E71A3B', marginRight: '4px' }} />}
+                                                            sx={{
+                                                                borderColor: '#E71A3B !important',
+                                                                borderRadius: '16px',
+                                                                height: '32px',
 
-                                                            '&:hover': {
-                                                                borderColor: '#C21631',
-                                                                backgroundColor: 'rgba(231, 26, 59, 0.1)',
-                                                            },
+                                                                '&:hover': {
+                                                                    borderColor: '#C21631',
+                                                                    backgroundColor: 'rgba(231, 26, 59, 0.1)',
+                                                                },
 
-                                                            '& .MuiTouchRipple-root': {
-                                                                color: '#C21631',
-                                                            }
-                                                        }}>
+                                                                '& .MuiTouchRipple-root': {
+                                                                    color: '#C21631',
+                                                                }
+                                                            }}>
 
-                                                        <Typography style={{ color: '#E71A3B', fontWeight: 700 }}>
-                                                            {new Date(info.dataDevolucao).toLocaleDateString('pt-br')}
-                                                        </Typography>
-                                                    </Button>
+                                                            <Typography style={{ color: '#E71A3B', fontWeight: 700 }}>
+                                                                {new Date(info.dataDevolucao).toLocaleDateString('pt-br')}
+                                                            </Typography>
+                                                        </Button>
+                                                    </span>
                                                 </Tooltip>
 
                                                 {info.status !== 'Cancelado' && info.status !== 'Devolvido' &&
@@ -375,19 +420,24 @@ export default function NotificacaoPedido(props) {
                                                     {pedidoSelecionado && (
                                                         <DatePicker
                                                             label='Data de devolução'
-                                                            size='medium'
-                                                            autoOk
-                                                            fullWidth
-                                                            inputVariant='outlined'
                                                             value={pedidoSelecionado.dataDevolucao}
                                                             onChange={handleDateDevolutionChange}
-                                                            renderInput={(params) => <TextField fullWidth {...params} />}
+                                                            size='medium'
+                                                            inputVariant='outlined'
+                                                            renderInput={(params) => (
+                                                                <TextField
+                                                                    {...params}
+                                                                    fullWidth
+                                                                    error={!!errors.dataDevolucao}
+                                                                    helperText={errors.dataDevolucao || ''}
+                                                                />
+                                                            )}
                                                         />
                                                     )}
                                                 </DialogContent>
 
                                                 <DialogActions sx={{ padding: '0px 24px 12px 24px' }}>
-                                                    <Button variant='' onClick={() => setOpen(false)}>Cancelar</Button>
+                                                    <Button variant='' onClick={() => { setOpen(false); setErrors({}) }}>Cancelar</Button>
                                                     <Button onClick={handleDateUpdated}>Salvar</Button>
                                                 </DialogActions>
                                             </Dialog>
@@ -416,22 +466,31 @@ export default function NotificacaoPedido(props) {
                                             }}>
                                                 <Grid container spacing={1}>
                                                     <Grid item xs={12} sm={12} md={12}>
-                                                        <Box sx={{ display: 'flex', flexWrap: "wrap", alignItems: 'center', gap: 2, marginBottom: 2 }}>
-                                                            <Typography style={{ fontSize: 20, fontWeight: 600 }}>
-                                                                Nº Pedido: #{info.numeroPedido}
+                                                        <Box
+                                                            display='flex'
+                                                            flexDirection={isSmallScreen ? 'column-reverse' : 'row'}
+                                                            justifyContent="space-between"
+                                                            flexWrap="wrap"
+                                                            alignItems='center'
+                                                            gap={2}
+                                                            mb={2}
+                                                        >
+                                                            <Typography sx={{ fontSize: 22, fontWeight: 700 }}>
+                                                                Produto(s)
                                                             </Typography>
 
-                                                            <Typography style={{ fontSize: 20, fontWeight: 600 }}>
-                                                                Data do pedido: {new Date(info.dataPedido).toLocaleDateString('pt-br')}
-                                                            </Typography>
+                                                            <Box sx={{ display: 'flex', gap: 2 }}>
+                                                                <Typography style={{ fontSize: 18, fontWeight: 600, fontStyle: 'italic' }}>
+                                                                    Pedido Nº: <strong style={{ fontSize: 20, fontWeight: 800 }}>#{info.numeroPedido}</strong>
+                                                                </Typography>
+                                                                <Typography style={{ fontSize: 18, fontWeight: 600, fontStyle: 'italic' }}>
+                                                                    Data do pedido: <strong style={{ fontSize: 20, fontWeight: 800 }}>{new Date(info.dataPedido).toLocaleDateString('pt-br')}</strong>
+                                                                </Typography>
+                                                            </Box>
                                                         </Box>
                                                     </Grid>
 
                                                     <Grid item xs={12} sm={12} md={12}>
-                                                        <Typography sx={{ fontSize: 22, fontWeight: 700, marginBottom: 2 }}>
-                                                            Produto(s)
-                                                        </Typography>
-
                                                         <Box sx={{
                                                             display: "flex",
                                                             alignItems: "center",
@@ -556,6 +615,6 @@ export default function NotificacaoPedido(props) {
                         })
                 )}
             </main>
-        </div>
+        </div >
     );
 }

@@ -75,9 +75,8 @@ export default function EditUsuario() {
                 message: 'Usuário atualizado com sucesso',
                 type: 'success'
             });
-            setTimeout(() => {
-                window.location.href = '/admin/usuarios';
-            }, 2500);
+
+            window.location.href = '/admin/usuarios';
         } else {
             alert('Erro! contate o administrador do sistema');
         }

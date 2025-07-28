@@ -244,9 +244,7 @@ export default function EditCliente() {
                     type: 'success'
                 });
 
-                setTimeout(() => {
-                    window.location.href = '/admin/clientes';
-                }, 2500);
+                window.location.href = '/admin/clientes';
             }
         } catch (error) {
             setNotify({

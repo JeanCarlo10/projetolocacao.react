@@ -49,8 +49,8 @@ const schema = yup.object({
   }),
 
   contacts: yup.array()
-  .min(1, 'Informe pelo menos um contato.')
-  .required("Informe pelo menos um contato."),
+    .min(1, 'Informe pelo menos um contato.')
+    .required("Informe pelo menos um contato."),
 })
 
 export default function CreateCliente() {
@@ -190,12 +190,10 @@ export default function CreateCliente() {
         setNotify({
           isOpen: true,
           message: 'Cadastro realizado com sucesso.',
-          type: 'success'
+          type: 'success',
         });
 
-        setTimeout(() => {
-          window.location.href = '/admin/clientes'
-        }, 2500);
+        window.location.href = '/admin/clientes';
       } else {
         setNotify({
           isOpen: true,

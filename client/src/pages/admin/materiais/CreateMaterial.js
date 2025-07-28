@@ -38,9 +38,8 @@ export default function CreateMaterial() {
         message: 'Cadastro realizado com sucesso.',
         type: 'success'
       });
-      setTimeout(() => {
-        window.location.href = '/admin/materiais';
-      }, 2500);
+
+      window.location.href = '/admin/materiais';
     }
     else {
       alert('Erro! contate o administrador do sistema');

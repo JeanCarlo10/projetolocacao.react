@@ -57,9 +57,8 @@ export default function CreateUsuario() {
         message: 'Cadastro realizado com sucesso.',
         type: 'success'
       });
-      setTimeout(() => {
-        window.location.href = '/admin/usuarios';
-      }, 2500);
+      
+      window.location.href = '/admin/usuarios';
     }
     else {
       alert('Erro! contate o administrador do sistema');

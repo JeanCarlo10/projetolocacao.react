@@ -314,9 +314,7 @@ export default function EditPedido() {
                     type: 'success'
                 });
 
-                setTimeout(() => {
-                    window.location.href = '/admin/pedidos'
-                }, 2500);
+                window.location.href = '/admin/pedidos';
             } else {
                 setNotify({
                     isOpen: true,
@@ -604,7 +602,7 @@ export default function EditPedido() {
                                                             inputProps: {
                                                                 ...params.inputProps,
                                                                 placeholder: "DD/MM/AAAA",
-                                                                
+
                                                             },
                                                         }}
                                                     />
